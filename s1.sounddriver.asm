@@ -683,25 +683,43 @@ ptr_flgE4:	bra.w	StopAllSound		; $E4
 ptr_flgend
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Play "Say-gaa" PCM sound
+; Play "Say-gaa" PCM sound - Fixed to allow Pressing the Start Button to skip
 ; ---------------------------------------------------------------------------
 ; Sound_E1: PlaySega:
 PlaySegaSound:
-		move.b	#$88,(z80_dac_sample).l	; Queue Sega PCM
-		startZ80
-		move.w	#$11,d1
+;		move.b	#$88,(z80_dac_sample).l	; Queue Sega PCM
+;		startZ80
+;		move.w	#$11,d1
 ; loc_71FC0:
-@busyloop_outer:
-		move.w	#-1,d0
+;@busyloop_outer:
+;		move.w	#-1,d0
 ; loc_71FC4:
-@busyloop:
-		nop	
-		dbf	d0,@busyloop
-
-		dbf	d1,@busyloop_outer
-
-		addq.w	#4,sp	; Tamper return value so we don't return to caller
-		rts	
+;@busyloop:
+;		nop	
+;		dbf	d0,@busyloop
+;
+;		dbf	d1,@busyloop_outer
+;
+;		addq.w	#4,sp	; Tamper return value so we don't return to caller
+;		rts	
+		lea	(SegaPCM).l,a2				; Load the SEGA PCM sample into a2. It's important that we use a2 since a0 and a1 are going to be used up ahead when reading the joypad ports 
+		move.l	#(SegaPCM_End-SegaPCM),d3	; Load the size of the SEGA PCM sample into d3 
+		move.b	#$2A,($A04000).l		; $A04000 = $2A -> Write to DAC channel	  
+PlayPCM_Loop:	  
+		move.b	(a2)+,($A04001).l		; Write the PCM data (contained in a2) to $A04001 (YM2612 register D0) 
+		move.w	#$14,d0					; Write the pitch ($14 in this case) to d0 
+		dbf	d0,*						; Decrement d0; jump to itself if not 0. (for pitch control, avoids playing the sample too fast)  
+		sub.l	#1,d3					; Subtract 1 from the PCM sample size 
+		beq.s	return_PlayPCM			; If d3 = 0, we finished playing the PCM sample, so stop playing, leave this loop, and unfreeze the 68K 
+		lea	($FFFFF604).w,a0			; address where JoyPad states are written 
+		lea	($A10003).l,a1				; address where JoyPad states are read from 
+		jsr	(Joypad_Read).w				; Read only the first joypad port. It's important that we do NOT do the two ports, we don't have the cycles for that 
+		btst	#7,($FFFFF604).w		; Check for Start button 
+		bne.s	return_PlayPCM			; If start is pressed, stop playing, leave this loop, and unfreeze the 68K 
+		bra.s	PlayPCM_Loop			; Otherwise, continue playing PCM sample 
+return_PlayPCM: 
+		addq.w	#4,sp					; Tamper return value so we don't return to caller
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Play music track $81-$9F
@@ -770,14 +788,19 @@ Sound_PlayBGM:
 		moveq	#0,d1
 		movea.l	a4,a3
 		addq.w	#6,a4			; Point past header
+
+		move.b	4(a3),d4		; load tempo dividing timing
+		moveq	#TrackSz,d6
+		move.b	#1,d5			; Note duration for first "note"
+
 		moveq	#0,d7
 		move.b	2(a3),d7		; load number of FM+DAC tracks
 		beq.w	@bgm_fmdone		; branch if zero
 		subq.b	#1,d7
 		move.b	#$C0,d1			; Default AMS+FMS+Panning
-		move.b	4(a3),d4		; load tempo dividing timing
-		moveq	#TrackSz,d6
-		move.b	#1,d5			; Note duration for first "note"
+		;move.b	4(a3),d4		; load tempo dividing timing
+		;moveq	#TrackSz,d6
+		;move.b	#1,d5			; Note duration for first "note"
 		lea	v_music_fmdac_tracks(a6),a1
 		lea	FMDACInitBytes(pc),a2
 ; loc_72098:
@@ -1557,6 +1580,15 @@ DoFadeIn:
 @fadedone:
 		bclr	#2,v_music_dac_track+TrackPlaybackControl(a6)	; Clear 'SFX overriding' bit
 		clr.b	f_fadein_flag(a6)				; Stop fadein
+
+		tst.b	v_music_dac_track+TrackPlaybackControl(a6)					; is the DAC channel running?
+		bpl.s	@Resume_NoDAC				; if not, branch
+
+		moveq	#$FFFFFFB6,d0				; prepare FM channel 3/6 L/R/AMS/FMS address
+		move.b	v_music_dac_track+TrackAMSFMSPan(a6),d1				; load DAC channel's L/R/AMS/FMS value
+		jmp	WriteFMII(pc)				; write to FM 6
+
+@Resume_NoDAC:
 		rts	
 ; End of function DoFadeIn
 
@@ -2030,6 +2062,11 @@ cfFadeInToPrevious:
 @restoreramloop:
 		move.l	(a1)+,(a0)+
 		dbf	d0,@restoreramloop
+
+; Fix FM 6 Restoration
+		move.b	#$2B, d0	; Register: DAC mode (bit 7 = enable)
+		moveq	#$00, d1	; Value: DAC mode disable
+		jsr	WriteFMI(pc)	; Write to YM2612 Port 0 [sub_7272E]
 
 		bset	#2,v_music_dac_track+TrackPlaybackControl(a6)	; Set 'SFX overriding' bit
 		movea.l	a5,a3

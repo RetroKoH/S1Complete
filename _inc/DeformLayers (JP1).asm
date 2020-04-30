@@ -636,21 +636,21 @@ locret_65B0:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-MoveScreenHoriz:
+MoveScreenHoriz: ;ScrollHoriz2:
 		move.w	(v_player+obX).w,d0
 		sub.w	(v_screenposx).w,d0 ; Sonic's distance from left edge of screen
-		subi.w	#144,d0		; is distance less than 144px?
-		bcs.s	SH_BehindMid	; if yes, branch
-		subi.w	#16,d0		; is distance more than 160px?
-		bcc.s	SH_AheadOfMid	; if yes, branch
+		subi.w	#144,d0				; is distance less than 144px?
+		bmi.s	SH_BehindMid		; if yes, branch (instruction changed to remove screen wrap)
+		subi.w	#16,d0				; is distance more than 160px?
+		bpl.s	SH_AheadOfMid		; if yes, branch (instruction changed to remove screen wrap)
 		clr.w	(v_scrshiftx).w
 		rts	
 ; ===========================================================================
 
-SH_AheadOfMid:
-		cmpi.w	#16,d0		; is Sonic within 16px of middle area?
+SH_AheadOfMid: ;loc_65CC:
+		cmpi.w	#$10,d0		; is Sonic within 16px of middle area?
 		bcs.s	SH_Ahead16	; if yes, branch
-		move.w	#16,d0		; set to 16 if greater
+		move.w	#$10,d0		; set to 16px if greater ; RESTRICTION
 
 	SH_Ahead16:
 		add.w	(v_screenposx).w,d0
@@ -667,7 +667,12 @@ SH_SetScreen:
 		rts	
 ; ===========================================================================
 
-SH_BehindMid:
+SH_BehindMid: ;loc_65F6:
+		cmpi.w	#$FFF0,d0	; has the screen moved more than 16 pixels left?
+		bcc.s	SH_Behind16	; if not, branch
+		move.w	#$FFF0,d0	; set the maximum move distance to 16 pixels left (RESTRICTION)
+
+	SH_Behind16:
 		add.w	(v_screenposx).w,d0
 		cmp.w	(v_limitleft2).w,d0
 		bgt.s	SH_SetScreen

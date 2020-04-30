@@ -925,12 +925,12 @@ JoypadInit:
 
 
 ReadJoypads:
-		lea	(v_jpadhold1).w,a0 ; address where joypad states are written
-		lea	($A10003).l,a1	; first	joypad port
-		bsr.s	@read		; do the first joypad
-		addq.w	#2,a1		; do the second	joypad
+		lea	(v_jpadhold1).w,a0 		; address where joypad states are written
+		lea	($A10003).l,a1			; first	joypad port
+		bsr.s	Joypad_Read			; do the first joypad
+		addq.w	#2,a1				; do the second	joypad
 
-	@read:
+Joypad_Read:						; Changed from a local label to accomodate changes to SegaPCM Play code
 		move.b	#0,(a1)
 		nop	
 		nop	
@@ -1237,7 +1237,6 @@ RunPLC:
 
 loc_160E:
 		andi.w	#$7FFF,d2
-		move.w	d2,(f_plc_execute).w
 		bsr.w	NemDec_BuildCodeTable
 		move.b	(a0)+,d5
 		asl.w	#8,d5
@@ -1251,6 +1250,7 @@ loc_160E:
 		move.l	d0,($FFFFF6EC).w
 		move.l	d5,($FFFFF6F0).w
 		move.l	d6,($FFFFF6F4).w
+		move.w	d2,(f_plc_execute).w ; Fix Race Condition with Pattern Load Cues
 
 Rplc_Exit:
 		rts	
@@ -2149,12 +2149,12 @@ GM_Title:
 		move.w	(a5)+,(a6)
 		dbf	d1,Tit_LoadText	; load level select font
 
-		move.b	#0,(v_lastlamp).w ; clear lamppost counter
-		move.w	#0,(v_debuguse).w ; disable debug item placement mode
-		move.w	#0,(f_demo).w	; disable debug mode
-		move.w	#0,($FFFFFFEA).w ; unused variable
-		move.w	#(id_GHZ<<8),(v_zone).w	; set level to GHZ (00)
-		move.w	#0,(v_pcyc_time).w ; disable palette cycling
+		move.b	#0,(v_lastlamp).w 			; clear lamppost counter
+		move.w	#0,(v_debuguse).w 			; disable debug item placement mode
+		move.w	#0,(f_demo).w				; disable debug mode
+		move.w	#0,($FFFFFFEA).w			; unused variable
+		move.w	#(id_GHZ<<8),(v_zone).w		; set level to GHZ (00)
+		move.w	#0,(v_pcyc_time).w 			; disable palette cycling
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
 		lea	(v_16x16).w,a1
@@ -2186,19 +2186,19 @@ GM_Title:
 		bsr.w	NemDec
 		moveq	#palid_Title,d0	; load title screen palette
 		bsr.w	PalLoad1
-		sfx	bgm_Title,0,1,1	; play title screen music
-		move.b	#0,(f_debugmode).w ; disable debug mode
-		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
+		sfx	bgm_Title,0,1,1				; play title screen music
+		move.b	#0,(f_debugmode).w 		; disable debug mode
+		move.w	#$178,(v_demolength).w 	; run title screen for $178 frames
 		lea	(v_objspace+$80).w,a1
 		moveq	#0,d0
-		move.w	#7,d1
+		move.w	#$F,d1 					; $F instead of 7 - Fixes START BUTTON object
 
-	Tit_ClrObj2:
+	Tit_ClrObj2: 						; Clear SONIC TEAM PRESENTS Object
 		move.l	d0,(a1)+
 		dbf	d1,Tit_ClrObj2
 
-		move.b	#id_TitleSonic,(v_objspace+$40).w ; load big Sonic object
-		move.b	#id_PSBTM,(v_objspace+$80).w ; load "PRESS START BUTTON" object
+		move.b	#id_TitleSonic,(v_objspace+$40).w 	; load big Sonic object
+		move.b	#id_PSBTM,(v_objspace+$80).w 		; load "PRESS START BUTTON" object
 
 		if Revision=0
 		else
@@ -2329,7 +2329,7 @@ Tit_ChkLevSel:
 ; ---------------------------------------------------------------------------
 
 LevelSelect:
-		move.b	#4,(v_vbla_routine).w
+		move.b	#2,(v_vbla_routine).w
 		bsr.w	WaitForVBla
 		bsr.w	LevSelControls
 		bsr.w	RunPLC
@@ -2421,49 +2421,26 @@ PlayLevel:
 ; ---------------------------------------------------------------------------
 ; Level	select - level pointers
 ; ---------------------------------------------------------------------------
-LevSel_Ptrs:	if Revision=0
-		; old level order
+LevSel_Ptrs:
 		dc.b id_GHZ, 0
 		dc.b id_GHZ, 1
 		dc.b id_GHZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
 		dc.b id_MZ, 0
 		dc.b id_MZ, 1
 		dc.b id_MZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
 		dc.b id_SYZ, 0
 		dc.b id_SYZ, 1
 		dc.b id_SYZ, 2
+		dc.b id_LZ, 0
+		dc.b id_LZ, 1
+		dc.b id_LZ, 2
+		dc.b id_SLZ, 0
+		dc.b id_SLZ, 1
+		dc.b id_SLZ, 2
 		dc.b id_SBZ, 0
 		dc.b id_SBZ, 1
 		dc.b id_LZ, 3		; Scrap Brain Zone 3
 		dc.b id_SBZ, 2		; Final Zone
-		else
-		; correct level order
-		dc.b id_GHZ, 0
-		dc.b id_GHZ, 1
-		dc.b id_GHZ, 2
-		dc.b id_MZ, 0
-		dc.b id_MZ, 1
-		dc.b id_MZ, 2
-		dc.b id_SYZ, 0
-		dc.b id_SYZ, 1
-		dc.b id_SYZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
-		dc.b id_SBZ, 0
-		dc.b id_SBZ, 1
-		dc.b id_LZ, 3
-		dc.b id_SBZ, 2
-		endc
 		dc.b id_SS, 0		; Special Stage
 		dc.w $8000		; Sound Test
 		even
@@ -2715,11 +2692,8 @@ LevSel_ChgLine:
 ; ---------------------------------------------------------------------------
 ; Level	select menu text
 ; ---------------------------------------------------------------------------
-LevelMenuText:	if Revision=0
+LevelMenuText:
 		incbin	"misc\Level Select Text.bin"
-		else
-		incbin	"misc\Level Select Text (JP1).bin"
-		endc
 		even
 ; ---------------------------------------------------------------------------
 ; Music	playlist
@@ -6200,6 +6174,8 @@ loc_D358:
 ; ===========================================================================
 
 loc_D362:
+		cmpi.b  #$A,(v_player+obRoutine).w	; Has Sonic drowned?
+		beq.s   loc_D348					; If so, run objects a little longer
 		moveq	#$1F,d7
 		bsr.s	loc_D348
 		moveq	#$5F,d7
@@ -6678,6 +6654,9 @@ loc_DA02:
 loc_DA10:
 		bsr.w	loc_DA3C
 		beq.s	loc_DA02
+		tst.b	$04(a0)		; was this object a remember state?
+		bpl.s	loc_DA16	; if not, branch
+		subq.b	#$01,(a2)	; move right counter back
 
 loc_DA16:
 		move.l	a0,(v_opl_data).w
@@ -6707,7 +6686,7 @@ locret_DA3A:
 loc_DA3C:
 		tst.b	4(a0)
 		bpl.s	OPL_MakeItem
-		bset	#7,2(a2,d2.w)
+		btst	#7,2(a2,d2.w) ; Fix Remember State Bug
 		beq.s	OPL_MakeItem
 		addq.w	#6,a0
 		moveq	#0,d0
@@ -6728,6 +6707,7 @@ OPL_MakeItem:
 		move.b	d1,obStatus(a1)
 		move.b	(a0)+,d0
 		bpl.s	loc_DA80
+		bset	#7,2(a2,d2.w) ; The above changed instruction has been moved here
 		andi.b	#$7F,d0
 		move.b	d2,obRespawnNo(a1)
 
@@ -6880,11 +6860,13 @@ Sonic_Normal:
 		move.w	Sonic_Index(pc,d0.w),d1
 		jmp	Sonic_Index(pc,d1.w)
 ; ===========================================================================
-Sonic_Index:	dc.w Sonic_Main-Sonic_Index
+Sonic_Index:
+		dc.w Sonic_Main-Sonic_Index
 		dc.w Sonic_Control-Sonic_Index
 		dc.w Sonic_Hurt-Sonic_Index
 		dc.w Sonic_Death-Sonic_Index
 		dc.w Sonic_ResetLevel-Sonic_Index
+		dc.w Sonic_Drowned-Sonic_Index
 ; ===========================================================================
 
 Sonic_Main:	; Routine 0
@@ -7063,6 +7045,7 @@ locret_13302:
 		include	"_incObj\Sonic ResetOnFloor.asm"
 		include	"_incObj\Sonic (part 2).asm"
 		include	"_incObj\Sonic Loops.asm"
+		include "_incObj\Sonic Drowned.asm"
 		include	"_incObj\Sonic Animate.asm"
 		include	"_anim\Sonic.asm"
 		include	"_incObj\Sonic LoadGfx.asm"

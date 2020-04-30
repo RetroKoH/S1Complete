@@ -60,10 +60,10 @@ Sonic_Death:	; Routine 6
 
 
 GameOver:
-		move.w	(v_limitbtm2).w,d0
+		move.w	(v_screenposy).w,d0  ; instead of v_limitbtm2. Quicker death transition
 		addi.w	#$100,d0
 		cmp.w	obY(a0),d0
-		bcc.w	locret_13900
+		bge.w	locret_13900		; Instead of bcc (signed condition, fixes boundary bug)
 		move.w	#-$38,obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		clr.b	(f_timecount).w	; stop time counter

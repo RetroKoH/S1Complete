@@ -56,10 +56,10 @@ Bonus_Main:	; Routine 0
 		jmp	(DeleteObject).l
 
 ; ===========================================================================
-@points:	dc.w 0			; Bonus	points array
+@points:	dc.w 0			; Bonus	points array - FIXED
 		dc.w 1000
 		dc.w 100
-		dc.w 1
+		dc.w 10
 ; ===========================================================================
 
 Bonus_Display:	; Routine 2
