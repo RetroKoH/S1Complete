@@ -5876,8 +5876,7 @@ ExecuteObjects:
 		lea	(v_objspace).w,a0 ; set address for object RAM
 		moveq	#$7F,d7
 		moveq	#0,d0
-		cmpi.b	#6,(v_player+obRoutine).w
-		bhs.s	loc_D362
+; OBJECTS do not freeze when dying
 
 loc_D348:
 		move.b	(a0),d0		; load object number from RAM
