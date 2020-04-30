@@ -61,11 +61,7 @@ Cat_Main:	; Routine 0
 
 Cat_Loop:
 		jsr	(FindNextFreeObj).l
-		if Revision=0
-		bne.s	@fail
-		else
-			bne.w	Cat_ChkGone
-		endc
+		bne.w	Cat_ChkGone
 		move.b	#id_Caterkiller,0(a1) ; load body segment object
 		move.b	d6,obRoutine(a1) ; goto Cat_BodySeg1 or Cat_BodySeg2 next
 		addq.b	#2,d6		; alternate between the two
@@ -159,15 +155,10 @@ loc_16AFC:
 loc_16B02:
 		subq.b	#1,$2A(a0)
 		bmi.s	@loc_16B5E
-		if Revision=0
-		move.l	obX(a0),-(sp)
+		tst.w	obVelX(a0)
+		beq.s	@notmoving
 		move.l	obX(a0),d2
-		else
-			tst.w	obVelX(a0)
-			beq.s	@notmoving
-			move.l	obX(a0),d2
-			move.l	d2,d3
-		endc
+		move.l	d2,d3
 		move.w	obVelX(a0),d0
 		btst	#0,obStatus(a0)
 		beq.s	@noflip
@@ -178,28 +169,17 @@ loc_16B02:
 		asl.l	#8,d0
 		add.l	d0,d2
 		move.l	d2,obX(a0)
-		if Revision=0
+
+		swap.w	d3
+		cmp.w	obX(a0),d3
+		beq.s	@notmoving
 		jsr	(ObjFloorDist).l
-		move.l	(sp)+,d2
-		cmpi.w	#-8,d1
+		cmpi.w	#$FFF8,d1
 		blt.s	@loc_16B70
 		cmpi.w	#$C,d1
 		bge.s	@loc_16B70
 		add.w	d1,obY(a0)
-		swap	d2
-		cmp.w	obX(a0),d2
-		beq.s	@notmoving
-		else
-			swap.w	d3
-			cmp.w	obX(a0),d3
-			beq.s	@notmoving
-			jsr	(ObjFloorDist).l
-			cmpi.w	#$FFF8,d1
-			blt.s	@loc_16B70
-			cmpi.w	#$C,d1
-			bge.s	@loc_16B70
-			add.w	d1,obY(a0)
-		endc
+
 		moveq	#0,d0
 		move.b	cat_parent(a0),d0
 		addq.b	#1,cat_parent(a0)
@@ -213,24 +193,14 @@ loc_16B02:
 @loc_16B5E:
 		subq.b	#2,ob2ndRout(a0)
 		move.b	#7,$2A(a0)
-		if Revision=0
-		move.w	#0,obVelX(a0)
-		else
+
 			clr.w	obVelX(a0)
 			clr.w	obInertia(a0)
-		endc
 		rts	
 ; ===========================================================================
 
 @loc_16B70:
-		if Revision=0
-		move.l	d2,obX(a0)
-		bchg	#0,obStatus(a0)
-		move.b	obStatus(a0),obRender(a0)
-		moveq	#0,d0
-		move.b	cat_parent(a0),d0
-		move.b	#$80,$2C(a0,d0.w)
-		else
+
 			moveq	#0,d0
 			move.b	cat_parent(a0),d0
 			move.b	#$80,$2C(a0,d0)
@@ -246,7 +216,7 @@ loc_16B02:
 	@loc_1730A:
 			bchg	#0,obStatus(a0)
 			move.b	obStatus(a0),obRender(a0)
-		endc
+
 		addq.b	#1,cat_parent(a0)
 		andi.b	#$F,cat_parent(a0)
 		rts	
@@ -278,11 +248,9 @@ Cat_BodySeg1:	; Routine 4, 8
 		beq.w	loc_16C64
 		move.w	obInertia(a1),obInertia(a0)
 		move.w	obVelX(a1),d0
-		if Revision=0
-		add.w	obInertia(a1),d0
-		else
+
 			add.w	obInertia(a0),d0
-		endc
+
 		move.w	d0,obVelX(a0)
 		move.l	obX(a0),d2
 		move.l	d2,d3
@@ -304,11 +272,7 @@ loc_16C0C:
 		move.b	$2C(a1,d0.w),d1
 		cmpi.b	#$80,d1
 		bne.s	loc_16C50
-		if Revision=0
-		swap	d3
-		move.l	d3,obX(a0)
-		move.b	d1,$2C(a0,d0.w)
-		else
+
 			move.b	d1,$2C(a0,d0)
 			neg.w	obX+2(a0)
 			beq.s	locj_173E4
@@ -322,7 +286,7 @@ loc_16C0C:
 			move.b	cat_parent(a0),d0
 			clr.b	$2C(a0,d0)
 	locj_173E4:
-		endc
+
 		bchg	#0,obStatus(a0)
 		move.b	obStatus(a0),1(a0)
 		addq.b	#1,cat_parent(a0)

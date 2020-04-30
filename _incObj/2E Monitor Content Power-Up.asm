@@ -97,11 +97,8 @@ Pow_ChkInvinc:
 		move.b	#4,(v_objspace+$2C0+obAnim).w
 		tst.b	(f_lockscreen).w ; is boss mode on?
 		bne.s	Pow_NoMusic	; if yes, branch
-		if Revision=0
-		else
-			cmpi.w	#$C,(v_air).w
-			bls.s	Pow_NoMusic
-		endc
+		cmpi.w	#$C,(v_air).w
+		bls.s	Pow_NoMusic
 		music	bgm_Invincible,1,0,0 ; play invincibility music
 ; ===========================================================================
 
