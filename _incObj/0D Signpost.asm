@@ -54,6 +54,7 @@ Sign_Spin:	; Routine 4
 		addq.b	#1,obAnim(a0)	; next spin cycle
 		cmpi.b	#3,obAnim(a0)	; have 3 spin cycles completed?
 		bne.s	@chksparkle	; if not, branch
+		sfx		bgm_Fade,0,0,0
 		addq.b	#2,obRoutine(a0)
 
 	@chksparkle:

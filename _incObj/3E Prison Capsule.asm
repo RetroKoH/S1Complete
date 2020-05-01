@@ -176,6 +176,7 @@ Pri_Animals:	; Routine $C
 	@noanimal:
 		subq.w	#1,obTimeFrame(a0)
 		bne.s	@wait
+		sfx		bgm_Fade,0,0,0
 		addq.b	#2,obRoutine(a0)
 		move.w	#180,obTimeFrame(a0)
 

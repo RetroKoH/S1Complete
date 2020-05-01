@@ -89,27 +89,26 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 
-Console:	dc.b "SEGA MEGA DRIVE " ; Hardware system ID (Console name)
-Date:		dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
+Console:		dc.b "SEGA MEGA DRIVE " ; Hardware system ID (Console name)
+Date:			dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
 Title_Local:	dc.b "SONIC THE               HEDGEHOG                " ; Domestic name
-Title_Int:	dc.b "SONIC THE               HEDGEHOG                " ; International name
-Serial:	
-		dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
-Checksum: dc.w $0
-		dc.b "J               " ; I/O support
+Title_Int:		dc.b "SONIC THE               HEDGEHOG                " ; International name
+Serial:			dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
+Checksum: 		dc.w $0
+				dc.b "J               " ; I/O support
 RomStartLoc:	dc.l StartOfRom		; Start address of ROM
-RomEndLoc:	dc.l EndOfRom-1		; End address of ROM
+RomEndLoc:		dc.l EndOfRom-1		; End address of ROM
 RamStartLoc:	dc.l $FF0000		; Start address of RAM
-RamEndLoc:	dc.l $FFFFFF		; End address of RAM
+RamEndLoc:		dc.l $FFFFFF		; End address of RAM
 SRAMSupport:	if EnableSRAM=1
-		dc.b $52, $41, $A0+(BackupSRAM<<6)+(AddressSRAM<<3), $20
-		else
-		dc.l $20202020
-		endc
-		dc.l $20202020		; SRAM start ($200001)
-		dc.l $20202020		; SRAM end ($20xxxx)
-Notes:		dc.b "                                                    " ; Notes (unused, anything can be put in this space, but it has to be 52 bytes.)
-Region:		dc.b "JUE             " ; Region (Country code)
+				dc.b $52, $41, $A0+(BackupSRAM<<6)+(AddressSRAM<<3), $20
+				else
+				dc.l $20202020
+				endc
+				dc.l $20202020		; SRAM start ($200001)
+				dc.l $20202020		; SRAM end ($20xxxx)
+Notes:			dc.b "                                                    " ; Notes (unused, anything can be put in this space, but it has to be 52 bytes.)
+Region:			dc.b "JUE             " ; Region (Country code)
 EndOfHeader:
 
 ; ===========================================================================
@@ -716,6 +715,12 @@ VBla_0A:
 		tst.w	(v_demolength).w	; is there time left on the demo?
 		beq.w	@end	; if not, return
 		subq.w	#1,(v_demolength).w	; subtract 1 from time left in demo
+		cmpi.b	#96,(v_hbla_line).w
+		bcc.s	@update
+		bra.w	@end
+
+	@update:
+		jsr	SS_LoadWalls ; Dynamic Special Stage Walls
 
 	@end:
 		rts	
@@ -1357,37 +1362,42 @@ Pal_SBZCyc7:	incbin	"palette\Cycle - SBZ 7.bin"
 Pal_SBZCyc8:	incbin	"palette\Cycle - SBZ 8.bin"
 Pal_SBZCyc9:	incbin	"palette\Cycle - SBZ 9.bin"
 Pal_SBZCyc10:	incbin	"palette\Cycle - SBZ 10.bin"
+
 ; ---------------------------------------------------------------------------
-; Subroutine to	fade in from black
+; Subroutine to	fade in from black - Proper Fade
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
 PaletteFadeIn:
-		move.w	#$003F,(v_pfade_start).w ; set start position = 0; size = $40
+		move.w	#$003F,(v_pfade_start).w	; set start position = 0; size = $40
 
-PalFadeIn_Alt:				; start position and size are already set
+PalFadeIn_Alt:						; start position and size are already set
 		moveq	#0,d0
-		lea	(v_pal_dry).w,a0
+		lea		(v_pal_dry).w,a0	; load the main palette to a1
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
-		moveq	#cBlack,d1
+		moveq	#cBlack,d1			; cBlack=0
 		move.b	(v_pfade_size).w,d0
 
 	@fill:
 		move.w	d1,(a0)+
-		dbf	d0,@fill 	; fill palette with black
-
-		move.w	#$15,d4
+		dbf		d0,@fill	; fill palette with black
+		moveq	#$0E,d4		; MJ: prepare maximum color check
+		moveq	#$00,d6		; MJ: clear d6
 
 	@mainloop:
+		bsr.w	RunPLC
 		move.b	#$12,(v_vbla_routine).w
 		bsr.w	WaitForVBla
+		bchg	#$00,d6					; MJ: change delay counter
+		beq		@mainloop				; MJ: if null, delay a frame
 		bsr.s	FadeIn_FromBlack
-		bsr.w	RunPLC
-		dbf	d4,@mainloop
-		rts	
+		subq.b	#$02,d4					; MJ: decrease color check
+		bne		@mainloop				; MJ: if it has not reached null, branch
+		move.b	#$12,(v_vbla_routine).w	; MJ: wait for V-blank again (so colors transfer)
+		bra		WaitForVBla				; MJ: ''
 ; End of function PaletteFadeIn
 
 
@@ -1396,8 +1406,8 @@ PalFadeIn_Alt:				; start position and size are already set
 
 FadeIn_FromBlack:
 		moveq	#0,d0
-		lea	(v_pal_dry).w,a0
-		lea	(v_pal_dry_dup).w,a1
+		lea		(v_pal_dry).w,a0
+		lea		(v_pal_dry_dup).w,a1
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		adda.w	d0,a1
@@ -1405,14 +1415,14 @@ FadeIn_FromBlack:
 
 	@addcolour:
 		bsr.s	FadeIn_AddColour ; increase colour
-		dbf	d0,@addcolour	; repeat for size of palette
+		dbf		d0,@addcolour	; repeat for size of palette
 
 		cmpi.b	#id_LZ,(v_zone).w	; is level Labyrinth?
 		bne.s	@exit		; if not, branch
 
 		moveq	#0,d0
-		lea	(v_pal_water).w,a0
-		lea	(v_pal_water_dup).w,a1
+		lea		(v_pal_water).w,a0
+		lea		(v_pal_water_dup).w,a1
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		adda.w	d0,a1
@@ -1420,7 +1430,7 @@ FadeIn_FromBlack:
 
 	@addcolour2:
 		bsr.s	FadeIn_AddColour ; increase colour again
-		dbf	d0,@addcolour2 ; repeat
+		dbf		d0,@addcolour2 ; repeat
 
 @exit:
 		rts	
@@ -1431,41 +1441,34 @@ FadeIn_FromBlack:
 
 
 FadeIn_AddColour:
-@addblue:
-		move.w	(a1)+,d2
-		move.w	(a0),d3
-		cmp.w	d2,d3		; is colour already at threshold level?
-		beq.s	@next		; if yes, branch
-		move.w	d3,d1
-		addi.w	#$200,d1	; increase blue	value
-		cmp.w	d2,d1		; has blue reached threshold level?
-		bhi.s	@addgreen	; if yes, branch
-		move.w	d1,(a0)+	; update palette
-		rts	
-; ===========================================================================
+		move.b	(a1),d5				; MJ: load blue
+		move.w	(a1)+,d1			; MJ: load green and red
+		move.b	d1,d2				; MJ: load red
+		lsr.b	#$04,d1				; MJ: get only green
+		andi.b	#$0E,d2				; MJ: get only red
+		move.w	(a0),d3				; MJ: load current colour in buffer
+		cmp.b	d5,d4				; MJ: is it time for blue to fade?
+		bhi		@noblue				; MJ: if not, branch
+		addi.w	#$0200,d3			; MJ: increase blue
 
-@addgreen:
-		move.w	d3,d1
-		addi.w	#$20,d1		; increase green value
-		cmp.w	d2,d1
-		bhi.s	@addred
-		move.w	d1,(a0)+	; update palette
-		rts	
-; ===========================================================================
+@noblue:
+		cmp.b	d1,d4				; MJ: is it time for green to fade?
+		bhi		@nogreen			; MJ: if not, branch
+		addi.b	#$20,d3				; MJ: increase green
 
-@addred:
-		addq.w	#2,(a0)+	; increase red value
-		rts	
-; ===========================================================================
+@nogreen:
+		cmp.b	d2,d4				; MJ: is it time for red to fade?
+		bhi		@nored				; MJ: if not, branch
+		addq.b	#$02,d3				; MJ: increase red
 
-@next:
-		addq.w	#2,a0		; next colour
-		rts	
+@nored:
+		move.w	d3,(a0)+			; MJ: save colour
+		rts							; MJ: return
 ; End of function FadeIn_AddColour
 
 
 ; ---------------------------------------------------------------------------
-; Subroutine to fade out to black
+; Subroutine to fade out to black - Proper Fade
 ; ---------------------------------------------------------------------------
 
 
@@ -1474,15 +1477,18 @@ FadeIn_AddColour:
 
 PaletteFadeOut:
 		move.w	#$003F,(v_pfade_start).w ; start position = 0; size = $40
-		move.w	#$15,d4
+		moveq	#$07,d4					; MJ: set repeat times
+		moveq	#$00,d6					; MJ: clear d6
 
 	@mainloop:
+		bsr.w	RunPLC
 		move.b	#$12,(v_vbla_routine).w
 		bsr.w	WaitForVBla
+		bchg	#$00,d6					; MJ: change delay counter
+		beq		@mainloop				; MJ: if null, delay a frame
 		bsr.s	FadeOut_ToBlack
-		bsr.w	RunPLC
-		dbf	d4,@mainloop
-		rts	
+		dbf		d4,@mainloop
+		rts
 ; End of function PaletteFadeOut
 
 
@@ -1491,24 +1497,24 @@ PaletteFadeOut:
 
 FadeOut_ToBlack:
 		moveq	#0,d0
-		lea	(v_pal_dry).w,a0
+		lea		(v_pal_dry).w,a0
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		move.b	(v_pfade_size).w,d0
 
 	@decolour:
 		bsr.s	FadeOut_DecColour ; decrease colour
-		dbf	d0,@decolour	; repeat for size of palette
+		dbf		d0,@decolour	; repeat for size of palette
 
 		moveq	#0,d0
-		lea	(v_pal_water).w,a0
+		lea		(v_pal_water).w,a0
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		move.b	(v_pfade_size).w,d0
 
 	@decolour2:
 		bsr.s	FadeOut_DecColour
-		dbf	d0,@decolour2
+		dbf		d0,@decolour2
 		rts	
 ; End of function FadeOut_ToBlack
 
@@ -1517,39 +1523,31 @@ FadeOut_ToBlack:
 
 
 FadeOut_DecColour:
-@dered:
-		move.w	(a0),d2
-		beq.s	@next
-		move.w	d2,d1
-		andi.w	#$E,d1
-		beq.s	@degreen
-		subq.w	#2,(a0)+	; decrease red value
-		rts	
-; ===========================================================================
+		move.w	(a0),d5			; MJ: load colour
+		move.w	d5,d1			; MJ: copy to d1
+		move.b	d1,d2			; MJ: load green and red
+		move.b	d1,d3			; MJ: load red
+		andi.w	#$0E00,d1		; MJ: get only blue
+		beq		@noblue			; MJ: if blue is finished, branch
+		subi.w	#$0200,d5		; MJ: decrease blue
 
-@degreen:
-		move.w	d2,d1
-		andi.w	#$E0,d1
-		beq.s	@deblue
-		subi.w	#$20,(a0)+	; decrease green value
-		rts	
-; ===========================================================================
+@noblue:
+		andi.w	#$00E0,d2		; MJ: get only green (needs to be word)
+		beq		@nogreen		; MJ: if green is finished, branch
+		subi.b	#$20,d5			; MJ: decrease green
 
-@deblue:
-		move.w	d2,d1
-		andi.w	#$E00,d1
-		beq.s	@next
-		subi.w	#$200,(a0)+	; decrease blue	value
-		rts	
-; ===========================================================================
+@nogreen:
+		andi.b	#$0E,d3			; MJ: get only red
+		beq		@nored			; MJ: if red is finished, branch
+		subq.b	#$02,d5			; MJ: decrease red
 
-@next:
-		addq.w	#2,a0
-		rts	
+@nored:
+		move.w	d5,(a0)+		; MJ: save new colour
+		rts						; MJ: return
 ; End of function FadeOut_DecColour
 
 ; ---------------------------------------------------------------------------
-; Subroutine to	fade in from white (Special Stage)
+; Subroutine to	fade in from white (Special Stage) - Proper Fade
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -1558,7 +1556,7 @@ FadeOut_DecColour:
 PaletteWhiteIn:
 		move.w	#$003F,(v_pfade_start).w ; start position = 0; size = $40
 		moveq	#0,d0
-		lea	(v_pal_dry).w,a0
+		lea		(v_pal_dry).w,a0		; load the main palette to a1
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		move.w	#cWhite,d1
@@ -1566,17 +1564,21 @@ PaletteWhiteIn:
 
 	@fill:
 		move.w	d1,(a0)+
-		dbf	d0,@fill 	; fill palette with white
-
-		move.w	#$15,d4
+		dbf		d0,@fill 	; fill palette with white
+		moveq	#$0E,d4		; KoH: set maximum color check
+		moveq	#$00,d6		; KoH: clear d6
 
 	@mainloop:
+		bsr.w	RunPLC
 		move.b	#$12,(v_vbla_routine).w
 		bsr.w	WaitForVBla
+		bchg	#$00,d6					; MJ: change delay counter
+		beq		@mainloop				; MJ: if null, delay a frame
 		bsr.s	WhiteIn_FromWhite
-		bsr.w	RunPLC
-		dbf	d4,@mainloop
-		rts	
+		subq.b	#$02,d4					; MJ: decrease color check
+		bne		@mainloop				; MJ: if it has not reached null, branch
+		move.b	#$12,(v_vbla_routine).w	; MJ: wait for V-blank again (so colors transfer)
+		bra		WaitForVBla				; MJ: ''
 ; End of function PaletteWhiteIn
 
 
@@ -1585,22 +1587,22 @@ PaletteWhiteIn:
 
 WhiteIn_FromWhite:
 		moveq	#0,d0
-		lea	(v_pal_dry).w,a0
-		lea	(v_pal_dry_dup).w,a1
+		lea		(v_pal_dry).w,a0
+		lea		(v_pal_dry_dup).w,a1
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		adda.w	d0,a1
 		move.b	(v_pfade_size).w,d0
 
 	@decolour:
-		bsr.s	WhiteIn_DecColour ; decrease colour
-		dbf	d0,@decolour	; repeat for size of palette
+		bsr.s	WhiteIn_DecColour	; decrease colour
+		dbf		d0,@decolour		; repeat for size of palette
 
 		cmpi.b	#id_LZ,(v_zone).w	; is level Labyrinth?
-		bne.s	@exit		; if not, branch
+		bne.s	@exit				; if not, branch
 		moveq	#0,d0
-		lea	(v_pal_water).w,a0
-		lea	(v_pal_water_dup).w,a1
+		lea		(v_pal_water).w,a0
+		lea		(v_pal_water_dup).w,a1
 		move.b	(v_pfade_start).w,d0
 		adda.w	d0,a0
 		adda.w	d0,a1
@@ -1608,7 +1610,7 @@ WhiteIn_FromWhite:
 
 	@decolour2:
 		bsr.s	WhiteIn_DecColour
-		dbf	d0,@decolour2
+		dbf		d0,@decolour2
 
 	@exit:
 		rts	
@@ -1619,42 +1621,33 @@ WhiteIn_FromWhite:
 
 
 WhiteIn_DecColour:
-@deblue:
-		move.w	(a1)+,d2
-		move.w	(a0),d3
-		cmp.w	d2,d3
-		beq.s	@next
-		move.w	d3,d1
-		subi.w	#$200,d1	; decrease blue	value
-		blo.s	@degreen
-		cmp.w	d2,d1
-		blo.s	@degreen
-		move.w	d1,(a0)+
-		rts	
-; ===========================================================================
+		move.b	(a1),d5		; MJ: load blue
+		move.w	(a1)+,d1	; MJ: load green and red
+		move.b	d1,d2		; MJ: load red
+		lsr.b	#$04,d1		; MJ: get only green
+		andi.b	#$0E,d2		; MJ: get only red
+		move.w	(a0),d3		; MJ: load current colour in buffer
+		cmp.b	d5,d4		; MJ: is it time for blue to fade?
+		ble		@noblue		; MJ: if not, branch
+		subi.w	#$0200,d3	; MJ: decrease blue
 
-@degreen:
-		move.w	d3,d1
-		subi.w	#$20,d1		; decrease green value
-		blo.s	@dered
-		cmp.w	d2,d1
-		blo.s	@dered
-		move.w	d1,(a0)+
-		rts	
-; ===========================================================================
+@noblue:
+		cmp.b	d1,d4		; MJ: is it time for green to fade?
+		ble		@nogreen	; MJ: if not, branch
+		subi.b	#$20,d3		; MJ: decrease green
 
-@dered:
-		subq.w	#2,(a0)+	; decrease red value
-		rts	
-; ===========================================================================
+@nogreen:
+		cmp.b	d2,d4		; MJ: is it time for red to fade?
+		ble		@nored		; MJ: if not, branch
+		subq.b	#$02,d3		; MJ: decrease red
 
-@next:
-		addq.w	#2,a0
-		rts	
+@nored:
+		move.w	d3,(a0)+	; MJ: save new colour
+		rts					; MJ: return
 ; End of function WhiteIn_DecColour
 
 ; ---------------------------------------------------------------------------
-; Subroutine to fade to white (Special Stage)
+; Subroutine to fade to white (Special Stage) - Proper fade
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -1662,15 +1655,18 @@ WhiteIn_DecColour:
 
 PaletteWhiteOut:
 		move.w	#$003F,(v_pfade_start).w ; start position = 0; size = $40
-		move.w	#$15,d4
+		moveq	#$07,d4					; MJ: set repeat times
+		moveq	#$00,d6					; MJ: clear d6
 
 	@mainloop:
+		bsr.w	RunPLC
 		move.b	#$12,(v_vbla_routine).w
 		bsr.w	WaitForVBla
+		bchg	#$00,d6					; MJ: change delay counter
+		beq		@mainloop				; MJ: if null, delay a frame
 		bsr.s	WhiteOut_ToWhite
-		bsr.w	RunPLC
-		dbf	d4,@mainloop
-		rts	
+		dbf		d4,@mainloop
+		rts
 ; End of function PaletteWhiteOut
 
 
@@ -1705,39 +1701,30 @@ WhiteOut_ToWhite:
 
 
 WhiteOut_AddColour:
-@addred:
-		move.w	(a0),d2
-		cmpi.w	#cWhite,d2
-		beq.s	@next
-		move.w	d2,d1
-		andi.w	#$E,d1
-		cmpi.w	#cRed,d1
-		beq.s	@addgreen
-		addq.w	#2,(a0)+	; increase red value
-		rts	
-; ===========================================================================
+		move.w	(a0),d5		; MJ: load colour
+		move.w	d5,d1		; MJ: copy to d1
+		move.b	d1,d2		; MJ: load green and red
+		move.b	d1,d3		; MJ: load red
+		andi.w	#$0E00,d1	; MJ: get only blue
+		eori.w  #$0E00,d1
+		beq		@noblue		; MJ: if blue is finished, branch
+		addi.w	#$0200,d5	; MJ: increase blue
 
-@addgreen:
-		move.w	d2,d1
-		andi.w	#$E0,d1
-		cmpi.w	#cGreen,d1
-		beq.s	@addblue
-		addi.w	#$20,(a0)+	; increase green value
-		rts	
-; ===========================================================================
+@noblue:
+		andi.w	#$00E0,d2	; MJ: get only green (needs to be word)
+		eori.w  #$00E0,d2
+		beq		@nogreen	; MJ: if green is finished, branch
+		addi.b	#$20,d5		; MJ: increase green
 
-@addblue:
-		move.w	d2,d1
-		andi.w	#$E00,d1
-		cmpi.w	#cBlue,d1
-		beq.s	@next
-		addi.w	#$200,(a0)+	; increase blue	value
-		rts	
-; ===========================================================================
+@nogreen:
+		andi.b	#$0E,d3		; MJ: get only red
+		eori.b  #$0E,d3
+		beq		@nored		; MJ: if red is finished, branch
+		addq.b	#$02,d5		; MJ: increase red
 
-@next:
-		addq.w	#2,a0
-		rts	
+@nored:
+		move.w	d5,(a0)+	; MJ: save new colour
+		rts					; MJ: return
 ; End of function WhiteOut_AddColour
 
 ; ---------------------------------------------------------------------------
@@ -1928,31 +1915,31 @@ PalLoad4_Water:
 
 ; ===========================================================================
 
-		include	"_inc\Palette Pointers.asm"
-
 ; ---------------------------------------------------------------------------
 ; Palette data
 ; ---------------------------------------------------------------------------
-Pal_SegaBG:	incbin	"palette\Sega Background.bin"
-Pal_Title:	incbin	"palette\Title Screen.bin"
+
+		include	"_inc\Palette Pointers.asm"
+
+Pal_Title:		incbin	"palette\Title Screen.bin"
 Pal_LevelSel:	incbin	"palette\Level Select.bin"
-Pal_Sonic:	incbin	"palette\Sonic.bin"
-Pal_GHZ:	incbin	"palette\Green Hill Zone.bin"
-Pal_LZ:		incbin	"palette\Labyrinth Zone.bin"
+Pal_Sonic:		incbin	"palette\Sonic.bin"
+Pal_GHZ:		incbin	"palette\Green Hill Zone.bin"
+Pal_LZ:			incbin	"palette\Labyrinth Zone.bin"
 Pal_LZWater:	incbin	"palette\Labyrinth Zone Underwater.bin"
-Pal_MZ:		incbin	"palette\Marble Zone.bin"
-Pal_SLZ:	incbin	"palette\Star Light Zone.bin"
-Pal_SYZ:	incbin	"palette\Spring Yard Zone.bin"
-Pal_SBZ1:	incbin	"palette\SBZ Act 1.bin"
-Pal_SBZ2:	incbin	"palette\SBZ Act 2.bin"
+Pal_MZ:			incbin	"palette\Marble Zone.bin"
+Pal_SLZ:		incbin	"palette\Star Light Zone.bin"
+Pal_SYZ:		incbin	"palette\Spring Yard Zone.bin"
+Pal_SBZ1:		incbin	"palette\SBZ Act 1.bin"
+Pal_SBZ2:		incbin	"palette\SBZ Act 2.bin"
 Pal_Special:	incbin	"palette\Special Stage.bin"
-Pal_SBZ3:	incbin	"palette\SBZ Act 3.bin"
+Pal_SBZ3:		incbin	"palette\SBZ Act 3.bin"
 Pal_SBZ3Water:	incbin	"palette\SBZ Act 3 Underwater.bin"
 Pal_LZSonWater:	incbin	"palette\Sonic - LZ Underwater.bin"
 Pal_SBZ3SonWat:	incbin	"palette\Sonic - SBZ3 Underwater.bin"
 Pal_SSResult:	incbin	"palette\Special Stage Results.bin"
 Pal_Continue:	incbin	"palette\Special Stage Continue Bonus.bin"
-Pal_Ending:	incbin	"palette\Ending.bin"
+Pal_Ending:		incbin	"palette\Ending.bin"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	wait for VBlank routines to complete
@@ -1982,7 +1969,7 @@ GM_Sega:
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
 		bsr.w	PaletteFadeOut
-		lea	(vdp_control_port).l,a6
+		lea		(vdp_control_port).l,a6
 		move.w	#$8004,(a6)	; use 8-colour mode
 		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
 		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
@@ -1995,10 +1982,10 @@ GM_Sega:
 		move.w	d0,(vdp_control_port).l
 		bsr.w	ClearScreen
 		locVRAM	0
-		lea	(Nem_SegaLogo).l,a0 ; load Sega	logo patterns
+		lea		(Nem_SegaLogo).l,a0 ; load Sega	logo patterns
 		bsr.w	NemDec
-		lea	($FF0000).l,a1
-		lea	(Eni_SegaLogo).l,a0 ; load Sega	logo mappings
+		lea		($FF0000).l,a1
+		lea		(Eni_SegaLogo).l,a0 ; load Sega	logo mappings
 		move.w	#0,d0
 		bsr.w	EniDec
 
@@ -2009,9 +1996,15 @@ GM_Sega:
 		bmi.s   @loadpal
 		copyTilemap	$FF0A40,$C53A,2,1 ; hide "TM" with a white rectangle
 
-	@loadpal:
-		moveq	#palid_SegaBG,d0
-		bsr.w	PalLoad2	; load Sega logo palette
+	@loadpal: ; Fade in the SEGA background
+		lea		(v_pal_dry_dup).l,a3
+		moveq	#$3F,d7
+
+	@loop:
+		move.w	#cWhite,(a3)+	; move data to RAM
+		dbf		d7,@loop
+
+		bsr.w	PaletteFadeIn
 		move.w	#-$A,(v_pcyc_num).w
 		move.w	#0,(v_pcyc_time).w
 		move.w	#0,(v_pal_buffer+$12).w
@@ -3188,7 +3181,8 @@ GM_Special:
 		lea	(v_ngfx_buffer).w,a1
 		moveq	#0,d0
 		move.w	#$7F,d1
-	SS_ClrNemRam:
+
+SS_ClrNemRam:
 		move.l	d0,(a1)+
 		dbf	d1,SS_ClrNemRam	; clear	Nemesis	buffer
 
@@ -3200,6 +3194,7 @@ GM_Special:
 		move.l	#0,(v_screenposx).w
 		move.l	#0,(v_screenposy).w
 		move.b	#id_SonicSpecial,(v_player).w ; load special stage Sonic object
+		move.b	#$FF,(v_ssangleprev).w	; fill previous angle with obviously false value to force an update
 		bsr.w	PalCycle_SS
 		clr.w	(v_ssangle).w	; set stage angle to "upright"
 		move.w	#$40,(v_ssrotate).w ; set stage rotation speed
@@ -7511,7 +7506,7 @@ SS_ShowLayout:
 		move.w	d5,-(sp)
 		lea	($FFFF8000).w,a1
 		move.b	(v_ssangle).w,d0
-		andi.b	#$FC,d0
+		;andi.b	#$FC,d0 - Removed for smooth rotation
 		jsr	(CalcSine).l
 		move.w	d0,d4
 		move.w	d1,d5
@@ -7637,18 +7632,6 @@ loc_1B288:
 
 
 SS_AniWallsRings:
-		lea	($FF400C).l,a1
-		moveq	#0,d0
-		move.b	(v_ssangle).w,d0
-		lsr.b	#2,d0
-		andi.w	#$F,d0
-		moveq	#$23,d1
-
-loc_1B2A4:
-		move.w	d0,(a1)
-		addq.w	#8,a1
-		dbf	d1,loc_1B2A4
-
 		lea	($FF4005).l,a1
 		subq.b	#1,(v_ani1_time).w
 		bpl.s	loc_1B2C8
@@ -7743,6 +7726,30 @@ loc_1B350:
 		adda.w	#$48,a1
 		rts	
 ; End of function SS_AniWallsRings
+
+SS_LoadWalls:
+		moveq	#0,d0
+		move.b	(v_ssangle).w,d0		; get the Special Stage angle
+		lsr.b	#2,d0					; modify so it can be used as a frame ID
+		andi.w	#$F,d0
+		cmp.b	(v_ssangleprev).w,d0	; does the modified angle match the recorded value?
+		beq.s	@return					; if so, branch
+
+		lea	($C00000).l,a6
+		lea	(Art_SSWalls).l,a1			; load wall art
+		move.w	d0,d1
+		lsl.w	#8,d1
+		add.w	d1,d1
+		add.w	d1,a1
+
+		locVRAM	$2840					; VRAM address
+
+		move.w	#$F,d1					; number of 8x8 tiles
+		jsr	LoadTiles
+		move.b	d0,(v_ssangleprev).w	; record the modified angle for comparison
+
+	@return:
+		rts
 
 ; ===========================================================================
 SS_WaRiVramSet:	dc.w $142, $6142, $142,	$142, $142, $142, $142,	$6142
@@ -8198,12 +8205,12 @@ Nem_Shield:	incbin	"artnem\Shield.bin"
 		even
 Nem_Stars:	incbin	"artnem\Invincibility Stars.bin"
 		even
-Map_SSWalls:	include	"_maps\SS Walls.asm"
+	include	"_maps\SS Walls.asm"
 
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - special stage
 ; ---------------------------------------------------------------------------
-Nem_SSWalls:	incbin	"artnem\Special Walls.bin" ; special stage walls
+Art_SSWalls:	incbin	"artunc\Special Walls.bin" ; special stage walls
 		even
 Eni_SSBg1:	incbin	"tilemaps\SS Background 1.bin" ; special stage background (mappings)
 		even

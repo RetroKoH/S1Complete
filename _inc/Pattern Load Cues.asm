@@ -263,7 +263,7 @@ PLC_Warp:
 PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSBgCloud, 0	; bubble and cloud background
 		plcm	Nem_SSBgFish, $A20	; bird and fish	background
-		plcm	Nem_SSWalls, $2840	; walls
+; Removed walls. These are now dynamic art
 		plcm	Nem_Bumper, $4760	; bumper
 		plcm	Nem_SSGOAL, $4A20	; GOAL block
 		plcm	Nem_SSUpDown, $4C60	; UP and DOWN blocks
@@ -279,9 +279,6 @@ PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSZone2, $F400	; ZONE 2 block
 		plcm	Nem_SSZone3, $F520	; ZONE 3 block
 	PLC_SpeStageend:
-		plcm	Nem_SSZone4, $F2E0	; ZONE 4 block
-		plcm	Nem_SSZone5, $F400	; ZONE 5 block
-		plcm	Nem_SSZone6, $F520	; ZONE 6 block
 ; ---------------------------------------------------------------------------
 ; Pattern load cues - GHZ animals
 ; ---------------------------------------------------------------------------
