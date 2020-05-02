@@ -23,6 +23,24 @@ Debug_Main:	; Routine 0
 		andi.w	#$3FF,(v_bgscreenposy).w
 		move.b	#0,obFrame(a0)
 		move.b	#id_Walk,obAnim(a0)
+
+; Debug Improvements
+		clr.w	obVelX(a0)
+		clr.w	obVelY(a0)
+		clr.w	obInertia(a0)
+		btst	#3,obStatus(a0)	; is Sonic standing on an object?
+		beq.s	@setpos		; if not, branch
+		bclr	#3,obStatus(a0)	; clear Sonic's standing flag
+		moveq	#0,d0
+		move.b	$3D(a0),d0	; get object id
+		clr.b	$3D(a0)	; clear object id
+		lsl.w	#6,d0
+		addi.l	#v_objspace&$FFFFFF,d0
+		movea.l	d0,a2
+		bclr	#3,obStatus(a2)	; clear object's standing flag
+		clr.b	obSolid(a2)
+	@setpos:
+
 		cmpi.b	#id_Special,(v_gamemode).w ; is game mode $10 (special stage)?
 		bne.s	@islevel	; if not, branch
 
@@ -162,6 +180,9 @@ Debug_ChgItem:
 		beq.s	@backtonormal	; if not, branch
 		jsr	(FindFreeObj).l
 		bne.s	@backtonormal
+
+		move.b	#0,(v_objstate+2).w ; Debug Improvements
+
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	4(a0),0(a1)	; create object

@@ -39,6 +39,7 @@ Sign_Touch:	; Routine 2
 		cmpi.w	#$20,d0		; is Sonic within $20 pixels of	the signpost?
 		bcc.s	@notouch	; if not, branch
 		music	sfx_Signpost,0,0,0	; play signpost sound
+		move.w  #1,(v_player+$34).w	; disable speed shoes
 		clr.b	(f_timecount).w	; stop time counter
 		move.w	(v_limitright2).w,(v_limitleft2).w ; lock screen position
 		addq.b	#2,obRoutine(a0)

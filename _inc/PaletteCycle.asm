@@ -18,7 +18,8 @@ PaletteCycle:
 ; ---------------------------------------------------------------------------
 ; Palette cycling routines
 ; ---------------------------------------------------------------------------
-PCycle_Index:	dc.w PCycle_GHZ-PCycle_Index
+PCycle_Index:
+		dc.w PCycle_GHZ-PCycle_Index
 		dc.w PCycle_LZ-PCycle_Index
 		dc.w PCycle_MZ-PCycle_Index
 		dc.w PalCycle_SLZ-PCycle_Index
@@ -32,7 +33,7 @@ PCycle_Index:	dc.w PCycle_GHZ-PCycle_Index
 
 
 PCycle_Title:
-		lea	(Pal_TitleCyc).l,a0
+		lea	(Pal_GHZCyc).l,a0
 		bra.s	PCycGHZ_Go
 ; ===========================================================================
 

@@ -5,7 +5,11 @@
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-DynamicLevelEvents:
+DynamicLevelEvents: ; Dont run DLE on Special Stage or Title
+		cmpi.b	#id_Title,(v_gamemode).w	;exit if on the Title
+		beq.s	DLE_NoChg
+		cmpi.b	#id_Special,(v_gamemode).w	;exit if in a Special Stage
+		beq.s	DLE_NoChg
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		add.w	d0,d0

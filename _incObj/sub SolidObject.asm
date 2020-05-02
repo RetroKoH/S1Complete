@@ -127,6 +127,22 @@ loc_FAD0:
 		ext.w	d3
 		add.w	d3,d2
 		move.w	obY(a1),d3
+
+	; Ducking Size Fix
+	
+;	if SpinDashActive=1	;Mercury Spin Dash Enabled
+;		cmpi.b	#id_SpinDash,obAnim(a1)
+;		beq.s	@short
+;	endc	;end Spin Dash Enabled
+	
+		cmpi.b	#id_Duck,obAnim(a1)
+		bne.s	@skip
+		
+	@short:
+		subi.w	#5,d2
+		addi.w	#5,d3
+		
+	@skip:
 		sub.w	obY(a0),d3
 		addq.w	#4,d3
 		add.w	d2,d3
@@ -201,13 +217,13 @@ Solid_SideAir:
 Solid_Ignore:
 		btst	#5,obStatus(a0)			; is Sonic pushing?
 		beq.s	Solid_Debug				; if not, branch
-		cmpi.b	#id_Roll,obAnim(a1)		; is Sonic in his jumping/rolling animation?
-		beq.s	Solid_NotPushing		; if so, branch
-		cmpi.b	#id_Drown,obAnim(a1)	; is Sonic in his drowning animation?
-		beq.s	Solid_NotPushing		; if so, branch
-		cmpi.b	#id_Hurt,obAnim(a1)		; is Sonic in his hurt animation?
-		beq.s	Solid_NotPushing		; if so, branch
-		move.w	#id_Run,obAnim(a1)		; use running animation
+;		cmpi.b	#id_Roll,obAnim(a1)		; is Sonic in his jumping/rolling animation?
+;		beq.s	Solid_NotPushing		; if so, branch
+;		cmpi.b	#id_Drown,obAnim(a1)	; is Sonic in his drowning animation?
+;		beq.s	Solid_NotPushing		; if so, branch
+;		cmpi.b	#id_Hurt,obAnim(a1)		; is Sonic in his hurt animation?
+;		beq.s	Solid_NotPushing		; if so, branch
+;		move.w	#id_Run,obAnim(a1)		; use running animation
 
 Solid_NotPushing:
 		bclr	#5,obStatus(a0)	; clear pushing flag

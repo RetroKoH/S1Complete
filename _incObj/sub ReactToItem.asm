@@ -14,7 +14,12 @@ ReactToItem:
 		move.b	obHeight(a0),d5	; load Sonic's height
 		subq.b	#3,d5
 		sub.w	d5,d3
-		cmpi.b	#fr_Duck,obFrame(a0) ; is Sonic ducking?
+		; Ducking Size Fix
+;	if SpinDashActive=1	;Mercury Spin Dash Enabled
+;		cmpi.b	#id_SpinDash,obAnim(a0)
+;		beq.s	@short
+;	endc	;end Spin Dash Enabled
+		cmpi.b	#id_Duck,obAnim(a0) ; is Sonic ducking?
 		bne.s	@notducking	; if not, branch
 		addi.w	#$C,d3
 		moveq	#$A,d5
@@ -230,6 +235,23 @@ React_Enemy:
 ; ===========================================================================
 
 React_Caterkiller:
+		move.b	#1,d0
+		move.w  obInertia(a0),d1
+		bmi.s	@skip
+		move.b	#0,d0
+	@skip:
+		move.b	obStatus(a1),d1
+		andi.b	#1,d1
+		cmp.b	d0,d1			;are Sonic and the Caterkiller facing the same way?
+		bne.s	@hurt			;if not, move on
+		btst	#1,obStatus(a0)	;is Sonic in the air?
+		bne.s	@hurt			;if so, move on
+		btst	#2,obStatus(a0)	;is Sonic spinning?
+		beq.s	@hurt			;if not, move on
+		moveq	#-1,d0			;else, he's rolling on the ground, and shouldn't be hurt
+		rts				
+	
+	@hurt:
 		bset	#7,obStatus(a1)
 
 React_ChkHurt:

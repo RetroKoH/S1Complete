@@ -150,8 +150,11 @@ CollectRing:
 		bne.s	@playsnd
 
 	@got100:
-		addq.b	#1,(v_lives).w	; add 1 to the number of lives you have
-		addq.b	#1,(f_lifecount).w ; update the lives counter
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm			; if yes, branch. (Overflow Fix)
+		addq.b	#1,(v_lives).w		; add 1 to the number of lives you have
+		addq.b	#1,(f_lifecount).w 	; update the lives counter
+	@playbgm:
 		move.w	#bgm_ExtraLife,d0 ; play extra life music
 
 	@playsnd:
@@ -267,7 +270,12 @@ RLoss_Bounce:	; Routine 2
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0				; has object moved below level boundary?
 		bcs.s	RLoss_Delete			; if yes, branch
-		bra.w	DisplaySprite
+		move.b	(v_ani3_time).w,d0
+		btst	#1,d0
+		beq.w	DisplaySprite
+		cmpi.b	#80,d0
+		bhi.w	DisplaySprite
+		rts
 ; ===========================================================================
 
 RLoss_Collect:	; Routine 4

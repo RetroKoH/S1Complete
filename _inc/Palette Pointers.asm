@@ -11,7 +11,7 @@ PalPointers:
 
 ; palette address, RAM address, colours
 
-ptr_Pal_Title:		palp	Pal_Title,v_pal_dry,$40			; 1 - title screen
+ptr_Pal_Title:		palp	Pal_Title,v_pal_dry,$20			; 1 - title screen - Adjusted
 ptr_Pal_LevelSel:	palp	Pal_LevelSel,v_pal_dry,$40		; 2 - level select
 ptr_Pal_Sonic:		palp	Pal_Sonic,v_pal_dry,$10			; 3 - Sonic
 Pal_Levels:

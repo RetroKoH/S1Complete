@@ -36,6 +36,7 @@ Sonic_ChkRoll:
 		move.b	#$E,obHeight(a0)
 		move.b	#7,obWidth(a0)
 		move.b	#id_Roll,obAnim(a0) ; use "rolling" animation
+		move.b	#fr_Roll1,obFrame(a0)	; hard sets frame so no flicker when roll in tunnels
 		addq.w	#5,obY(a0)
 		sfx	sfx_Roll,0,0,0	; play rolling sound
 		tst.w	obInertia(a0)

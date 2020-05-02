@@ -13,6 +13,7 @@ loc_1380C:
 		bsr.w	Sonic_HurtStop
 		bsr.w	Sonic_LevelBound
 		bsr.w	Sonic_RecordPosition
+		bsr.w	Sonic_Water
 		bsr.w	Sonic_Animate
 		bsr.w	Sonic_LoadGfx
 		jmp	(DisplaySprite).l
@@ -25,10 +26,7 @@ loc_1380C:
 
 
 Sonic_HurtStop:
-		move.w	(v_limitbtm2).w,d0
-		addi.w	#$E0,d0
-		cmp.w	obY(a0),d0
-		bcs.w	KillSonic
+; Top boundary Bugfix
 		bsr.w	Sonic_Floor
 		btst	#1,obStatus(a0)
 		bne.s	locret_13860
@@ -67,9 +65,14 @@ GameOver:
 		move.w	#-$38,obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		clr.b	(f_timecount).w	; stop time counter
+
+		cmpi.b	#0,(v_lives).w	; are lives at min? - Underflow Fix
+		beq.s	@skip	
 		addq.b	#1,(f_lifecount).w ; update lives counter
 		subq.b	#1,(v_lives).w	; subtract 1 from number of lives
 		bne.s	loc_138D4
+
+	@skip:
 		move.w	#0,$3A(a0)
 		move.b	#id_GameOverCard,(v_objspace+$80).w ; load GAME object
 		move.b	#id_GameOverCard,(v_objspace+$C0).w ; load OVER object

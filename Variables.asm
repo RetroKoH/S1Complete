@@ -12,7 +12,11 @@ v_ngfx_buffer:	equ $FFFFAA00	; Nemesis graphics decompression buffer ($200 bytes
 v_spritequeue:	equ $FFFFAC00	; sprite display queue, in order of priority ($400 bytes)
 v_16x16:		equ $FFFFB000	; 16x16 tile mappings
 
-v_sgfx_buffer:	equ $FFFFC800	; buffered Sonic graphics ($17 cells) ($2E0 bytes)
+;v_sgfx_buffer:		= $FFFFC800	; buffered Sonic graphics ($18 cells) ($300 bytes) - USING DMA QUEUE, NO LONGER NEEDED
+VDP_Command_Buffer:	= $FFFFC800	; Buffer for DMA Queue replacing the old art buffer.
+VDP_Command_Buffer_Slot:= $FFFFC8FC	; Stores the address of the next open slot for a queued VDP command
+;C900-CB00 UNUSED
+
 v_tracksonic:	equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 v_objspace:	equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)
@@ -292,9 +296,13 @@ v_lamp_wtrpos:	equ v_lastlamp+$20 ; water position at lamppost (2 bytes)
 v_lamp_wtrrout:	equ v_lastlamp+$22 ; water routine at lamppost
 v_lamp_wtrstat:	equ v_lastlamp+$23 ; water state at lamppost
 v_lamp_lives:	equ v_lastlamp+$24 ; lives counter at lamppost
-v_emeralds:	equ $FFFFFE57	; number of chaos emeralds
-v_emldlist:	equ $FFFFFE58	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
+v_emeralds:		equ $FFFFFE57	; number of chaos emeralds
+v_emldlist:		equ $FFFFFE58	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
 v_oscillate:	equ $FFFFFE5E	; values which oscillate - for swinging platforms, et al ($42 bytes)
+				; $FFFFFEA0
+
+v_scrolldelay:	equ $FFFFFEBE	; scroll delay timer
+
 v_ani0_time:	equ $FFFFFEC0	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
 v_ani0_frame:	equ $FFFFFEC1	; synchronised sprite animation 0 - current frame
 v_ani1_time:	equ $FFFFFEC2	; synchronised sprite animation 1 - time until next frame

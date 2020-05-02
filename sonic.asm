@@ -656,11 +656,7 @@ VBla_08:
 
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	@nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
 		startZ80
@@ -705,11 +701,7 @@ VBla_0A:
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
 		bsr.w	PalCycle_SS
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	@nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
 		tst.w	(v_demolength).w	; is there time left on the demo?
@@ -743,10 +735,7 @@ VBla_0C:
 		move.w	(v_hbla_hreg).w,(a5)
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w
-		beq.s	@nochg
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
 		startZ80
@@ -782,10 +771,7 @@ VBla_16:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
-		tst.b	(f_sonframechg).w
-		beq.s	@nochg
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
 		tst.w	(v_demolength).w
@@ -1098,6 +1084,7 @@ TilemapToVRAM:
 ; End of function TilemapToVRAM
 
 		include	"_inc\Nemesis Decompression.asm"
+		include "_inc\DMA Queue.asm"
 
 
 ; ---------------------------------------------------------------------------
@@ -1340,7 +1327,6 @@ QuickPLC:
 
 		include	"_inc\PaletteCycle.asm"
 
-Pal_TitleCyc:	incbin	"palette\Cycle - Title Screen Water.bin"
 Pal_GHZCyc:	incbin	"palette\Cycle - GHZ.bin"
 Pal_LZCyc1:	incbin	"palette\Cycle - LZ Waterfall.bin"
 Pal_LZCyc2:	incbin	"palette\Cycle - LZ Conveyor Belt.bin"
@@ -2112,6 +2098,7 @@ GM_Title:
 		move.w	(a5)+,(a6)
 		dbf	d1,Tit_LoadText	; load level select font
 
+		move.b	#0,(f_nobgscroll).w			; Clear to prevent GAME OVER when drowning glitch
 		move.b	#0,(v_lastlamp).w 			; clear lamppost counter
 		move.w	#0,(v_debuguse).w 			; disable debug item placement mode
 		move.w	#0,(f_demo).w				; disable debug mode
@@ -2147,6 +2134,8 @@ GM_Title:
 		locVRAM	0
 		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
 		bsr.w	NemDec
+		moveq	#palid_GHZ,d0	; load GHZ palette
+		bsr.w	PalLoad1
 		moveq	#palid_Title,d0	; load title screen palette
 		bsr.w	PalLoad1
 		sfx	bgm_Title,0,1,1				; play title screen music
@@ -2724,6 +2713,8 @@ Level_ClrRam:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		move.w	#$8A00+223,(v_hbla_hreg).w ; set palette change position (for water)
 		move.w	(v_hbla_hreg).w,(a6)
+		clr.w	(VDP_Command_Buffer).w
+		move.l	#VDP_Command_Buffer,(VDP_Command_Buffer_Slot).w
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadPal	; if not, branch
 
@@ -3285,6 +3276,8 @@ loc_47D4:
 		lea	(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
 		jsr	(Hud_Base).l
+		clr.w	(VDP_Command_Buffer).w
+		move.l	#VDP_Command_Buffer,(VDP_Command_Buffer_Slot).w
 		enable_ints
 		moveq	#palid_SSResult,d0
 		bsr.w	PalLoad2	; load results screen palette
@@ -5395,7 +5388,7 @@ loc_8A92:
 loc_8AA8:
 		btst	#5,obStatus(a0)
 		beq.s	locret_8AC2
-		move.w	#id_Run,obAnim(a1)
+;		move.w	#id_Run,obAnim(a1) Walking In Air Fix
 
 loc_8AB6:
 		bclr	#5,obStatus(a0)
@@ -5435,6 +5428,22 @@ Obj44_SolidWall2:
 		ext.w	d3
 		add.w	d3,d2
 		move.w	obY(a1),d3
+
+	; Ducking Size Fix
+	
+	;if SpinDashActive=1	;Mercury Spin Dash Enabled
+	;	cmpi.b	#id_SpinDash,obAnim(a1)
+	;	beq.s	@short
+	;endc	;end Spin Dash Enabled
+	
+		cmpi.b	#id_Duck,obAnim(a1)
+		bne.s	@skip
+		
+	@short:
+		subi.w	#5,d2
+		addi.w	#5,d3
+		
+	@skip:
 		sub.w	obY(a0),d3
 		add.w	d2,d3
 		bmi.s	loc_8B48
@@ -6246,8 +6255,13 @@ OPL_Main:
 
 OPL_ClrList:
 		clr.l	(a2)+
-		dbf	d0,OPL_ClrList	; clear	pre-destroyed object list
+		dbf	d0,OPL_ClrList					; clear	pre-destroyed object list
+		cmpi.b	#id_SLZ,(v_zone).w
+		bne.s	@notSLZ
+		move.b	#id_Pylon,(v_lvlobjspace).w	; force load SLZ pylons
+		; otherwise they won't appear in a layout if the level is reloaded
 
+	@notSLZ:
 		lea	(v_objstate).w,a2
 		moveq	#0,d2
 		move.w	(v_screenposx).w,d6
@@ -7451,7 +7465,7 @@ BossMove:
 		include	"_incObj\3D Boss - Green Hill (part 2).asm"
 		include	"_incObj\48 Eggman's Swinging Ball.asm"
 		include	"_anim\Eggman.asm"
-Map_Eggman:	include	"_maps\Eggman.asm"
+		include	"_maps\Eggman.asm"
 Map_BossItems:	include	"_maps\Boss Items.asm"
 		include	"_incObj\77 Boss - Labyrinth.asm"
 		include	"_incObj\73 Boss - Marble.asm"
@@ -8081,26 +8095,28 @@ Map_HUD:	include	"_maps\HUD.asm"
 
 AddPoints:
 		move.b	#1,(f_scorecount).w ; set score counter to update
-			lea     (v_score).w,a3
-			add.l   d0,(a3)
-			move.l  #999999,d1
-			cmp.l   (a3),d1 ; is score below 999999?
-			bhi.s   @belowmax ; if yes, branch
-			move.l  d1,(a3) ; reset score to 999999
-		@belowmax:
-			move.l  (a3),d0
-			cmp.l   (v_scorelife).w,d0 ; has Sonic got 50000+ points?
-			blo.s   @noextralife ; if not, branch
+		lea     (v_score).w,a3
+		add.l   d0,(a3)
+		move.l  #999999,d1
+		cmp.l   (a3),d1 ; is score below 999999?
+		bhi.s   @belowmax ; if yes, branch
+		move.l  d1,(a3) ; reset score to 999999
 
-			addi.l  #5000,(v_scorelife).w ; increase requirement by 50000
-			tst.b   (v_megadrive).w
-			bmi.s   @noextralife ; branch if Mega Drive is Japanese
-			addq.b  #1,(v_lives).w ; give extra life
-			addq.b  #1,(f_lifecount).w
-			music	bgm_ExtraLife,1,0,0
+	@belowmax:
+		move.l  (a3),d0
+		cmp.l   (v_scorelife).w,d0 ; has Sonic got 50000+ points?
+		blo.s   @noextralife ; if not, branch
+		addi.l  #5000,(v_scorelife).w ; increase requirement by 50000
 
-@locret_1C6B6:
-@noextralife:
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm
+		addq.b  #1,(v_lives).w ; give extra life
+		addq.b  #1,(f_lifecount).w
+
+	@playbgm:
+		music	bgm_ExtraLife,1,0,0
+
+	@noextralife:
 		rts	
 ; End of function AddPoints
 
@@ -8715,7 +8731,7 @@ Art_BigRing:	incbin	"artunc\Giant Ring.bin"
 		align	$100,$FF
 
 ; ---------------------------------------------------------------------------
-; Sprite locations index
+; Object locations index
 ; ---------------------------------------------------------------------------
 ObjPos_Index:
 		; GHZ
@@ -8754,18 +8770,26 @@ ObjPos_Index:
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; --- Put extra object data here. ---
+
+; MOVING MINI-PLATFORM LAYOUTS (LABYRINTH ZONE)
 ObjPosLZPlatform_Index:
 		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
 		dc.w ObjPos_LZ2pf1-ObjPos_Index, ObjPos_LZ2pf2-ObjPos_Index
 		dc.w ObjPos_LZ3pf1-ObjPos_Index, ObjPos_LZ3pf2-ObjPos_Index
 		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
+
+; MOVING MINI-PLATFORM LAYOUTS (SCRAP BRAIN ZONE ACT 1)
 ObjPosSBZPlatform_Index:
 		dc.w ObjPos_SBZ1pf1-ObjPos_Index, ObjPos_SBZ1pf2-ObjPos_Index
 		dc.w ObjPos_SBZ1pf3-ObjPos_Index, ObjPos_SBZ1pf4-ObjPos_Index
 		dc.w ObjPos_SBZ1pf5-ObjPos_Index, ObjPos_SBZ1pf6-ObjPos_Index
 		dc.w ObjPos_SBZ1pf1-ObjPos_Index, ObjPos_SBZ1pf2-ObjPos_Index
+
+
+		; ALWAYS place this before ObjPos incbin's
 		dc.b $FF, $FF, 0, 0, 0,	0
+
+
 ObjPos_GHZ1:	incbin	"objpos\ghz1.bin"
 		even
 ObjPos_GHZ2:	incbin	"objpos\ghz2.bin"

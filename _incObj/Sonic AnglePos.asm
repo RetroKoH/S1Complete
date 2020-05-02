@@ -93,8 +93,17 @@ locret_146BE:
 		rts	
 ; ===========================================================================
 
-loc_146C0:
-		cmpi.w	#$E,d1
+loc_146C0: ; Quarterloop fix
+		move.b	obVelX(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_146CC
 
 loc_146C6:
@@ -172,9 +181,19 @@ Sonic_Angle:
 		move.b	($FFFFF768).w,d2
 		move.w	d0,d1
 
-loc_1475E:
+loc_1475E: ; Quarterwheel fix
 		btst	#0,d2
 		bne.s	loc_1476A
+		tst.b	$38(a0)
+		bne.s	@onwheel
+		move.b	d2,d0
+		sub.b	obAngle(a0),d0
+		bpl.s	@next
+		neg.b	d0
+	@next:
+		cmpi.b	#$20,d0
+		bcc.s	loc_1476A
+	@onwheel:
 		move.b	d2,obAngle(a0)
 		rts	
 ; ===========================================================================
@@ -236,8 +255,17 @@ locret_147F0:
 		rts	
 ; ===========================================================================
 
-loc_147F2:
-		cmpi.w	#$E,d1
+loc_147F2: ; Quarterloop fix
+		move.b	obVelY(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_147FE
 
 loc_147F8:
@@ -304,8 +332,17 @@ locret_14892:
 		rts	
 ; ===========================================================================
 
-loc_14894:
-		cmpi.w	#$E,d1
+loc_14894: ; Quarterloop fix
+		move.b	obVelX(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:	
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_148A0
 
 loc_1489A:
@@ -372,8 +409,17 @@ locret_14934:
 		rts	
 ; ===========================================================================
 
-loc_14936:
-		cmpi.w	#$E,d1
+loc_14936: ; Quarterloop fix
+		move.b	obVelY(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_14942
 
 loc_1493C:

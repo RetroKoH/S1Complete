@@ -54,9 +54,13 @@ Pow_ChkSonic:
 		cmpi.b	#2,d0		; does monitor contain Sonic?
 		bne.s	Pow_ChkShoes
 
-	ExtraLife:
-		addq.b	#1,(v_lives).w	; add 1 to the number of lives you have
-		addq.b	#1,(f_lifecount).w ; update the lives counter
+ExtraLife:
+	; Lives Over/Underflow Fix
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm
+		addq.b	#1,(v_lives).w		; add 1 to number of lives
+		addq.b	#1,(f_lifecount).w 	; update the lives counter
+	@playbgm:
 		music	bgm_ExtraLife,1,0,0	; play extra life music
 ; ===========================================================================
 
@@ -64,7 +68,7 @@ Pow_ChkShoes:
 		cmpi.b	#3,d0		; does monitor contain speed shoes?
 		bne.s	Pow_ChkShield
 
-		move.b	#1,(v_shoes).w	; speed up the BG music
+		move.b	#1,(v_shoes).w			; set shoes flag
 		move.w	#$4B0,(v_player+$34).w	; time limit for the power-up
 		move.w	#$C00,(v_sonspeedmax).w ; change Sonic's top speed
 		move.w	#$18,(v_sonspeedacc).w	; change Sonic's acceleration

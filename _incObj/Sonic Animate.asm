@@ -14,6 +14,7 @@ Sonic_Animate:
 		move.b	d0,obNextAni(a0) ; set to "no restart"
 		move.b	#0,obAniFrame(a0) ; reset animation
 		move.b	#0,obTimeFrame(a0) ; reset frame duration
+		bclr	#5,obStatus(a0)	; clear pushing flag (FIX)
 
 	@do:
 		add.w	d0,d0
@@ -76,10 +77,15 @@ Sonic_Animate:
 		bne.w	@rolljump	; if not, branch
 		moveq	#0,d1
 		move.b	obAngle(a0),d0	; get Sonic's angle
+		bmi.s	@ble 			; better handling of angles
+		beq.s	@ble
+		subq.b	#1,d0
+
+	@ble:
 		move.b	obStatus(a0),d2
 		andi.b	#1,d2		; is Sonic mirrored horizontally?
 		bne.s	@flip		; if yes, branch
-		not.b	d0		; reverse angle
+		not.b	d0			; reverse angle
 
 	@flip:
 		addi.b	#$10,d0		; add $10 to angle

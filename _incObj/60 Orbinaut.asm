@@ -89,7 +89,7 @@ Orb_ChkSonic:	; Routine 2
 		neg.w	d0
 
 	@isright:
-		cmpi.w	#$A0,d0		; is Sonic within $A0 pixels of	orbinaut?
+		cmpi.w	#$80,d0		; is Sonic within $80 pixels of	orbinaut?
 		bcc.s	@animate	; if not, branch
 		move.w	(v_player+obY).w,d0
 		sub.w	obY(a0),d0	; is Sonic above the orbinaut?

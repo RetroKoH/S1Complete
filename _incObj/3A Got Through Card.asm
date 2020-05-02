@@ -100,18 +100,35 @@ Got_Display:
 
 Got_TimeBonus:	; Routine 6
 		bsr.w	DisplaySprite
+		move.b	#10,d1				; set score decrement to 10
+		move.b	(v_jpadhold1).w,d0
+		andi.b	#btnABC,d0			; is A, B or C pressed?
+		beq.w	@dontspeedup		; if not, branch
+		move.b	#100,d1				; increase score decrement to 100
+		
+	@dontspeedup:
 		move.b	#1,(f_endactbonus).w ; set time/ring bonus update flag
 		moveq	#0,d0
-		tst.w	(v_timebonus).w	; is time bonus	= zero?
-		beq.s	Got_RingBonus	; if yes, branch
-		addi.w	#10,d0		; add 10 to score
-		subi.w	#10,(v_timebonus).w ; subtract 10 from time bonus
+		tst.w	(v_timebonus).w		; is time bonus	= zero?
+		beq.s	Got_RingBonus		; if yes, branch
+		cmp.w	(v_timebonus).w,d1	; compare time bonus to score decrement
+		blt.s	@skip				; if it's greater or equal, branch
+		move.w	(v_timebonus).w,d1	; else, set the decrement to the remaining bonus
+	@skip:
+		add.w	d1,d0				; add decrement to score
+		sub.w	d1,(v_timebonus).w	; subtract decrement from time bonus
 
 Got_RingBonus:
-		tst.w	(v_ringbonus).w	; is ring bonus	= zero?
-		beq.s	Got_ChkBonus	; if yes, branch
-		addi.w	#10,d0		; add 10 to score
-		subi.w	#10,(v_ringbonus).w ; subtract 10 from ring bonus
+		tst.w	(v_ringbonus).w		; is ring bonus	= zero?
+		beq.s	Got_ChkBonus		; if yes, branch
+		cmp.w	(v_ringbonus).w,d1	; compare ring bonus to score decrement
+		blt.s	@skip				; if it's greater or equal, branch
+		move.w	(v_ringbonus).w,d1	; else, set the decrement to the remaining bonus
+	@skip:
+		add.w	d1,d0				; add decrement to score
+		sub.w	d1,(v_ringbonus).w	; subtract decrement from ring bonus
+
+;Got_CoolBonus: ; Add-on from Sonic Mania
 
 Got_ChkBonus:
 		tst.w	d0		; is there any bonus?

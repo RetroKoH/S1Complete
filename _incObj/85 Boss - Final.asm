@@ -187,6 +187,8 @@ loc_19F6A:
 		move.w	d0,(v_player+obVelX).w
 		tst.b	$35(a0)
 		bne.s	loc_19F88
+		tst.b	obColProp(a0)	; has the boss been defeated?
+		beq.s	loc_19F9C		; if so, don't let it be hit again. - Underflow fix
 		subq.b	#1,obColProp(a0)
 		move.b	#$64,$35(a0)
 		sfx	sfx_HitBoss,0,0,0	; play boss damage sound

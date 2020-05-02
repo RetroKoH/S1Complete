@@ -36,6 +36,7 @@ loc_1341C:
 		addq.l	#4,sp
 		move.b	#1,$3C(a0)
 		clr.b	$38(a0)
+		clr.w	$3E(a0)	; clear horiz control lock
 		sfx	sfx_Jump,0,0,0	; play jumping sound
 		move.b	#$13,obHeight(a0)
 		move.b	#9,obWidth(a0)
