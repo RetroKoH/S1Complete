@@ -4,13 +4,18 @@ v_regbuffer:				equ $FFFFFC00	; stores registers d0-a7 during an error event ($4
 v_spbuffer:					equ $FFFFFC40	; stores most recent sp address (4 bytes)
 v_errortype:				equ $FFFFFC44	; error type
 
-v_128x128:					equ   $FF0000	; 128x128 tile mappings ($A400 bytes)
+v_128x128:					equ $FFFF0000	; 128x128 tile mappings (4 bytes) Saved $A400
+v_16x16:					equ v_128x128+4	; 16x16 tile mappings (4 bytes) Saved $1800
+
+; $FFFF0008-A3FF - UNUSED
+
 v_lvllayoutfg:				equ $FFFFA400	; level layout ROM address (4 bytes)
 v_lvllayoutbg:				equ $FFFFA404	; background layout ROM address (4 bytes)
 
 v_ngfx_buffer:				equ $FFFFAA00	; Nemesis graphics decompression buffer ($200 bytes)
 v_spritequeue:				equ $FFFFAC00	; sprite display queue, in order of priority ($400 bytes)
-v_16x16:					equ $FFFFB000	; 16x16 tile mappings
+
+; $FFFFB000-C7FF - UNUSED
 
 VDP_Command_Buffer:			equ $FFFFC800	; Buffer for DMA Queue replacing the old art buffer.
 VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slot for a queued VDP command

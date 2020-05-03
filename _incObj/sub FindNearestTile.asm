@@ -21,7 +21,7 @@ FindNearestTile:
 		lsr.w	#7,d1			; MJ: shift to right side
 		andi.w	#$7F,d1			; MJ: get within 7F
 		add.w	d1,d0			; MJ: add calc'd Y to calc'd X
-		moveq	#-1,d1			; MJ: prepare FFFF in d3
+		moveq	#0,d1			; MJ: prepare FFFF in d3 (Prepare 0 for Unc Chunks)
 		movea.l	(v_lvllayoutfg).w,a1	; MJ: load address of Layout to a1
 		move.b	(a1,d0.w),d1		; MJ: collect correct chunk ID based on the X and Y position
 		andi.w	#$FF,d1			; MJ: keep within FF
@@ -34,6 +34,7 @@ FindNearestTile:
 		andi.w	#$E,d0			; MJ: keep X within 10 pixels
 		add.w	d0,d1			; MJ: add to ror'd chunk ID
 
+		add.l	(v_128x128).l,d1 ; Unc chunks
 		movea.l	d1,a1			; MJ: set address (Chunk to read)
-		rts				; MJ: return
+		rts						; MJ: return
 ; End of function FindNearestTile

@@ -1987,13 +1987,10 @@ GM_Title:
 		move.w	#0,(v_pcyc_time).w ; disable palette cycling
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
-		lea	(v_16x16).w,a1
-		lea	(Blk16_GHZ).l,a0 ; load	GHZ 16x16 mappings
-		move.w	#0,d0
-		bsr.w	EniDec
-		lea	(Blk128_GHZ).l,a0 ; load GHZ 128x128 mappings
-		lea	(v_128x128).l,a1
-		bsr.w	KosDec
+
+		move.l	#Blk16_GHZ,(v_16x16).l	; store the ROM address for the block mappings
+		move.l	#Blk128_GHZ,(v_128x128).l	; store the ROM address for the chunk mappings
+
 		bsr.w	LevelLayoutLoad
 		bsr.w	PaletteFadeOut
 		disable_ints
@@ -2004,12 +2001,8 @@ GM_Title:
 		movea.l	(v_lvllayoutbg).w,a4	; MJ: Load address of layout BG
 		move.w	#$6000,d2
 		bsr.w	DrawChunks
-		lea	($FF0000).l,a1
-		lea	(Eni_Title).l,a0 ; load	title screen mappings
-		move.w	#0,d0
-		bsr.w	EniDec
 
-		copyTilemap	$FF0000,$C206,$21,$15
+		copyTilemap	Eni_Title,$C206,$21,$15 ; Load Title Chunks from ROM
 
 		locVRAM	0
 		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
@@ -4857,14 +4850,14 @@ DrawFlipXY:
 ; DrawBlocks:
 GetBlockData:
 		if Revision=0
-		lea	(v_16x16).w,a1	; MJ: load Block's location
+		movea.l	(v_16x16).l,a1	; MJ: load Block's location
 		add.w	4(a3),d4	; MJ: load Y position to d4
 		add.w	(a3),d5		; MJ: load X position to d5
 		else
 			add.w	(a3),d5		; MJ: load X position to d5
 	GetBlockData_2:
 			add.w	4(a3),d4	; MJ: load Y position to d4
-			lea	(v_16x16).w,a1	; MJ: load Block's location
+			movea.l	(v_16x16).l,a1	; MJ: load Block's location
 		endc
 		; Turn Y coordinate into index into level layout
 		move.w	d4,d3		; MJ: copy Y position to d3
@@ -4877,7 +4870,7 @@ GetBlockData:
 		; Get chunk from level layout
 		lsl.w	#1,d3		; MJ: multiply by 2 (So it skips the BG)
 		add.w	d3,d0		; MJ: add calc'd Y pos
-		moveq	#-1,d3		; MJ: prepare FFFF in d3
+		moveq	#0,d3		; MJ: prepare FFFF in d3 (Prepare 0 for Unc Chunks)
 		move.b	(a4,d0.w),d3	; MJ: collect correct chunk ID from layout
 		; Turn chunk ID into index into chunk table
 		andi.w	#$FF,d3		; MJ: keep within FF
@@ -4889,6 +4882,9 @@ GetBlockData:
 		; Get block metadata from chunk
 		add.w	d4,d3		; MJ: add calc'd Y pos to ror'd d3
 		add.w	d5,d3		; MJ: add calc'd X pos to ror'd d3
+
+		add.l	(v_128x128).l,d3 ; Unc Chunks
+
 		movea.l	d3,a0		; MJ: set address (Chunk to read)
 		move.w	(a0),d3
 		; Turn block ID into address
@@ -5097,13 +5093,12 @@ LevelDataLoad:
 		lea	(a2,d0.w),a2
 		move.l	a2,-(sp)
 		addq.l	#4,a2
-		movea.l	(a2)+,a0
-		lea	(v_16x16).w,a1	; RAM address for 16x16 mappings
-		move.w	#0,d0
-		bsr.w	EniDec
-		movea.l	(a2)+,a0
-		lea	(v_128x128).l,a1 ; RAM address for 128x128 mappings
-		bsr.w	KosDec
+
+		move.l	(a2)+,(v_16x16).l	; store the ROM address for the block mappings
+		andi.l	#$FFFFFF,(v_16x16).l
+
+		move.l	(a2)+,(v_128x128).l	; store the ROM address for the chunk mappings
+
 		bsr.w	LevelLayoutLoad
 		move.w	(a2)+,d0
 		move.w	(a2),d0
@@ -8338,7 +8333,7 @@ Eni_SegaLogo:	incbin	"tilemaps\Sega Logo.bin" ; large Sega logo (mappings)
 	Eni_SegaLogo:	incbin	"tilemaps\Sega Logo (JP1).bin" ; large Sega logo (mappings)
 			even
 		endc
-Eni_Title:	incbin	"tilemaps\Title Screen.bin" ; title screen foreground (mappings)
+Eni_Title:	incbin	"tilemaps\Title Screen.bin" ; title screen foreground (mappings) (Unc Chunks)
 		even
 Nem_TitleFg:	incbin	"artnem\Title Screen Foreground.bin"
 		even
