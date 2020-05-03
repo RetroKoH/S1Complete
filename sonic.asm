@@ -1803,26 +1803,25 @@ PalLoad4_Water:
 ; ---------------------------------------------------------------------------
 ; Palette data
 ; ---------------------------------------------------------------------------
-Pal_SegaBG:	incbin	"palette\Sega Background.bin"
-Pal_Title:	incbin	"palette\Title Screen.bin"
+Pal_Title:		incbin	"palette\Title Screen.bin"
 Pal_LevelSel:	incbin	"palette\Level Select.bin"
-Pal_Sonic:	incbin	"palette\Sonic.bin"
-Pal_GHZ:	incbin	"palette\Green Hill Zone.bin"
-Pal_LZ:		incbin	"palette\Labyrinth Zone.bin"
+Pal_Sonic:		incbin	"palette\Sonic.bin"
+Pal_GHZ:		incbin	"palette\Green Hill Zone.bin"
+Pal_LZ:			incbin	"palette\Labyrinth Zone.bin"
 Pal_LZWater:	incbin	"palette\Labyrinth Zone Underwater.bin"
-Pal_MZ:		incbin	"palette\Marble Zone.bin"
-Pal_SLZ:	incbin	"palette\Star Light Zone.bin"
-Pal_SYZ:	incbin	"palette\Spring Yard Zone.bin"
-Pal_SBZ1:	incbin	"palette\SBZ Act 1.bin"
-Pal_SBZ2:	incbin	"palette\SBZ Act 2.bin"
+Pal_MZ:			incbin	"palette\Marble Zone.bin"
+Pal_SLZ:		incbin	"palette\Star Light Zone.bin"
+Pal_SYZ:		incbin	"palette\Spring Yard Zone.bin"
+Pal_SBZ1:		incbin	"palette\SBZ Act 1.bin"
+Pal_SBZ2:		incbin	"palette\SBZ Act 2.bin"
 Pal_Special:	incbin	"palette\Special Stage.bin"
-Pal_SBZ3:	incbin	"palette\SBZ Act 3.bin"
+Pal_SBZ3:		incbin	"palette\SBZ Act 3.bin"
 Pal_SBZ3Water:	incbin	"palette\SBZ Act 3 Underwater.bin"
 Pal_LZSonWater:	incbin	"palette\Sonic - LZ Underwater.bin"
 Pal_SBZ3SonWat:	incbin	"palette\Sonic - SBZ3 Underwater.bin"
 Pal_SSResult:	incbin	"palette\Special Stage Results.bin"
 Pal_Continue:	incbin	"palette\Special Stage Continue Bonus.bin"
-Pal_Ending:	incbin	"palette\Ending.bin"
+Pal_Ending:		incbin	"palette\Ending.bin"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	wait for VBlank routines to complete
@@ -1882,9 +1881,15 @@ GM_Sega:
 			copyTilemap	$FF0A40,$C53A,2,1 ; hide "TM" with a white rectangle
 		endc
 
-	@loadpal:
-		moveq	#palid_SegaBG,d0
-		bsr.w	PalLoad2	; load Sega logo palette
+	@loadpal: ; Fade in the SEGA background
+		lea		(v_pal_dry_dup).l,a3
+		moveq	#$3F,d7
+
+	@loop:
+		move.w	#cWhite,(a3)+	; move data to RAM
+		dbf		d7,@loop
+
+		bsr.w	PaletteFadeIn
 		move.w	#-$A,(v_pcyc_num).w
 		move.w	#0,(v_pcyc_time).w
 		move.w	#0,(v_pal_buffer+$12).w
