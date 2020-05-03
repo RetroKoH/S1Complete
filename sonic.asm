@@ -294,27 +294,46 @@ GameProgram:
 		cmpi.l	#'init',(v_init).w ; has checksum routine already run?
 		beq.w	GameInit	; if yes, branch
 
-CheckSumCheck:
-		movea.l	#EndOfHeader,a0	; start	checking bytes after the header	($200)
-		movea.l	#RomEndLoc,a1	; stop at end of ROM
-		move.l	(a1),d0
-		moveq	#0,d1
+CheckSumCheck: ; FASTER CHECKSUM CHECK BY MARKEYJESTER
+		movea.w	#$0200,a0				; prepare start address
+		move.l	(RomEndLoc).w,d7		; load size
+		sub.l	a0,d7					; minus start address
+		move.b	d7,d5					; copy end nybble
+		andi.w	#$000F,d5				; get only the remaining nybble
+		lsr.l	#$04,d7					; divide the size by 20
+		move.w	d7,d6					; load lower word size
+		swap	d7						; get upper word size
+		moveq	#$00,d0					; clear d0
 
-	@loop:
-		add.w	(a0)+,d1
-		cmp.l	a0,d0
-		bhs.s	@loop
-		movea.l	#Checksum,a1	; read the checksum
-		cmp.w	(a1),d1		; compare checksum in header to ROM
-		bne.w	CheckSumError	; if they don't match, branch
+CS_MainBlock:
+		add.w	(a0)+,d0				; modular checksum (8 words)
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		dbf		d6,CS_MainBlock			; repeat until all main block sections are done
+		dbf		d7,CS_MainBlock			; ''
+		subq.w	#$01,d5					; decrease remaining nybble for dbf
+		bpl.s	CS_Finish				; if there is no remaining nybble, branch
 
-	CheckSumOk:
-		lea	($FFFFFE00).w,a6
+CS_Remains:
+		add.w	(a0)+,d0				; add remaining words
+		dbf		d5,CS_Remains			; repeat until the remaining words are done
+
+CS_Finish:
+		cmp.w	(Checksum).w,d0			; does the checksum match?
+		bne.w	CheckSumError			; if not, branch
+
+CheckSumOk:
+		lea		($FFFFFE00).w,a6
 		moveq	#0,d7
 		move.w	#$7F,d6
 	@clearRAM:
 		move.l	d7,(a6)+
-		dbf	d6,@clearRAM	; clear RAM ($FE00-$FFFF)
+		dbf		d6,@clearRAM	; clear RAM ($FE00-$FFFF)
 
 		move.b	(z80_version).l,d0
 		andi.b	#$C0,d0
@@ -322,12 +341,12 @@ CheckSumCheck:
 		move.l	#'init',(v_init).w ; set flag so checksum won't run again
 
 GameInit:
-		lea	($FF0000).l,a6
+		lea		($FF0000).l,a6
 		moveq	#0,d7
 		move.w	#$3F7F,d6
 	@clearRAM:
 		move.l	d7,(a6)+
-		dbf	d6,@clearRAM	; clear RAM ($0000-$FDFF)
+		dbf		d6,@clearRAM			; clear RAM ($0000-$FDFF)
 
 		bsr.w	VDPSetupGame
 		bsr.w	SoundDriverLoad
@@ -335,10 +354,10 @@ GameInit:
 		move.b	#id_Sega,(v_gamemode).w ; set Game Mode to Sega Screen
 
 MainGameLoop:
-		move.b	(v_gamemode).w,d0 ; load Game Mode
-		andi.w	#$1C,d0	; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
-		jsr	GameModeArray(pc,d0.w) ; jump to apt location in ROM
-		bra.s	MainGameLoop	; loop indefinitely
+		move.b	(v_gamemode).w,d0		; load Game Mode
+		andi.w	#$1C,d0					; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
+		jsr		GameModeArray(pc,d0.w)	; jump to apt location in ROM
+		bra.s	MainGameLoop			; loop indefinitely
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Main game mode array
