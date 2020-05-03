@@ -348,6 +348,7 @@ GameInit:
 		move.l	d7,(a6)+
 		dbf		d6,@clearRAM			; clear RAM ($0000-$FDFF)
 
+		jsr		(InitDMAQueue).l 		; Flamewing DMA Queue
 		bsr.w	VDPSetupGame
 		bsr.w	SoundDriverLoad
 		bsr.w	JoypadInit
@@ -385,13 +386,14 @@ ptr_GM_Credits:	bra.w	GM_Credits	; Credits ($1C)
 ; ===========================================================================
 
 CheckSumError:
+		jsr		(InitDMAQueue).l 				; Flamewing DMA Queue
 		bsr.w	VDPSetupGame
 		move.l	#$C0000000,(vdp_control_port).l ; set VDP to CRAM write
 		moveq	#$3F,d7
 
 	@fillred:
 		move.w	#cRed,(vdp_data_port).l ; fill palette with red
-		dbf	d7,@fillred	; repeat $3F more times
+		dbf		d7,@fillred	; repeat $3F more times
 
 	@endlessloop:
 		bra.s	@endlessloop
@@ -532,11 +534,7 @@ VBla_08:
 
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	@nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
 		startZ80
@@ -581,11 +579,7 @@ VBla_0A:
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
 		bsr.w	PalCycle_SS
-		tst.b	(f_sonframechg).w ; has Sonic's sprite changed?
-		beq.s	@nochg		; if not, branch
-
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic ; load new Sonic gfx
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
 		tst.w	(v_demolength).w	; is there time left on the demo?
@@ -613,10 +607,7 @@ VBla_0C:
 		move.w	(v_hbla_hreg).w,(a5)
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
-		tst.b	(f_sonframechg).w
-		beq.s	@nochg
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l ; DMA_Queue
 
 	@nochg:
 		startZ80
@@ -652,10 +643,7 @@ VBla_16:
 		writeVRAM	v_spritetablebuffer,$280,vram_sprites
 		writeVRAM	v_hscrolltablebuffer,$380,vram_hscroll
 		startZ80
-		tst.b	(f_sonframechg).w
-		beq.s	@nochg
-		writeVRAM	v_sgfx_buffer,$2E0,vram_sonic
-		move.b	#0,(f_sonframechg).w
+		jsr	(ProcessDMAQueue).l
 
 	@nochg:
 		tst.w	(v_demolength).w
@@ -971,6 +959,8 @@ TilemapToVRAM:
 		dbf	d2,Tilemap_Line	; next line
 		rts	
 ; End of function TilemapToVRAM
+
+		include	"_inc\DMA Queue.asm"
 
 		include	"_inc\Nemesis Decompression.asm"
 
@@ -2658,7 +2648,7 @@ Level_ClrRam:
 
 		disable_ints
 		bsr.w	ClearScreen
-		lea	(vdp_control_port).l,a6
+		lea		(vdp_control_port).l,a6
 		move.w	#$8B03,(a6)	; line scroll mode
 		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
 		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
@@ -2668,6 +2658,11 @@ Level_ClrRam:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		move.w	#$8A00+223,(v_hbla_hreg).w ; set palette change position (for water)
 		move.w	(v_hbla_hreg).w,(a6)
+
+		; DMA QUEUE + flamewing optimization
+		clr.w	(VDP_Command_Buffer).w
+		move.w	#VDP_Command_Buffer,(VDP_Command_Buffer_Slot).w
+
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadPal	; if not, branch
 
@@ -2675,7 +2670,7 @@ Level_ClrRam:
 		moveq	#0,d0
 		move.b	(v_act).w,d0
 		add.w	d0,d0
-		lea	(WaterHeight).l,a1 ; load water	height array
+		lea		(WaterHeight).l,a1 ; load water	height array
 		move.w	(a1,d0.w),d0
 		move.w	d0,(v_waterpos1).w ; set water heights
 		move.w	d0,(v_waterpos2).w
@@ -3228,15 +3223,20 @@ loc_47D4:
 		bne.s	SS_FinLoop
 
 		disable_ints
-		lea	(vdp_control_port).l,a6
+		lea		(vdp_control_port).l,a6
 		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
 		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
 		move.w	#$9001,(a6)		; 64-cell hscroll size
 		bsr.w	ClearScreen
 		locVRAM	$B000
-		lea	(Nem_TitleCard).l,a0 ; load title card patterns
+		lea		(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
-		jsr	(Hud_Base).l
+		jsr		(Hud_Base).l
+
+		; DMA QUEUE + flamewing optimization
+		clr.w	(VDP_Command_Buffer).w
+		move.w	#VDP_Command_Buffer,(VDP_Command_Buffer_Slot).w
+
 		enable_ints
 		moveq	#palid_SSResult,d0
 		bsr.w	PalLoad2	; load results screen palette
@@ -3249,7 +3249,7 @@ loc_47D4:
 		move.w	(v_rings).w,d0
 		mulu.w	#10,d0		; multiply rings by 10
 		move.w	d0,(v_ringbonus).w ; set rings bonus
-		sfx	bgm_GotThrough,0,0,0	 ; play end-of-level music
+		sfx		bgm_GotThrough,0,0,0	 ; play end-of-level music
 
 		lea	(v_objspace).w,a1
 		moveq	#0,d0

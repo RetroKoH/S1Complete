@@ -1,18 +1,22 @@
 ; Variables (v) and Flags (f)
 
-v_regbuffer:	equ $FFFFFC00	; stores registers d0-a7 during an error event ($40 bytes)
-v_spbuffer:	equ $FFFFFC40	; stores most recent sp address (4 bytes)
-v_errortype:	equ $FFFFFC44	; error type
+v_regbuffer:				equ $FFFFFC00	; stores registers d0-a7 during an error event ($40 bytes)
+v_spbuffer:					equ $FFFFFC40	; stores most recent sp address (4 bytes)
+v_errortype:				equ $FFFFFC44	; error type
 
-v_128x128:	equ   $FF0000	; 128x128 tile mappings ($A400 bytes)
-v_lvllayoutfg:	equ $FFFFA400	; level layout ROM address (4 bytes)
-v_lvllayoutbg:	equ $FFFFA404	; background layout ROM address (4 bytes)
+v_128x128:					equ   $FF0000	; 128x128 tile mappings ($A400 bytes)
+v_lvllayoutfg:				equ $FFFFA400	; level layout ROM address (4 bytes)
+v_lvllayoutbg:				equ $FFFFA404	; background layout ROM address (4 bytes)
 
-v_ngfx_buffer:	equ $FFFFAA00	; Nemesis graphics decompression buffer ($200 bytes)
-v_spritequeue:	equ $FFFFAC00	; sprite display queue, in order of priority ($400 bytes)
-v_16x16:		equ $FFFFB000	; 16x16 tile mappings
+v_ngfx_buffer:				equ $FFFFAA00	; Nemesis graphics decompression buffer ($200 bytes)
+v_spritequeue:				equ $FFFFAC00	; sprite display queue, in order of priority ($400 bytes)
+v_16x16:					equ $FFFFB000	; 16x16 tile mappings
 
-v_sgfx_buffer:	equ $FFFFC800	; buffered Sonic graphics ($17 cells) ($2E0 bytes)
+VDP_Command_Buffer:			equ $FFFFC800	; Buffer for DMA Queue replacing the old art buffer.
+VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slot for a queued VDP command
+
+; $FFFFC900-CAFF - UNUSED
+
 v_tracksonic:	equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 v_objspace:	equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)

@@ -1,7 +1,7 @@
-s1disasm_git
+S1C_git
 ============
 
-The very latest Sonic 1 Disassembly.
+Sonic 1 Complete Project Files. Built from the Clownacy S1 Two-Eight Disassembly.
 
 See: http://info.sonicretro.org/Disassemblies
 
