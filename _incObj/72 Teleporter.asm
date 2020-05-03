@@ -57,7 +57,7 @@ loc_166E0:
 loc_1670E:
 		addq.b	#2,obRoutine(a0)
 		move.b	#$81,(f_lockmulti).w ; lock controls
-		move.b	#id_Roll,obAnim(a1) ; use Sonic's rolling animation
+		move.b	#aniID_Roll,obAnim(a1) ; use Sonic's rolling animation
 		move.w	#$800,obInertia(a1)
 		move.w	#0,obVelX(a1)
 		move.w	#0,obVelY(a1)

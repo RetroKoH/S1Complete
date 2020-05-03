@@ -22,7 +22,7 @@ Debug_Main:	; Routine 0
 		andi.w	#$7FF,(v_screenposy).w
 		andi.w	#$3FF,(v_bgscreenposy).w
 		move.b	#0,obFrame(a0)
-		move.b	#id_Walk,obAnim(a0)
+		move.b	#aniID_Walk,obAnim(a0)
 
 ; Debug Improvements
 		clr.w	obVelX(a0)
@@ -215,7 +215,7 @@ Debug_ChgItem:
 		move.w	#$40,(v_ssrotate).w ; set new level rotation speed
 		move.l	#Map_Sonic,(v_player+obMap).w
 		move.w	#$780,(v_player+obGfx).w
-		move.b	#id_Roll,(v_player+obAnim).w
+		move.b	#aniID_Roll,(v_player+obAnim).w
 		bset	#2,(v_player+obStatus).w
 		bset	#1,(v_player+obStatus).w
 

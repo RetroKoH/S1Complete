@@ -116,7 +116,7 @@ loc_146CC:
 		bne.s	loc_146C6
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; ===========================================================================
 
@@ -278,7 +278,7 @@ loc_147FE:
 		bne.s	loc_147F8
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; End of function Sonic_WalkVertR
 
@@ -355,7 +355,7 @@ loc_148A0:
 		bne.s	loc_1489A
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; End of function Sonic_WalkCeiling
 
@@ -432,6 +432,6 @@ loc_14942:
 		bne.s	loc_1493C
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; End of function Sonic_WalkVertL

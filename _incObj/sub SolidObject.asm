@@ -131,11 +131,11 @@ loc_FAD0:
 	; Ducking Size Fix
 	
 ;	if SpinDashActive=1	;Mercury Spin Dash Enabled
-;		cmpi.b	#id_SpinDash,obAnim(a1)
+;		cmpi.b	#aniID_SpinDash,obAnim(a1)
 ;		beq.s	@short
 ;	endc	;end Spin Dash Enabled
 	
-		cmpi.b	#id_Duck,obAnim(a1)
+		cmpi.b	#aniID_Duck,obAnim(a1)
 		bne.s	@skip
 		
 	@short:

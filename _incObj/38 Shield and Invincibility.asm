@@ -43,7 +43,7 @@ Shi_Shield:	; Routine 2
 	; Shield/Invincibility Positioning Fix
 		move.b	obStatus(a0),d0
 		move.w	#$A,d1
-		cmpi.b	#id_Balance,(v_player+obAnim).w
+		cmpi.b	#aniID_Balance,(v_player+obAnim).w
 		bne.s	@noshift
 		
 	@shift:
@@ -112,7 +112,7 @@ Shi_Stars:	; Routine 4
 		move.b	obStatus(a0),d0
 		move.w	#$A,d1
 
-		cmpi.b	#id_Balance,(v_player+obAnim).w
+		cmpi.b	#aniID_Balance,(v_player+obAnim).w
 		bne.s	@noshift
 		
 	@shift:

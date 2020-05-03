@@ -10,11 +10,11 @@ Sonic_Move:
 		move.w	(v_sonspeedacc).w,d5
 		move.w	(v_sonspeeddec).w,d4
 		tst.b	(f_jumponly).w
-		bne.w	loc_12FEE
+		bne.w	Sonic_Traction
 		tst.w	$3E(a0)
 		bne.w	Sonic_ResetScr
-		btst	#bitL,(v_jpadhold2).w ; is left being pressed?
-		beq.s	@notleft	; if not, branch
+		btst	#bitL,(v_jpadhold2).w 	; is left being pressed?
+		beq.s	@notleft				; if not, branch
 		bsr.w	Sonic_MoveLeft
 
 	@notleft:
@@ -30,7 +30,7 @@ Sonic_Move:
 		tst.w	obInertia(a0)	; is Sonic moving?
 		bne.w	Sonic_ResetScr	; if yes, branch
 		bclr	#5,obStatus(a0)
-		move.b	#id_Wait,obAnim(a0) ; use "standing" animation
+		move.b	#aniID_Wait,obAnim(a0) ; use "standing" animation
 		btst	#3,obStatus(a0)
 		beq.s	Sonic_Balance
 		moveq	#0,d0
@@ -74,14 +74,14 @@ loc_12F6A:
 		bset	#0,obStatus(a0)
 
 loc_12F70:
-		move.b	#id_Balance,obAnim(a0) ; use "balancing" animation
+		move.b	#aniID_Balance,obAnim(a0) ; use "balancing" animation
 		bra.w	Sonic_ResetScr
 ; ===========================================================================
 
 Sonic_LookUp: ; Look Shift Fix and delay
 		btst	#bitUp,(v_jpadhold2).w	; is up being pressed?
 		beq.s	Sonic_Duck				; if not, branch
-		move.b	#id_LookUp,obAnim(a0)	; use "looking up" animation
+		move.b	#aniID_LookUp,obAnim(a0)	; use "looking up" animation
 
 		addq.b	#1,(v_scrolldelay).w	; add 1 to the scroll timer
 		cmpi.b	#120,(v_scrolldelay).w	; is it equal to or greater than the scroll delay?
@@ -97,15 +97,15 @@ Sonic_LookUp: ; Look Shift Fix and delay
 		
 	@skip:
 		cmp.w	(v_lookshift).w,d0
-		ble.s	loc_12FC2
+		ble.s	Sonic_Friction
 		addq.w	#2,(v_lookshift).w
-		bra.s	loc_12FC2
+		bra.s	Sonic_Friction
 ; ===========================================================================
 
 Sonic_Duck: ; Look Shift Fix
-		btst	#bitDn,(v_jpadhold2).w ; is down being pressed?
-		beq.s	Sonic_ResetScr	; if not, branch
-		move.b	#id_Duck,obAnim(a0) ; use "ducking" animation
+		btst	#bitDn,(v_jpadhold2).w	; is down being pressed?
+		beq.s	Sonic_ResetScr			; if not, branch
+		move.b	#aniID_Duck,obAnim(a0) 	; use "ducking" animation
 
 		addq.b	#1,(v_scrolldelay).w	; add 1 to the scroll timer
 		cmpi.b	#120,(v_scrolldelay).w	; is it equal to or greater than the scroll delay?
@@ -120,13 +120,13 @@ Sonic_Duck: ; Look Shift Fix
 		bgt.s	@skip					; if greater than 8, branch
 		
 	@set:
-		move.w	#8,d0	; set offset to 8
+		move.w	#8,d0					; set offset to 8
 		
 	@skip:
 		cmp.w	(v_lookshift).w,d0
-		bge.s	loc_12FC2
+		bge.s	Sonic_Friction
 		subq.w	#2,(v_lookshift).w
-		bra.s	loc_12FC2
+		bra.s	Sonic_Friction
 ; ===========================================================================
 
 Sonic_ResetScr:
@@ -134,19 +134,19 @@ Sonic_ResetScr:
 
 Sonic_LookReset:
 		cmpi.w	#$60,(v_lookshift).w ; is screen in its default position?
-		beq.s	loc_12FC2	; if yes, branch
+		beq.s	Sonic_Friction	; if yes, branch
 		bcc.s	loc_12FBE
 		addq.w	#4,(v_lookshift).w ; move screen back to default
 
 loc_12FBE:
 		subq.w	#2,(v_lookshift).w ; move screen back to default
 
-loc_12FC2:
+Sonic_Friction:
 		move.b	(v_jpadhold2).w,d0
 		andi.b	#btnL+btnR,d0	; is left/right	pressed?
-		bne.s	loc_12FEE	; if yes, branch
+		bne.s	Sonic_Traction	; if yes, branch
 		move.w	obInertia(a0),d0
-		beq.s	loc_12FEE
+		beq.s	Sonic_Traction
 		bmi.s	loc_12FE2
 		sub.w	d5,d0
 		bcc.s	loc_12FDC
@@ -154,7 +154,7 @@ loc_12FC2:
 
 loc_12FDC:
 		move.w	d0,obInertia(a0)
-		bra.s	loc_12FEE
+		bra.s	Sonic_Traction
 ; ===========================================================================
 
 loc_12FE2:
@@ -165,7 +165,7 @@ loc_12FE2:
 loc_12FEA:
 		move.w	d0,obInertia(a0)
 
-loc_12FEE:
+Sonic_Traction:
 		move.b	obAngle(a0),d0
 		jsr	(CalcSine).l
 		muls.w	obInertia(a0),d1
@@ -239,7 +239,7 @@ loc_13086:
 		bset	#0,obStatus(a0)
 		bne.s	loc_1309A
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 
 loc_1309A:
 		sub.w	d5,d0
@@ -254,7 +254,7 @@ loc_1309A:
 
 loc_130A6:
 		move.w	d0,obInertia(a0)
-		move.b	#id_Walk,obAnim(a0) ; use walking animation
+		move.b	#aniID_Walk,obAnim(a0) ; use walking animation
 		rts	
 ; ===========================================================================
 
@@ -271,7 +271,7 @@ loc_130BA:
 		bne.s	locret_130E8
 		cmpi.w	#$400,d0
 		blt.s	locret_130E8
-		move.b	#id_Stop,obAnim(a0) ; use "stopping" animation
+		move.b	#aniID_Stop,obAnim(a0) ; use "stopping" animation
 		bclr	#0,obStatus(a0)
 		sfx	sfx_Skid,0,0,0	; play stopping sound
 
@@ -289,7 +289,7 @@ Sonic_MoveRight:
 		bclr	#0,obStatus(a0)
 		beq.s	loc_13104
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 
 loc_13104:
 		add.w	d5,d0
@@ -302,7 +302,7 @@ loc_13104:
 
 loc_1310C:
 		move.w	d0,obInertia(a0)
-		move.b	#id_Walk,obAnim(a0) ; use walking animation
+		move.b	#aniID_Walk,obAnim(a0) ; use walking animation
 		rts	
 ; ===========================================================================
 
@@ -319,7 +319,7 @@ loc_13120:
 		bne.s	locret_1314E
 		cmpi.w	#-$400,d0
 		bgt.s	locret_1314E
-		move.b	#id_Stop,obAnim(a0) ; use "stopping" animation
+		move.b	#aniID_Stop,obAnim(a0) ; use "stopping" animation
 		bset	#0,obStatus(a0)
 		sfx	sfx_Skid,0,0,0	; play stopping sound
 
