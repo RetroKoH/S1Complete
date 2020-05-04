@@ -1,9 +1,5 @@
 ; Variables (v) and Flags (f)
 
-v_regbuffer:				equ $FFFFFC00	; stores registers d0-a7 during an error event ($40 bytes)
-v_spbuffer:					equ $FFFFFC40	; stores most recent sp address (4 bytes)
-v_errortype:				equ $FFFFFC44	; error type
-
 v_128x128:					equ $FFFF0000	; 128x128 tile mappings (4 bytes) Saved $A400
 v_16x16:					equ v_128x128+4	; 16x16 tile mappings (4 bytes) Saved $1800
 
@@ -23,6 +19,7 @@ VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slo
 ; $FFFFC900-CAFF - UNUSED
 
 v_tracksonic:	equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
+
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 v_objspace:	equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)
 v_player:	equ v_objspace	; object variable space for Sonic ($40 bytes)
@@ -195,7 +192,9 @@ v_opl_data:	equ $FFFFF770	; ObjPosLoad - data buffer ($10 bytes)
 
 v_ssangle:			equ $FFFFF780	; Special Stage angle (2 bytes)
 v_ssrotate:			equ $FFFFF782	; Special Stage rotation speed (2 bytes)
-v_ssangleprev:		equ $FFFFF784	; USED WITH DYN SS WALLS
+v_ssangleprev:		equ $FFFFF784	; USED WITH DYN SS WALLS (2 bytes)
+
+f_level_started: = $FFFFF786 ; from Sonic 2
 
 v_btnpushtime1:	equ $FFFFF790	; button push duration - in level (2 bytes)
 v_btnpushtime2:	equ $FFFFF792	; button push duration - in demo (2 bytes)
@@ -251,7 +250,11 @@ v_pal_water_dup:	equ $FFFFFA00 ; duplicate underwater palette, used for transiti
 v_pal_water:	equ $FFFFFA80	; main underwater palette ($80 bytes)
 v_pal_dry:	equ $FFFFFB00	; main palette ($80 bytes)
 v_pal_dry_dup:	equ $FFFFFB80	; duplicate palette, used for transitions ($80 bytes)
-v_objstate:	equ $FFFFFC00	; object state list ($200 bytes)
+
+v_objstate:					equ $FFFFFC00	; object state list ($200 bytes)
+v_regbuffer:				equ $FFFFFC00	; stores registers d0-a7 during an error event ($40 bytes)
+v_spbuffer:					equ $FFFFFC40	; stores most recent sp address (4 bytes)
+v_errortype:				equ $FFFFFC44	; error type
 
 
 v_systemstack:	equ $FFFFFE00

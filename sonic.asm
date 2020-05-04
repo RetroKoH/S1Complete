@@ -559,8 +559,8 @@ VBla_08:
 
 Demo_Time:
 		bsr.w	LoadTilesAsYouMove
-		jsr	(AnimateLevelGfx).l
-		jsr	(HUD_Update).l
+		jsr		(AnimateLevelGfx).l
+		jsr		(HUD_Update).l
 		bsr.w	ProcessDPLC2
 		tst.w	(v_demolength).w ; is there time left on the demo?
 		beq.w	@end		; if not, branch
@@ -625,8 +625,8 @@ VBla_0C:
 		movem.l	(v_fg_scroll_flags).w,d0-d1
 		movem.l	d0-d1,(v_fg_scroll_flags_dup).w
 		bsr.w	LoadTilesAsYouMove
-		jsr	(AnimateLevelGfx).l
-		jsr	(HUD_Update).l
+		jsr		(AnimateLevelGfx).l
+		jsr		(HUD_Update).l
 		bsr.w	sub_1642
 		rts	
 ; ===========================================================================
@@ -1939,6 +1939,7 @@ GM_Title:
 		move.w	#$8720,(a6)	; set background colour (palette line 2, entry 0)
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
+		clr.b	(f_level_started).w	; LEVEL START FLAG
 
 		lea		(v_objspace).w,a1
 		moveq	#0,d0
@@ -1994,12 +1995,12 @@ GM_Title:
 		move.w	(a5)+,(a6)
 		dbf	d1,Tit_LoadText	; load level select font
 
-		move.b	#0,(v_lastlamp).w ; clear lamppost counter
-		move.w	#0,(v_debuguse).w ; disable debug item placement mode
-		move.w	#0,(f_demo).w	; disable debug mode
-		move.w	#0,($FFFFFFEA).w ; unused variable
-		move.w	#(id_GHZ<<8),(v_zone).w	; set level to GHZ (00)
-		move.w	#0,(v_pcyc_time).w ; disable palette cycling
+		clr.b	(v_lastlamp).w		; clear lamppost counter
+		clr.w	(v_debuguse).w		; disable debug item placement mode
+		clr.w	(f_demo).w			; disable debug mode
+		clr.w	($FFFFFFEA).w 		; unused variable
+		clr.w	(v_zone).w			; set level to GHZ (00)
+		clr.w	(v_pcyc_time).w 	; disable palette cycling
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
 
@@ -2579,7 +2580,7 @@ GM_Level:
 		bset	#7,(v_gamemode).w ; add $80 to screen mode (for pre level sequence)
 		tst.w	(f_demo).w
 		bmi.s	Level_NoMusicFade
-		sfx	bgm_Fade,0,1,1 ; fade out music
+		sfx		bgm_Fade,0,1,1 ; fade out music
 
 	Level_NoMusicFade:
 		bsr.w	ClearPLC
@@ -2588,14 +2589,14 @@ GM_Level:
 		bmi.s	Level_ClrRam	; if yes, branch
 		disable_ints
 		locVRAM	$B000
-		lea	(Nem_TitleCard).l,a0 ; load title card patterns
+		lea		(Nem_TitleCard).l,a0 ; load title card patterns
 		bsr.w	NemDec
 		enable_ints
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		lsl.w	#4,d0
-		lea	(LevelHeaders).l,a2
-		lea	(a2,d0.w),a2
+		lea		(LevelHeaders).l,a2
+		lea		(a2,d0.w),a2
 		moveq	#0,d0
 		move.b	(a2),d0
 		beq.s	loc_37FC
@@ -2606,7 +2607,7 @@ loc_37FC:
 		bsr.w	AddPLC		; load standard	patterns
 
 Level_ClrRam:
-		lea	(v_objspace).w,a1
+		lea		(v_objspace).w,a1
 		moveq	#0,d0
 		move.w	#$7FF,d1
 
@@ -2721,7 +2722,7 @@ Level_TtlCardLoop:
 		bne.s	Level_TtlCardLoop ; if not, branch
 		tst.l	(v_plc_buffer).w ; are there any items in the pattern load cue?
 		bne.s	Level_TtlCardLoop ; if yes, branch
-		jsr	(Hud_Base).l	; load basic HUD gfx
+		jsr		(Hud_Base).l	; load basic HUD gfx
 
 	Level_SkipTtlCard:
 		moveq	#palid_Sonic,d0
@@ -2737,9 +2738,9 @@ Level_TtlCardLoop:
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
-		tst.w	(f_demo).w
-		bmi.s	Level_ChkDebug
-		move.b	#id_HUD,(v_objspace+$40).w ; load HUD object
+;		tst.w	(f_demo).w
+;		bmi.s	Level_ChkDebug
+;		move.b	#id_HUD,(v_objspace+$40).w ; load HUD object
 
 Level_ChkDebug:
 		tst.b	(f_debugcheat).w ; has debug cheat been entered?
@@ -2749,8 +2750,9 @@ Level_ChkDebug:
 		move.b	#1,(f_debugmode).w ; enable debug mode
 
 Level_ChkWater:
-		move.w	#0,(v_jpadhold2).w
-		move.w	#0,(v_jpadhold1).w
+		clr.w	(v_jpadhold2).w
+		clr.w	(v_jpadhold1).w
+		clr.b	(f_level_started).w ; LEVEL START FLAG
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadObj	; if not, branch
 		move.b	#id_WaterSurface,(v_objspace+$780).w ; load water surface object
@@ -2839,13 +2841,18 @@ Level_Delay:
 
 Level_ClrCardArt:
 		moveq	#plcid_Explode,d0
-		jsr	(AddPLC).l	; load explosion gfx
+		jsr		(AddPLC).l	; load explosion gfx
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		addi.w	#plcid_GHZAnimals,d0
-		jsr	(AddPLC).l	; load animal gfx (level no. + $15)
+		jsr		(AddPLC).l	; load animal gfx (level no. + $15)
+;		jsr	(AddAnimalPLC).l	; load animal gfx - REV C EDIT (FraGag)
 
 Level_StartGame:
+		tst.w	(f_demo).w
+		bmi.s	@demo
+		bset	#0,(f_level_started).w ; LEVEL START FLAG
+	@demo:
 		bclr	#7,(v_gamemode).w ; subtract $80 from mode to end pre-level stuff
 
 ; ---------------------------------------------------------------------------
@@ -3583,6 +3590,7 @@ GM_Continue:
 		move.w	#$8004,(a6)	; 8 colour mode
 		move.w	#$8700,(a6)	; background colour
 		bsr.w	ClearScreen
+		clr.b	(f_level_started).w	; LEVEL START FLAG
 
 		lea	(v_objspace).w,a1
 		moveq	#0,d0
@@ -3754,7 +3762,8 @@ End_LoadSonic:
 		move.b	#1,(f_lockctrl).w ; lock controls
 		move.w	#(btnL<<8),(v_jpadhold2).w ; move Sonic to the left
 		move.w	#$F800,(v_player+obInertia).w ; set Sonic's speed
-		move.b	#id_HUD,(v_objspace+$40).w ; load HUD object
+		bset	#0,(f_level_started).w
+		;move.b	#id_HUD,(v_objspace+$40).w ; load HUD object
 		jsr	(ObjPosLoad).l
 		jsr	(ExecuteObjects).l
 		jsr	(BuildSprites).l
@@ -3926,6 +3935,7 @@ GM_Credits:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
+		clr.b	(f_level_started).w
 
 		lea	(v_objspace).w,a1
 		moveq	#0,d0
@@ -6096,10 +6106,23 @@ BldSpr_ScrPos:	dc.l 0				; blank
 BuildSprites:
 		lea	(v_spritetablebuffer).w,a2 ; set address for sprite table
 		moveq	#0,d5
+		moveq	#0,d4
+		tst.b	(f_level_started).w
+		beq.s	@noRingsorHUD
+		bsr.w	BuildHUD	; Sonic 2 HUD Manager
+
+	@noRingsorHUD:
 		lea	(v_spritequeue).w,a4
 		moveq	#7,d7
 
 loc_D66A:
+;		cmpi.b	#2,d7
+;		bne.s	@notpriority2
+;		move.l	a4,-(sp)
+;		jsr		BuildRings
+;		move.l	(sp)+,a4
+
+;	@notpriority2:
 		tst.w	(a4)
 		beq.w	loc_D72E
 		moveq	#2,d6
@@ -6212,7 +6235,7 @@ sub_D750:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_D762:
+DrawSprite_Loop: ;sub_D762:
 		cmpi.b	#$50,d5
 		beq.s	locret_D794
 		move.b	(a1)+,d0
@@ -6236,11 +6259,11 @@ sub_D762:
 
 loc_D78E:
 		move.w	d0,(a2)+
-		dbf	d1,sub_D762
+		dbf		d1,DrawSprite_Loop
 
 locret_D794:
 		rts	
-; End of function sub_D762
+; End of function DrawSprite_Loop
 
 ; ===========================================================================
 
@@ -6364,9 +6387,12 @@ loc_D876:
 locret_D87C:
 		rts	
 
+;		include	"_inc\RingsManager.asm"
+		include "_inc\BuildHUD.asm"
 		include	"_incObj\sub ChkObjectVisible.asm"
 
 ; ---------------------------------------------------------------------------
+; OBJECTS MANAGER
 ; Subroutine to	load a level's objects
 ; ---------------------------------------------------------------------------
 
@@ -7738,7 +7764,7 @@ loc_1B210:
 		move.b	(a1)+,d1
 		subq.b	#1,d1
 		bmi.s	loc_1B268
-		jsr	(sub_D762).l
+		jsr		(DrawSprite_Loop).l
 
 loc_1B268:
 		addq.w	#4,a4
@@ -8204,7 +8230,7 @@ Map_SS_Down:	include	"_maps\SS DOWN Block.asm"
 
 		include	"_inc\AnimateLevelGfx.asm"
 
-		include	"_incObj\21 HUD.asm"
+			include "_incObj\21.asm"
 Map_HUD:	include	"_maps\HUD.asm"
 
 ; ---------------------------------------------------------------------------

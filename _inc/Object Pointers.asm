@@ -2,30 +2,30 @@
 ; Object pointers
 ; ---------------------------------------------------------------------------
 ptr_SonicPlayer:	dc.l SonicPlayer	; $01
-ptr_Obj02:		dc.l NullObject
+ptr_Obj02:			dc.l NullObject
 ptr_PathSwapper:	dc.l PathSwapper
-ptr_Obj04:		dc.l NullObject
-ptr_Obj05:		dc.l NullObject
-ptr_Obj06:		dc.l NullObject
-ptr_Obj07:		dc.l NullObject
-ptr_Splash:		dc.l Splash		; $08
+ptr_Obj04:			dc.l NullObject
+ptr_Obj05:			dc.l NullObject
+ptr_Obj06:			dc.l NullObject
+ptr_Obj07:			dc.l NullObject
+ptr_Splash:			dc.l Splash		; $08
 ptr_SonicSpecial:	dc.l SonicSpecial
 ptr_DrownCount:		dc.l DrownCount
-ptr_Pole:		dc.l Pole
+ptr_Pole:			dc.l Pole
 ptr_FlapDoor:		dc.l FlapDoor
 ptr_Signpost:		dc.l Signpost
 ptr_TitleSonic:		dc.l TitleSonic
-ptr_PSBTM:		dc.l PSBTM
-ptr_Obj10:		dc.l Obj10		; $10
-ptr_Bridge:		dc.l Bridge
+ptr_PSBTM:			dc.l PSBTM
+ptr_Obj10:			dc.l Obj10		; $10
+ptr_Bridge:			dc.l Bridge
 ptr_SpinningLight:	dc.l SpinningLight
 ptr_LavaMaker:		dc.l LavaMaker
 ptr_LavaBall:		dc.l LavaBall
 ptr_SwingingPlatform:	dc.l SwingingPlatform
 ptr_Harpoon:		dc.l Harpoon
-ptr_Helix:		dc.l Helix
+ptr_Helix:			dc.l Helix
 ptr_BasicPlatform:	dc.l BasicPlatform	; $18
-ptr_Obj19:		dc.l Obj19
+ptr_Obj19:			dc.l Obj19
 ptr_CollapseLedge:	dc.l CollapseLedge
 ptr_WaterSurface:	dc.l WaterSurface
 ptr_Scenery:		dc.l Scenery
@@ -33,28 +33,28 @@ ptr_MagicSwitch:	dc.l MagicSwitch
 ptr_BallHog:		dc.l BallHog
 ptr_Crabmeat:		dc.l Crabmeat
 ptr_Cannonball:		dc.l Cannonball		; $20
-ptr_HUD:		dc.l HUD
+ptr_Obj21:			dc.l Obj21
 ptr_BuzzBomber:		dc.l BuzzBomber
 ptr_Missile:		dc.l Missile
 ptr_MissileDissolve:	dc.l MissileDissolve
-ptr_Rings:		dc.l Rings
+ptr_Rings:			dc.l Rings
 ptr_Monitor:		dc.l Monitor
 ptr_ExplosionItem:	dc.l ExplosionItem
 ptr_Animals:		dc.l Animals		; $28
-ptr_Points:		dc.l Points
+ptr_Points:			dc.l Points
 ptr_AutoDoor:		dc.l AutoDoor
 ptr_Chopper:		dc.l Chopper
-ptr_Jaws:		dc.l Jaws
+ptr_Jaws:			dc.l Jaws
 ptr_Burrobot:		dc.l Burrobot
 ptr_PowerUp:		dc.l PowerUp
 ptr_LargeGrass:		dc.l LargeGrass
 ptr_GlassBlock:		dc.l GlassBlock		; $30
 ptr_ChainStomp:		dc.l ChainStomp
-ptr_Button:		dc.l Button
+ptr_Button:			dc.l Button
 ptr_PushBlock:		dc.l PushBlock
 ptr_TitleCard:		dc.l TitleCard
 ptr_GrassFire:		dc.l GrassFire
-ptr_Spikes:		dc.l Spikes
+ptr_Spikes:			dc.l Spikes
 ptr_RingLoss:		dc.l RingLoss
 ptr_ShieldItem:		dc.l ShieldItem		; $38
 ptr_GameOverCard:	dc.l GameOverCard
@@ -62,16 +62,16 @@ ptr_GotThroughCard:	dc.l GotThroughCard
 ptr_PurpleRock:		dc.l PurpleRock
 ptr_SmashWall:		dc.l SmashWall
 ptr_BossGreenHill:	dc.l BossGreenHill
-ptr_Prison:		dc.l Prison
+ptr_Prison:			dc.l Prison
 ptr_ExplosionBomb:	dc.l ExplosionBomb
 ptr_MotoBug:		dc.l MotoBug		; $40
 ptr_Springs:		dc.l Springs
 ptr_Newtron:		dc.l Newtron
-ptr_Roller:		dc.l Roller
+ptr_Roller:			dc.l Roller
 ptr_EdgeWalls:		dc.l EdgeWalls
 ptr_SideStomp:		dc.l SideStomp
 ptr_MarbleBrick:	dc.l MarbleBrick
-ptr_Bumper:		dc.l Bumper
+ptr_Bumper:			dc.l Bumper
 ptr_BossBall:		dc.l BossBall		; $48
 ptr_WaterSound:		dc.l WaterSound
 ptr_VanishSonic:	dc.l VanishSonic
@@ -79,8 +79,8 @@ ptr_GiantRing:		dc.l GiantRing
 ptr_GeyserMaker:	dc.l GeyserMaker
 ptr_LavaGeyser:		dc.l LavaGeyser
 ptr_LavaWall:		dc.l LavaWall
-ptr_Obj4F:		dc.l Obj4F
-ptr_Yadrin:		dc.l Yadrin		; $50
+ptr_Obj4F:			dc.l Obj4F
+ptr_Yadrin:			dc.l Yadrin		; $50
 ptr_SmashBlock:		dc.l SmashBlock
 ptr_MovingBlock:	dc.l MovingBlock
 ptr_CollapseFloor:	dc.l CollapseFloor
