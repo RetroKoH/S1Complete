@@ -7,8 +7,8 @@
 
 Sonic_AnglePos:
 		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
-		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
-		beq.s	@first					; MJ: if not, branch
+		cmpi.b	#$C,(v_top_solid_bit).w				; MJ: is second collision set to be used?
+		beq.s	@first								; MJ: if not, branch
 		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
 @first:
 		move.b	(v_top_solid_bit).w,d5			; MJ: load L/R/B soldity bit
@@ -94,7 +94,16 @@ locret_146BE:
 ; ===========================================================================
 
 loc_146C0:
-		cmpi.w	#$E,d1
+	move.b	obVelX(a0),d0
+	bpl.s	@next1
+	neg.b	d0
+@next1:
+	addq.b	#4,d0
+	cmpi.b	#$E,d0
+	bcs.s	@next2
+	move.b	#$E,d0
+@next2:
+	cmp.b	d0,d1
 		bgt.s	loc_146CC
 
 loc_146C6:
@@ -107,7 +116,7 @@ loc_146CC:
 		bne.s	loc_146C6
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; ===========================================================================
 
@@ -175,6 +184,16 @@ Sonic_Angle:
 loc_1475E:
 		btst	#0,d2
 		bne.s	loc_1476A
+	tst.b	$38(a0)
+	bne.s	@onwheel
+	move.b	d2,d0
+	sub.b	obAngle(a0),d0
+	bpl.s	@next
+	neg.b	d0
+@next:
+	cmpi.b	#$20,d0
+	bcc.s	loc_1476A
+@onwheel:
 		move.b	d2,obAngle(a0)
 		rts	
 ; ===========================================================================
@@ -237,7 +256,16 @@ locret_147F0:
 ; ===========================================================================
 
 loc_147F2:
-		cmpi.w	#$E,d1
+	move.b	obVelY(a0),d0
+	bpl.s	@next1
+	neg.b	d0
+@next1:
+	addq.b	#4,d0
+	cmpi.b	#$E,d0
+	bcs.s	@next2
+	move.b	#$E,d0
+@next2:
+	cmp.b	d0,d1
 		bgt.s	loc_147FE
 
 loc_147F8:
@@ -250,7 +278,7 @@ loc_147FE:
 		bne.s	loc_147F8
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; End of function Sonic_WalkVertR
 
@@ -305,7 +333,16 @@ locret_14892:
 ; ===========================================================================
 
 loc_14894:
-		cmpi.w	#$E,d1
+	move.b	obVelX(a0),d0
+	bpl.s	@next1
+	neg.b	d0
+@next1:	
+	addq.b	#4,d0
+	cmpi.b	#$E,d0
+	bcs.s	@next2
+	move.b	#$E,d0
+@next2:
+	cmp.b	d0,d1
 		bgt.s	loc_148A0
 
 loc_1489A:
@@ -318,7 +355,7 @@ loc_148A0:
 		bne.s	loc_1489A
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; End of function Sonic_WalkCeiling
 
@@ -373,7 +410,16 @@ locret_14934:
 ; ===========================================================================
 
 loc_14936:
-		cmpi.w	#$E,d1
+	move.b	obVelY(a0),d0
+	bpl.s	@next1
+	neg.b	d0
+@next1:
+	addq.b	#4,d0
+	cmpi.b	#$E,d0
+	bcs.s	@next2
+	move.b	#$E,d0
+@next2:
+	cmp.b	d0,d1
 		bgt.s	loc_14942
 
 loc_1493C:
@@ -386,6 +432,6 @@ loc_14942:
 		bne.s	loc_1493C
 		bset	#1,obStatus(a0)
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 		rts	
 ; End of function Sonic_WalkVertL
