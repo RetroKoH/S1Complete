@@ -1221,7 +1221,6 @@ QuickPLC:
 
 		include	"_inc\PaletteCycle.asm"
 
-Pal_TitleCyc:	incbin	"palette\Cycle - Title Screen Water.bin"
 Pal_GHZCyc:	incbin	"palette\Cycle - GHZ.bin"
 Pal_LZCyc1:	incbin	"palette\Cycle - LZ Waterfall.bin"
 Pal_LZCyc2:	incbin	"palette\Cycle - LZ Conveyor Belt.bin"
@@ -1930,7 +1929,7 @@ GM_Title:
 		bsr.w	PaletteFadeOut
 		disable_ints
 		bsr.w	SoundDriverLoad
-		lea	(vdp_control_port).l,a6
+		lea		(vdp_control_port).l,a6
 		move.w	#$8004,(a6)	; 8-colour mode
 		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
 		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
@@ -1941,28 +1940,28 @@ GM_Title:
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
 
-		lea	(v_objspace).w,a1
+		lea		(v_objspace).w,a1
 		moveq	#0,d0
 		move.w	#$7FF,d1
 
 	Tit_ClrObj1:
 		move.l	d0,(a1)+
-		dbf	d1,Tit_ClrObj1	; fill object space ($D000-$EFFF) with 0
+		dbf		d1,Tit_ClrObj1	; fill object space ($D000-$EFFF) with 0
 
 		locVRAM	0
-		lea	(Nem_JapNames).l,a0 ; load Japanese credits
+		lea		(Nem_JapNames).l,a0 ; load Japanese credits
 		bsr.w	NemDec
 		locVRAM	$14C0
-		lea	(Nem_CreditText).l,a0 ;	load alphabet
+		lea		(Nem_CreditText).l,a0 ;	load alphabet
 		bsr.w	NemDec
-		lea	($FF0000).l,a1
-		lea	(Eni_JapNames).l,a0 ; load mappings for	Japanese credits
+		lea		($FF0000).l,a1
+		lea		(Eni_JapNames).l,a0 ; load mappings for	Japanese credits
 		move.w	#0,d0
 		bsr.w	EniDec
 
 		copyTilemap	$FF0000,$C000,$27,$1B
 
-		lea	(v_pal_dry_dup).w,a1
+		lea		(v_pal_dry_dup).w,a1
 		moveq	#cBlack,d0
 		move.w	#$1F,d1
 
@@ -1973,8 +1972,8 @@ GM_Title:
 		moveq	#palid_Sonic,d0	; load Sonic's palette
 		bsr.w	PalLoad1
 		move.b	#id_CreditsText,(v_objspace+$80).w ; load "SONIC TEAM PRESENTS" object
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
+		jsr		(ExecuteObjects).l
+		jsr		(BuildSprites).l
 		bsr.w	PaletteFadeIn
 		disable_ints
 		locVRAM	$4000
@@ -2018,26 +2017,23 @@ GM_Title:
 		move.w	#$6000,d2
 		bsr.w	DrawChunks
 
-		copyTilemap	Eni_Title,$C206,$21,$15 ; Load Title Chunks from ROM
+		copyTilemap	Eni_Title,$C208,$21,$15 ; Load Title Chunks from ROM
 
 		locVRAM	0
 		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
 		bsr.w	NemDec
+		moveq	#palid_GHZ,d0	; load GHZ palette
+		bsr.w	PalLoad1
 		moveq	#palid_Title,d0	; load title screen palette
 		bsr.w	PalLoad1
 		sfx	bgm_Title,0,1,1	; play title screen music
 		move.b	#0,(f_debugmode).w ; disable debug mode
 		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
-		lea	(v_objspace+$80).w,a1
-		moveq	#0,d0
-		move.w	#7,d1
 
-	Tit_ClrObj2:
-		move.l	d0,(a1)+
-		dbf	d1,Tit_ClrObj2
-
-		move.b	#id_TitleSonic,(v_objspace+$40).w ; load big Sonic object
-		move.b	#id_PSBTM,(v_objspace+$80).w ; load "PRESS START BUTTON" object
+		lea		(v_objspace+$80).w,a0
+		jsr		DeleteObject						; clear object RAM to make room for the "Press Start Button" object
+		move.b	#id_TitleSonic,(v_objspace+$40).w	; load big Sonic object
+		move.b	#id_PSBTM,(v_objspace+$80).w		; load "PRESS START BUTTON" object
 
 		if Revision=0
 		else

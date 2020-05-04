@@ -32,12 +32,12 @@ PCycle_Index:	dc.w PCycle_GHZ-PCycle_Index
 
 
 PCycle_Title:
-		lea	(Pal_TitleCyc).l,a0
+		lea		(Pal_GHZCyc).l,a0
 		bra.s	PCycGHZ_Go
 ; ===========================================================================
 
 PCycle_GHZ:
-		lea	(Pal_GHZCyc).l,a0
+		lea		(Pal_GHZCyc).l,a0
 
 PCycGHZ_Go:
 		subq.w	#1,(v_pcyc_time).w ; decrement timer
