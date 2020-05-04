@@ -272,7 +272,6 @@ PLC_Warp:
 PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSBgCloud, 0	; bubble and cloud background
 		plcm	Nem_SSBgFish, $A20	; bird and fish	background
-		plcm	Nem_SSWalls, $2840	; walls
 		plcm	Nem_Bumper, $4760	; bumper
 		plcm	Nem_SSGOAL, $4A20	; GOAL block
 		plcm	Nem_SSUpDown, $4C60	; UP and DOWN blocks

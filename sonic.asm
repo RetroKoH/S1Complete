@@ -584,6 +584,13 @@ VBla_0A:
 		jsr	(ProcessDMAQueue).l ; DMA Queue
 
 	@nochg:
+		cmpi.b	#96,(v_hbla_line).w
+		bcc.s	@update
+		bra.w	@end
+
+	@update:
+		jsr	SS_LoadWalls
+
 		tst.w	(v_demolength).w	; is there time left on the demo?
 		beq.w	@end	; if not, return
 		subq.w	#1,(v_demolength).w	; subtract 1 from time left in demo
@@ -648,6 +655,13 @@ VBla_16:
 		jsr	(ProcessDMAQueue).l
 
 	@nochg:
+		cmpi.b	#96,(v_hbla_line).w
+		bcc.s	@update
+		bra.w	@end
+		
+	@update:
+		jsr	SS_LoadWalls
+
 		tst.w	(v_demolength).w
 		beq.w	@end
 		subq.w	#1,(v_demolength).w
@@ -3122,6 +3136,7 @@ GM_Special:
 		move.l	#0,(v_screenposx).w
 		move.l	#0,(v_screenposy).w
 		move.b	#id_SonicSpecial,(v_player).w ; load special stage Sonic object
+		move.b	#$FF,(v_ssangleprev).w	; fill previous angle with obviously false value to force an update
 		bsr.w	PalCycle_SS
 		clr.w	(v_ssangle).w	; set stage angle to "upright"
 		move.w	#$40,(v_ssrotate).w ; set stage rotation speed
@@ -7630,7 +7645,7 @@ SS_ShowLayout:
 		move.w	d5,-(sp)
 		lea	($FFFF8000).w,a1
 		move.b	(v_ssangle).w,d0
-		andi.b	#$FC,d0
+		;andi.b	#$FC,d0				; Removed for smooth rotation (Cinossu)
 		jsr	(CalcSine).l
 		move.w	d0,d4
 		move.w	d1,d5
@@ -7756,18 +7771,6 @@ loc_1B288:
 
 
 SS_AniWallsRings:
-		lea	($FF400C).l,a1
-		moveq	#0,d0
-		move.b	(v_ssangle).w,d0
-		lsr.b	#2,d0
-		andi.w	#$F,d0
-		moveq	#$23,d1
-
-loc_1B2A4:
-		move.w	d0,(a1)
-		addq.w	#8,a1
-		dbf	d1,loc_1B2A4
-
 		lea	($FF4005).l,a1
 		subq.b	#1,(v_ani1_time).w
 		bpl.s	loc_1B2C8
@@ -7862,6 +7865,30 @@ loc_1B350:
 		adda.w	#$48,a1
 		rts	
 ; End of function SS_AniWallsRings
+
+SS_LoadWalls:
+		moveq	#0,d0
+		move.b	(v_ssangle).w,d0		; get the Special Stage angle
+		lsr.b	#2,d0					; modify so it can be used as a frame ID
+		andi.w	#$F,d0
+		cmp.b	(v_ssangleprev).w,d0	; does the modified angle match the recorded value?
+		beq.s	@return					; if so, branch
+
+		lea		($C00000).l,a6
+		lea		(Art_SSWalls).l,a1		; load wall art
+		move.w	d0,d1
+		lsl.w	#8,d1
+		add.w	d1,d1
+		add.w	d1,a1
+
+		locVRAM	$2840					; VRAM address
+
+		move.w	#$F,d1					; number of 8x8 tiles
+		jsr		LoadTiles
+		move.b	d0,(v_ssangleprev).w	; record the modified angle for comparison
+
+	@return:
+		rts
 
 ; ===========================================================================
 SS_WaRiVramSet:	dc.w $142, $6142, $142,	$142, $142, $142, $142,	$6142
@@ -8363,12 +8390,12 @@ Nem_Goggle:	incbin	"artnem\Unused - Goggles.bin" ; unused goggles
 		else
 		endc
 
-Map_SSWalls:	include	"_maps\SS Walls.asm"
+		include	"_maps\SS Walls.asm"
 
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - special stage
 ; ---------------------------------------------------------------------------
-Nem_SSWalls:	incbin	"artnem\Special Walls.bin" ; special stage walls
+Art_SSWalls:	incbin	"artunc\Special Walls.bin" ; special stage walls
 		even
 Eni_SSBg1:	incbin	"tilemaps\SS Background 1.bin" ; special stage background (mappings)
 		even

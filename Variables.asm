@@ -193,8 +193,10 @@ v_opl_routine:	equ $FFFFF76C	; ObjPosLoad - routine counter
 v_opl_screen:	equ $FFFFF76E	; ObjPosLoad - screen variable
 v_opl_data:	equ $FFFFF770	; ObjPosLoad - data buffer ($10 bytes)
 
-v_ssangle:	equ $FFFFF780	; Special Stage angle (2 bytes)
-v_ssrotate:	equ $FFFFF782	; Special Stage rotation speed (2 bytes)
+v_ssangle:			equ $FFFFF780	; Special Stage angle (2 bytes)
+v_ssrotate:			equ $FFFFF782	; Special Stage rotation speed (2 bytes)
+v_ssangleprev:		equ $FFFFF784	; USED WITH DYN SS WALLS
+
 v_btnpushtime1:	equ $FFFFF790	; button push duration - in level (2 bytes)
 v_btnpushtime2:	equ $FFFFF792	; button push duration - in demo (2 bytes)
 v_palchgspeed:	equ $FFFFF794	; palette fade/transition speed (0 is fastest) (2 bytes)
