@@ -2718,6 +2718,8 @@ Level_TtlCardLoop:
 		bsr.w	PalLoad1	; load Sonic's palette
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformLayers
+		move.b	#$C,(v_vbla_routine).w
+		bsr.w	WaitForVBla
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
