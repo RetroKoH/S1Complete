@@ -246,15 +246,15 @@ See_Spring:
 		beq.s	loc_1192C
 		clr.b	ob2ndRout(a1)
 		move.b	#2,obRoutine(a1)
-		lea	(v_player).w,a2
+		lea		(v_player).w,a2
 		move.w	obVelY(a0),obVelY(a2)
 		neg.w	obVelY(a2)
 		bset	#1,obStatus(a2)
 		bclr	#3,obStatus(a2)
 		clr.b	$3C(a2)
-		move.b	#id_Spring,obAnim(a2) ; change Sonic's animation to "spring" ($10)
+		move.b	#aniID_Spring,obAnim(a2) ; change Sonic's animation to "spring" ($10)
 		move.b	#2,obRoutine(a2)
-		sfx	sfx_Spring,0,0,0	; play spring sound
+		sfx		sfx_Spring,0,0,0	; play spring sound
 
 loc_1192C:
 		clr.w	obVelX(a0)

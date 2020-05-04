@@ -29,7 +29,7 @@ Obj09_Main:	; Routine 0
 		move.w	#$780,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#0,obPriority(a0)
-		move.b	#id_Roll,obAnim(a0)
+		move.b	#aniID_Roll,obAnim(a0)
 		bset	#2,obStatus(a0)
 		bset	#1,obStatus(a0)
 

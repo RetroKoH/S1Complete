@@ -7,25 +7,27 @@
 
 ; ===========================================================================
 
-	include "Debugger.asm"
-	include	"Constants.asm"
-	include	"Variables.asm"
-	include	"Macros.asm"
+		include "Debugger.asm"
+		include	"Constants.asm"
+		include	"Variables.asm"
+		include	"Macros.asm"
+SonicMappingsVer:	equ	1
+		include	"SpritePiece.asm"
 
-EnableSRAM:	equ 0	; change to 1 to enable SRAM
-BackupSRAM:	equ 1
-AddressSRAM:	equ 3	; 0 = odd+even; 2 = even only; 3 = odd only
+EnableSRAM:			equ 0	; change to 1 to enable SRAM
+BackupSRAM:			equ 1
+AddressSRAM:		equ 3	; 0 = odd+even; 2 = even only; 3 = odd only
 
 ; Change to 0 to build the original version of the game, dubbed REV00
 ; Change to 1 to build the later vesion, dubbed REV01, which includes various bugfixes and enhancements
 ; Change to 2 to build the version from Sonic Mega Collection, dubbed REVXB, which fixes the infamous "spike bug"
-Revision:	equ 1
+Revision:			equ 1
 
-ZoneCount:	equ 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
+ZoneCount:			equ 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
 
-OptimiseSound:	equ 0	; change to 1 to optimise sound queuing
+OptimiseSound:		equ 0	; change to 1 to optimise sound queuing
 
-DebugPathSwappers: = 1
+DebugPathSwappers:	equ 1
 
 ; ===========================================================================
 
@@ -3866,7 +3868,7 @@ End_MoveSon2:
 		move.w	d0,(v_player+obInertia).w
 		move.b	#$81,(f_lockmulti).w ; lock controls & position
 		move.b	#3,(v_player+obFrame).w
-		move.w	#(id_Wait<<8)+id_Wait,(v_player+obAnim).w ; use "standing" animation
+		move.w	#(aniID_Wait<<8)+aniID_Wait,(v_player+obAnim).w ; use "standing" animation
 		move.b	#3,(v_player+obTimeFrame).w
 		rts	
 ; ===========================================================================
@@ -5537,7 +5539,6 @@ loc_8A92:
 loc_8AA8:
 		btst	#5,obStatus(a0)
 		beq.s	locret_8AC2
-		move.w	#id_Run,obAnim(a1)
 
 loc_8AB6:
 		bclr	#5,obStatus(a0)
@@ -6866,26 +6867,6 @@ loc_12EA6:
 		include	"_incObj\Sonic Move.asm"
 		include	"_incObj\Sonic RollSpeed.asm"
 		include	"_incObj\Sonic JumpDirection.asm"
-
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Unused subroutine to squash Sonic
-; ---------------------------------------------------------------------------
-		move.b	obAngle(a0),d0
-		addi.b	#$20,d0
-		andi.b	#$C0,d0
-		bne.s	locret_13302
-		bsr.w	Sonic_DontRunOnWalls
-		tst.w	d1
-		bpl.s	locret_13302
-		move.w	#0,obInertia(a0) ; stop Sonic moving
-		move.w	#0,obVelX(a0)
-		move.w	#0,obVelY(a0)
-		move.b	#id_Warp3,obAnim(a0) ; use "warping" animation
-
-locret_13302:
-		rts	
-
 		include	"_incObj\Sonic LevelBound.asm"
 		include	"_incObj\Sonic Roll.asm"
 		include	"_incObj\Sonic Jump.asm"

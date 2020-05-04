@@ -47,7 +47,8 @@ LZWaterFeatures:
 ; ---------------------------------------------------------------------------
 ; Initial water heights
 ; ---------------------------------------------------------------------------
-WaterHeight:	dc.w $B8	; Labyrinth 1
+WaterHeight:
+		dc.w $B8	; Labyrinth 1
 		dc.w $328	; Labyrinth 2
 		dc.w $900	; Labyrinth 3
 		dc.w $228	; Scrap Brain 3
@@ -63,7 +64,7 @@ LZDynamicWater:
 		move.b	(v_act).w,d0
 		add.w	d0,d0
 		move.w	DynWater_Index(pc,d0.w),d0
-		jsr	DynWater_Index(pc,d0.w)
+		jsr		DynWater_Index(pc,d0.w)
 		moveq	#0,d1
 		move.b	(f_water).w,d1
 		move.w	(v_waterpos3).w,d0
@@ -330,7 +331,7 @@ LZWindTunnels:
 		addq.w	#4,obX(a1)
 		move.w	#$400,obVelX(a1) ; move Sonic horizontally
 		move.w	#0,obVelY(a1)
-		move.b	#id_Float2,obAnim(a1)	; use floating animation
+		move.b	#aniID_Float2,obAnim(a1)	; use floating animation
 		bset	#1,obStatus(a1)
 		btst	#0,(v_jpadhold2).w ; is up pressed?
 		beq.s	@down		; if not, branch
@@ -347,10 +348,10 @@ LZWindTunnels:
 
 @chknext:
 		addq.w	#8,a2		; use second set of values (act 1 only)
-		dbf	d1,@chksonic	; on act 1, repeat for a second tunnel
+		dbf		d1,@chksonic	; on act 1, repeat for a second tunnel
 		tst.b	(f_wtunnelmode).w ; is Sonic still in a tunnel?
 		beq.s	@quit		; if yes, branch
-		move.b	#id_Walk,obAnim(a1)	; use walking animation
+		move.b	#aniID_Walk,obAnim(a1)	; use walking animation
 
 @clrquit:
 		clr.b	(f_wtunnelmode).w ; finish tunnel
@@ -421,7 +422,7 @@ loc_3F84:
 
 loc_3F9A:
 		clr.b	obInertia+1(a1)
-		move.b	#id_WaterSlide,obAnim(a1) ; use Sonic's "sliding" animation
+		move.b	#aniID_WaterSlide,obAnim(a1) ; use Sonic's "sliding" animation
 		move.b	#1,(f_jumponly).w ; lock controls (except jumping)
 		move.b	(v_vbla_byte).w,d0
 		andi.b	#$1F,d0

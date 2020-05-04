@@ -14,7 +14,7 @@ ReactToItem:
 		move.b	obHeight(a0),d5	; load Sonic's height
 		subq.b	#3,d5
 		sub.w	d5,d3
-		cmpi.b	#fr_Duck,obFrame(a0) ; is Sonic ducking?
+		cmpi.b	#aniID_Duck,obAnim(a0) ; is Sonic ducking? (Check frame as well)
 		bne.s	@notducking	; if not, branch
 		addi.w	#$C,d3
 		moveq	#$A,d5
@@ -155,7 +155,7 @@ React_Monitor:
 ; ===========================================================================
 
 @movingdown:
-		cmpi.b	#id_Roll,obAnim(a0) ; is Sonic rolling/jumping?
+		cmpi.b	#aniID_Roll,obAnim(a0) ; is Sonic rolling/jumping?
 		bne.s	@donothing
 		neg.w	obVelY(a0)	; reverse Sonic's y-motion
 		addq.b	#2,obRoutine(a1) ; advance the monitor's routine counter
@@ -167,7 +167,7 @@ React_Monitor:
 React_Enemy:
 		tst.b	(v_invinc).w	; is Sonic invincible?
 		bne.s	@donthurtsonic	; if yes, branch
-		cmpi.b	#id_Roll,obAnim(a0) ; is Sonic rolling/jumping?
+		cmpi.b	#aniID_Roll,obAnim(a0) ; is Sonic rolling/jumping?
 		bne.w	React_ChkHurt	; if not, branch
 
 	@donthurtsonic:
@@ -290,7 +290,7 @@ HurtSonic:
 
 	@isleft:
 		move.w	#0,obInertia(a0)
-		move.b	#id_Hurt,obAnim(a0)
+		move.b	#aniID_Hurt,obAnim(a0)
 		move.w	#120,$30(a0)	; set temp invincible time to 2 seconds
 		move.w	#sfx_Death,d0	; load normal damage sound
 		cmpi.b	#id_Spikes,(a2)	; was damage caused by spikes?
@@ -327,7 +327,7 @@ KillSonic:
 		move.w	#0,obVelX(a0)
 		move.w	#0,obInertia(a0)
 		move.w	obY(a0),$38(a0)
-		move.b	#id_Death,obAnim(a0)
+		move.b	#aniID_Death,obAnim(a0)
 		bset	#7,obGfx(a0)
 		move.w	#sfx_Death,d0	; play normal death sound
 		cmpi.b	#id_Spikes,(a2)	; check	if you were killed by spikes

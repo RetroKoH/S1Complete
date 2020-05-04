@@ -81,7 +81,7 @@ Mon_Solid:	; Routine 2
 		beq.w	loc_A25C
 		tst.w	obVelY(a1)
 		bmi.s	loc_A20A
-		cmpi.b	#id_Roll,obAnim(a1) ; is Sonic rolling?
+		cmpi.b	#aniID_Roll,obAnim(a1) ; is Sonic rolling?
 		beq.s	loc_A25C	; if yes, branch
 
 loc_A20A:
@@ -122,7 +122,6 @@ loc_A246:
 loc_A25C:
 		btst	#5,obStatus(a0)
 		beq.s	Mon_Animate
-		move.w	#1,obAnim(a1)	; clear obAnim and set obNextAni to 1
 
 loc_A26A:
 		bclr	#5,obStatus(a0)

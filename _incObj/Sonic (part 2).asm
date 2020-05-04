@@ -36,7 +36,7 @@ Sonic_HurtStop:
 		move.w	d0,obVelY(a0)
 		move.w	d0,obVelX(a0)
 		move.w	d0,obInertia(a0)
-		move.b	#id_Walk,obAnim(a0)
+		move.b	#aniID_Walk,obAnim(a0)
 		subq.b	#2,obRoutine(a0)
 		move.w	#$78,$30(a0)
 

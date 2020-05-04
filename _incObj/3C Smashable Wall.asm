@@ -40,7 +40,7 @@ Smash_Solid:	; Routine 2
 ; ===========================================================================
 
 @chkroll:
-		cmpi.b	#id_Roll,obAnim(a1) ; is Sonic rolling?
+		cmpi.b	#aniID_Roll,obAnim(a1) ; is Sonic rolling?
 		bne.s	@donothing	; if not, branch
 		move.w	smash_speed(a0),d0
 		bpl.s	@chkspeed

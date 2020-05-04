@@ -30,7 +30,7 @@ Sonic_Move:
 		tst.w	obInertia(a0)	; is Sonic moving?
 		bne.w	Sonic_ResetScr	; if yes, branch
 		bclr	#5,obStatus(a0)
-		move.b	#id_Wait,obAnim(a0) ; use "standing" animation
+		move.b	#aniID_Wait,obAnim(a0) ; use "standing" animation
 		btst	#3,obStatus(a0)
 		beq.s	Sonic_Balance
 		moveq	#0,d0
@@ -74,14 +74,14 @@ loc_12F6A:
 		bset	#0,obStatus(a0)
 
 loc_12F70:
-		move.b	#id_Balance,obAnim(a0) ; use "balancing" animation
+		move.b	#aniID_Balance,obAnim(a0) ; use "balancing" animation
 		bra.s	Sonic_ResetScr
 ; ===========================================================================
 
 Sonic_LookUp:
 		btst	#bitUp,(v_jpadhold2).w ; is up being pressed?
 		beq.s	Sonic_Duck	; if not, branch
-		move.b	#id_LookUp,obAnim(a0) ; use "looking up" animation
+		move.b	#aniID_LookUp,obAnim(a0) ; use "looking up" animation
 		cmpi.w	#$C8,(v_lookshift).w
 		beq.s	loc_12FC2
 		addq.w	#2,(v_lookshift).w
@@ -91,7 +91,7 @@ Sonic_LookUp:
 Sonic_Duck:
 		btst	#bitDn,(v_jpadhold2).w ; is down being pressed?
 		beq.s	Sonic_ResetScr	; if not, branch
-		move.b	#id_Duck,obAnim(a0) ; use "ducking" animation
+		move.b	#aniID_Duck,obAnim(a0) ; use "ducking" animation
 		cmpi.w	#8,(v_lookshift).w
 		beq.s	loc_12FC2
 		subq.w	#2,(v_lookshift).w
@@ -205,7 +205,7 @@ loc_13086:
 		bset	#0,obStatus(a0)
 		bne.s	loc_1309A
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 
 loc_1309A:
 		sub.w	d5,d0
@@ -217,7 +217,7 @@ loc_1309A:
 
 loc_130A6:
 		move.w	d0,obInertia(a0)
-		move.b	#id_Walk,obAnim(a0) ; use walking animation
+		move.b	#aniID_Walk,obAnim(a0) ; use walking animation
 		rts	
 ; ===========================================================================
 
@@ -234,7 +234,7 @@ loc_130BA:
 		bne.s	locret_130E8
 		cmpi.w	#$400,d0
 		blt.s	locret_130E8
-		move.b	#id_Stop,obAnim(a0) ; use "stopping" animation
+		move.b	#aniID_Stop,obAnim(a0) ; use "stopping" animation
 		bclr	#0,obStatus(a0)
 		sfx	sfx_Skid,0,0,0	; play stopping sound
 
@@ -252,7 +252,7 @@ Sonic_MoveRight:
 		bclr	#0,obStatus(a0)
 		beq.s	loc_13104
 		bclr	#5,obStatus(a0)
-		move.b	#1,obNextAni(a0)
+		move.b	#aniID_Run,obNextAni(a0)
 
 loc_13104:
 		add.w	d5,d0
@@ -262,7 +262,7 @@ loc_13104:
 
 loc_1310C:
 		move.w	d0,obInertia(a0)
-		move.b	#id_Walk,obAnim(a0) ; use walking animation
+		move.b	#aniID_Walk,obAnim(a0) ; use walking animation
 		rts	
 ; ===========================================================================
 
@@ -279,7 +279,7 @@ loc_13120:
 		bne.s	locret_1314E
 		cmpi.w	#-$400,d0
 		bgt.s	locret_1314E
-		move.b	#id_Stop,obAnim(a0) ; use "stopping" animation
+		move.b	#aniID_Stop,obAnim(a0) ; use "stopping" animation
 		bset	#0,obStatus(a0)
 		sfx	sfx_Skid,0,0,0	; play stopping sound
 
