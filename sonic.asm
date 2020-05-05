@@ -1962,7 +1962,8 @@ GM_Title:
 
 	Tit_LoadText:
 		move.w	(a5)+,(a6)
-		dbf	d1,Tit_LoadText	; load level select font
+		dbf		d1,Tit_LoadText		; load level select font
+		move.b	#0,(f_nobgscroll).w ; Fixes bug w/ Game OVer while drowning
 
 		clr.b	(v_lastlamp).w		; clear lamppost counter
 		clr.w	(v_debuguse).w		; disable debug item placement mode

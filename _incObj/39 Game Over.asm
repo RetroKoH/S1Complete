@@ -48,7 +48,7 @@ Over_Move:	; Routine 2
 Over_SetWait:
 		move.w	#720,obTimeFrame(a0) ; set time delay to 12 seconds
 		addq.b	#2,obRoutine(a0)
-		rts	
+		bra.w   DisplaySprite ; additional instruction to prevent blinking
 ; ===========================================================================
 
 Over_Wait:	; Routine 4

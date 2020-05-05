@@ -26,15 +26,19 @@ Sonic_LevelBound:
 		cmp.w	d1,d0		; has Sonic touched the	side boundary?
 		bls.s	@sides		; if yes, branch
 
-	@chkbottom:
-		move.w	(v_limitbtm2).w,d0
+	@chkbottom: ; Recoded to suit my own preference. Allow Sonic to outrun camera, ALSO prevent sudden deaths.
+		move.w	(v_limitbtm2).w,d0 ; current bottom boundary=d0
+		cmp.w   (v_limitbtm1).w,d0 ; is the intended bottom boundary lower than the current one?
+		bcc.s   @notlower          ; if not, branch
+		move.w  (v_limitbtm1).w,d0 ; intended bottom boundary=d0
+	@notlower:
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has Sonic touched the	bottom boundary?
 		blt.s	@bottom		; if yes, branch
 		rts	
 ; ===========================================================================
 
-@bottom:
+	@bottom:
 		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w ; is level SBZ2 ?
 		bne.s	@killsonic	; if not, kill Sonic	; MJ: Fix out-of-range branch
 		cmpi.w	#$2000,(v_player+obX).w
@@ -42,17 +46,19 @@ Sonic_LevelBound:
 		clr.b	(v_lastlamp).w	; clear	lamppost counter
 		move.w	#1,(f_restart).w ; restart the level
 		move.w	#(id_LZ<<8)+3,(v_zone).w ; set level to SBZ3 (LZ4)
-		rts	
+	@nobottom:
+		rts
+	@killsonic:
+		addq.l	#4,sp			; flamewing fix to prevent Sonic from interacting with solids when dying.
+		jmp		(KillSonic).l	; MJ: Fix out-of-range branch
 ; ===========================================================================
 
-@sides:
+	@sides:
 		move.w	d0,obX(a0)
-		move.w	#0,obX+2(a0)
-		move.w	#0,obVelX(a0)	; stop Sonic moving
-		move.w	#0,obInertia(a0)
+		clr.w	obX+2(a0)
+		clr.w	obVelX(a0)	; stop Sonic moving
+		clr.w	obInertia(a0)
 		bra.s	@chkbottom
 ; ===========================================================================
 
-@killsonic:
-		jmp	(KillSonic).l	; MJ: Fix out-of-range branch
 ; End of function Sonic_LevelBound
