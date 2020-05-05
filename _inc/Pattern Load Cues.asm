@@ -231,7 +231,6 @@ PLC_SBZ2:	dc.w ((PLC_SBZ2end-PLC_SBZ2-2)/6)-1
 ; Pattern load cues - title card
 ; ---------------------------------------------------------------------------
 PLC_TitleCard:	dc.w ((PLC_TitleCardend-PLC_TitleCard-2)/6)-1
-		plcm	Nem_TitleCard, $B000
 	PLC_TitleCardend:
 ; ---------------------------------------------------------------------------
 ; Pattern load cues - act 3 boss

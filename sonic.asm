@@ -951,6 +951,8 @@ TilemapToVRAM:
 		include	"_inc\DMA Queue.asm"
 
 		include	"_inc\Nemesis Decompression.asm"
+		include "_inc\Uncompressed Art Loading.asm"
+		include	"_inc\Comper Decompression.asm"
 
 
 ; ---------------------------------------------------------------------------
@@ -2506,8 +2508,9 @@ GM_Level:
 		bmi.s	Level_ClrRam	; if yes, branch
 		disable_ints
 		locVRAM	$B000
-		lea		(Nem_TitleCard).l,a0 ; load title card patterns
-		bsr.w	NemDec
+		lea 	Art_TitleCard,a0        ; load title card patterns
+		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0; the title card art lenght, in tiles
+		jsr 	LoadUncArt          ; load uncompressed art
 		enable_ints
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
@@ -3136,8 +3139,9 @@ loc_47D4:
 		move.w	#$9001,(a6)		; 64-cell hscroll size
 		bsr.w	ClearScreen
 		locVRAM	$B000
-		lea		(Nem_TitleCard).l,a0 ; load title card patterns
-		bsr.w	NemDec
+		lea 	Art_TitleCard,a0        ; load title card patterns
+		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0; the title card art lenght, in tiles
+		jsr 	LoadUncArt          ; load uncompressed art
 		jsr		(Hud_Base).l
 
 		; DMA QUEUE + flamewing optimization
@@ -3502,8 +3506,9 @@ GM_Continue:
 		dbf	d1,Cont_ClrObjRam ; clear object RAM
 
 		locVRAM	$B000
-		lea	(Nem_TitleCard).l,a0 ; load title card patterns
-		bsr.w	NemDec
+		lea 	Art_TitleCard,a0        ; load title card patterns
+		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0; the title card art lenght, in tiles
+		jsr 	LoadUncArt          ; load uncompressed art
 		locVRAM	$A000
 		lea	(Nem_ContSonic).l,a0 ; load Sonic patterns
 		bsr.w	NemDec
@@ -7933,8 +7938,6 @@ AddPoints:
 		blo.s   @noextralife ; if not, branch
 
 		addi.l  #5000,(v_scorelife).w ; increase requirement by 50000
-		tst.b   (v_megadrive).w
-		bmi.s   @noextralife ; branch if Mega Drive is Japanese
 		addq.b  #1,(v_lives).w ; give extra life
 		addq.b  #1,(f_lifecount).w
 		music	bgm_ExtraLife,1,0,0
@@ -8275,8 +8278,8 @@ Nem_Cater:	incbin	"artnem\Enemy Caterkiller.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------
-Nem_TitleCard:	incbin	"artnem\Title Cards.bin"
-		even
+Art_TitleCard:	incbin	"artunc\Title Cards.bin"
+Art_TitleCard_End:		even
 Nem_Hud:	incbin	"artnem\HUD.bin"	; HUD (rings, time, score)
 		even
 Nem_Lives:	incbin	"artnem\HUD - Life Counter Icon.bin"

@@ -111,7 +111,7 @@ Sign_SonicRun:	; Routine 6
 		move.w	(v_limitright2).w,d1
 		addi.w	#$128,d1
 		cmp.w	d1,d0
-		bcs.s	locret_ECEE
+		bcs.w	locret_ECEE
 
 	loc_EC86:
 		addq.b	#2,obRoutine(a0)
@@ -131,8 +131,14 @@ GotThroughAct:
 		clr.b	(v_invinc).w	; disable invincibility
 		clr.b	(f_timecount).w	; stop time counter
 		move.b	#id_GotThroughCard,(v_objspace+$5C0).w
-		moveq	#plcid_TitleCard,d0
-		jsr	(NewPLC).l	; load title card patterns
+
+		move.l  a0,-(sp)            ; save object address to stack
+		move.l  #$70000002,($C00004)        ; set mode "VRAM Write to $B000"
+		lea Art_TitleCard,a0        ; load title card patterns
+		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0; the title card art lenght, in tiles
+		jsr LoadUncArt          ; load uncompressed art
+		move.l  (sp)+,a0            ; get object address from stack
+
 		move.b	#1,(f_endactbonus).w
 		moveq	#0,d0
 		move.b	(v_timemin).w,d0
