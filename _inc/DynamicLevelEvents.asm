@@ -6,15 +6,19 @@
 
 
 DynamicLevelEvents:
+		cmpi.b	#id_Title,(v_gamemode).w	;exit if on the Title
+		beq.s	DLE_NoChg
+		cmpi.b	#id_Special,(v_gamemode).w	;exit if in a Special Stage
+		beq.s	DLE_NoChg
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		add.w	d0,d0
 		move.w	DLE_Index(pc,d0.w),d0
-		jsr	DLE_Index(pc,d0.w) ; run level-specific events
+		jsr		DLE_Index(pc,d0.w)	; run level-specific events
 		moveq	#2,d1
 		move.w	(v_limitbtm1).w,d0
-		sub.w	(v_limitbtm2).w,d0 ; has lower level boundary changed recently?
-		beq.s	DLE_NoChg	; if not, branch
+		sub.w	(v_limitbtm2).w,d0	; has lower level boundary changed recently?
+		beq.s	DLE_NoChg			; if not, branch
 		bcc.s	loc_6DAC
 
 		neg.w	d1
