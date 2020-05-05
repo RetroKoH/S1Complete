@@ -176,22 +176,7 @@ dbug:	macro map,object,subtype,frame,vram
 
 ;		mappings	object		subtype	frame	VRAM setting
 	dbug	Map_Ring,	id_Rings,	0,	0,	$27B2
-	if Revision=0
-	dbug	Map_Bump,	id_Bumper,	0,	0,	$380
-	dbug	Map_Animal2,	id_Animals,	$A,	0,	$5A0
-	dbug	Map_Animal2,	id_Animals,	$B,	0,	$5A0
-	dbug	Map_Animal2,	id_Animals,	$C,	0,	$5A0
-	dbug	Map_Animal1,	id_Animals,	$D,	0,	$553
-	dbug	Map_Animal1,	id_Animals,	$E,	0,	$553
-	dbug	Map_Animal1,	id_Animals,	$F,	0,	$573
-	dbug	Map_Animal1,	id_Animals,	$10,	0,	$573
-	dbug	Map_Animal2,	id_Animals,	$11,	0,	$585
-	dbug	Map_Animal3,	id_Animals,	$12,	0,	$593
-	dbug	Map_Animal2,	id_Animals,	$13,	0,	$565
-	dbug	Map_Animal3,	id_Animals,	$14,	0,	$5B3
-	else
 	dbug	Map_Ring,	id_Rings,	0,	8,	$27B2
-	endc
 	@Endingend:
 
 	even

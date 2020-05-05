@@ -269,10 +269,7 @@ loc_180F6:
 
 loc_18112:
 		music	bgm_LZ,0,0,0		; play LZ music
-		if Revision=0
-		else
-			clr.b	(f_lockscreen).w
-		endc
+		clr.b	(f_lockscreen).w
 		bset	#0,obStatus(a0)
 		addq.b	#2,ob2ndRout(a0)
 

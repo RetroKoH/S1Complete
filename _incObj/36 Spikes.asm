@@ -79,25 +79,19 @@ Spik_Upright:
 		bpl.s	Spik_Display
 
 Spik_Hurt:
-		tst.b	(v_invinc).w	; is Sonic invincible?
-		bne.s	Spik_Display	; if yes, branch
+		tst.b	(v_invinc).w			; is Sonic invincible?
+		bne.s	Spik_Display			; if yes, branch
+		tst.w	(v_player+flashtime).w	; +++ is Sonic invulnerable?
+		bne.s	Spik_Display			; +++ if yes, branch
 		move.l	a0,-(sp)
 		movea.l	a0,a2
-		lea	(v_player).w,a0
+		lea		(v_player).w,a0
 		cmpi.b	#4,obRoutine(a0)
 		bcc.s	loc_CF20
-	if Revision<>2
 		move.l	obY(a0),d3
 		move.w	obVelY(a0),d0
 		ext.l	d0
 		asl.l	#8,d0
-	else
-		; This fixes the infamous "spike bug"
-		tst.w	flashtime(a0)	; Is Sonic flashing after being hurt?
-		bne.s	loc_CF20	; If so, skip getting hurt
-		jmp	(loc_E0).l	; This is a copy of the above code that was pushed aside for this
-loc_D5A2:
-	endif
 		sub.l	d0,d3
 		move.l	d3,obY(a0)
 		jsr	(HurtSonic).l

@@ -10,6 +10,7 @@ Map_Ring_internal:
 		dc.w @sparkle2-Map_Ring_internal
 		dc.w @sparkle3-Map_Ring_internal
 		dc.w @sparkle4-Map_Ring_internal
+		dc.w @blank-Map_Ring_internal
 @front:		dc.b 1
 		dc.b $F8, 5, 0,	0, $F8	; ring front
 @angle1:	dc.b 1
@@ -26,4 +27,5 @@ Map_Ring_internal:
 		dc.b $F8, 5, 8,	$A, $F8	;sparkle
 @sparkle4:	dc.b 1
 		dc.b $F8, 5, $10, $A, $F8 ; sparkle
+@blank:		dc.b 0
 		even

@@ -18,11 +18,6 @@ EnableSRAM:			equ 0	; change to 1 to enable SRAM
 BackupSRAM:			equ 1
 AddressSRAM:		equ 3	; 0 = odd+even; 2 = even only; 3 = odd only
 
-; Change to 0 to build the original version of the game, dubbed REV00
-; Change to 1 to build the later vesion, dubbed REV01, which includes various bugfixes and enhancements
-; Change to 2 to build the version from Sonic Mega Collection, dubbed REVXB, which fixes the infamous "spike bug"
-Revision:			equ 1
-
 ZoneCount:			equ 6	; discrete zones are: GHZ, MZ, SYZ, LZ, SLZ, and SBZ
 
 OptimiseSound:		equ 0	; change to 1 to optimise sound queuing
@@ -88,7 +83,6 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
-	if Revision<>2
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
@@ -97,40 +91,23 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
 		dc.l ErrorTrap			; Unused (reserved)
-	else
-loc_E0:
-		; Relocated code from Spik_Hurt. REVXB was a nasty hex-edit.
-		move.l	obY(a0),d3
-		move.w	obVelY(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		jmp	(loc_D5A2).l
 
-		dc.w ErrorTrap
-		dc.l ErrorTrap
-		dc.l ErrorTrap
-		dc.l ErrorTrap
-	endif
 Hardware:		dc.b "SEGA MEGA DRIVE " ; Hardware system ID (Console name)
 Date:			dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
 Title_Local:	dc.b "SONIC THE               HEDGEHOG                " ; Domestic name
 Title_Int:		dc.b "SONIC THE               HEDGEHOG                " ; International name
-Serial:		if Revision=0
-				dc.b "GM 00001009-00"   ; Serial/version number (Rev 0)
-			else
-				dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
-			endc
+Serial:			dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
 Checksum: 		dc.w $0
 				dc.b "J               " ; I/O support
 RomStartLoc:	dc.l StartOfRom		; Start address of ROM
 RomEndLoc:		dc.l EndOfRom-1		; End address of ROM
 RamStartLoc:	dc.l $FF0000		; Start address of RAM
 RamEndLoc:		dc.l $FFFFFF		; End address of RAM
-SRAMSupport:	if EnableSRAM=1
+SRAMSupport:if EnableSRAM=1
 				dc.b $52, $41, $A0+(BackupSRAM<<6)+(AddressSRAM<<3), $20
 			else
 				dc.l $20202020
-		endc
+			endc
 				dc.l $20202020		; SRAM start ($200001)
 				dc.l $20202020		; SRAM end ($20xxxx)
 Notes:			dc.b "                                                    " ; Notes (unused, anything can be put in this space, but it has to be 52 bytes.)
@@ -153,7 +130,7 @@ EntryPoint:
 
 PortA_Ok:
 		bne.s	SkipSetup ; Skip the VDP and Z80 setup code if port A, B or C is ok...?
-		lea	SetupValues(pc),a5	; Load setup values array address.
+		lea		SetupValues(pc),a5	; Load setup values array address.
 		movem.w	(a5)+,d5-d7
 		movem.l	(a5)+,a0-a4
 		move.b	-$10FF(a1),d0	; get hardware version (from $A10001)
@@ -894,13 +871,8 @@ ClearScreen:
 		bne.s	@wait2
 
 		move.w	#$8F02,(a5)
-		if Revision=0
-		move.l	#0,(v_scrposy_dup).w
-		move.l	#0,(v_scrposx_dup).w
-		else
 		clr.l	(v_scrposy_dup).w
 		clr.l	(v_scrposx_dup).w
-		endc
 
 		lea	(v_spritetablebuffer).w,a1
 		moveq	#0,d0
@@ -1871,12 +1843,9 @@ GM_Sega:
 		copyTilemap	$FF0000,$E510,$17,7
 		copyTilemap	$FF0180,$C000,$27,$1B
 
-		if Revision=0
-		else
-			tst.b   (v_megadrive).w	; is console Japanese?
-			bmi.s   @loadpal
-			copyTilemap	$FF0A40,$C53A,2,1 ; hide "TM" with a white rectangle
-		endc
+		tst.b   (v_megadrive).w	; is console Japanese?
+		bmi.s   @loadpal
+		copyTilemap	$FF0A40,$C53A,2,1 ; hide "TM" with a white rectangle
 
 	@loadpal: ; Fade in the SEGA background
 		lea		(v_pal_dry_dup).l,a3
@@ -2036,11 +2005,8 @@ GM_Title:
 		move.b	#id_TitleSonic,(v_objspace+$40).w	; load big Sonic object
 		move.b	#id_PSBTM,(v_objspace+$80).w		; load "PRESS START BUTTON" object
 
-		if Revision=0
-		else
-			tst.b   (v_megadrive).w	; is console Japanese?
-			bpl.s   @isjap		; if yes, branch
-		endc
+		tst.b   (v_megadrive).w	; is console Japanese?
+		bpl.s   @isjap		; if yes, branch
 
 		move.b	#id_PSBTM,(v_objspace+$C0).w ; load "TM" object
 		move.b	#3,(v_objspace+$C0+obFrame).w
@@ -2071,23 +2037,14 @@ Tit_MainLoop:
 		addq.w	#2,d0
 		move.w	d0,(v_objspace+obX).w ; move Sonic to the right
 		cmpi.w	#$1C00,d0	; has Sonic object passed $1C00 on x-axis?
-		blo.s	Tit_ChkRegion	; if not, branch
+		blo.s	Tit_EnterCheat	; if not, branch
 
 		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
 		rts	
 ; ===========================================================================
 
-Tit_ChkRegion:
-		tst.b	(v_megadrive).w	; check	if the machine is US or	Japanese
-		bpl.s	Tit_RegionJap	; if Japanese, branch
-
-		lea	(LevSelCode_US).l,a0 ; load US code
-		bra.s	Tit_EnterCheat
-
-	Tit_RegionJap:
-		lea	(LevSelCode_J).l,a0 ; load J code
-
 Tit_EnterCheat:
+		lea		(LevSelCode).l,a0 ; load US code
 		move.w	(v_title_dcount).w,d0
 		adda.w	d0,a0
 		move.b	(v_jpadpress1).w,d0 ; get button press
@@ -2224,10 +2181,7 @@ LevSel_Level_SS:
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
-		if Revision=0
-		else
-			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		endc
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		rts	
 ; ===========================================================================
 
@@ -2247,38 +2201,14 @@ PlayLevel:
 		move.l	d0,(v_emldlist).w ; clear emeralds
 		move.l	d0,(v_emldlist+4).w ; clear emeralds
 		move.b	d0,(v_continues).w ; clear continues
-		if Revision=0
-		else
-			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		endc
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		sfx	bgm_Fade,0,1,1 ; fade out music
 		rts	
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Level	select - level pointers
 ; ---------------------------------------------------------------------------
-LevSel_Ptrs:	if Revision=0
-		; old level order
-		dc.b id_GHZ, 0
-		dc.b id_GHZ, 1
-		dc.b id_GHZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
-		dc.b id_MZ, 0
-		dc.b id_MZ, 1
-		dc.b id_MZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
-		dc.b id_SYZ, 0
-		dc.b id_SYZ, 1
-		dc.b id_SYZ, 2
-		dc.b id_SBZ, 0
-		dc.b id_SBZ, 1
-		dc.b id_LZ, 3		; Scrap Brain Zone 3
-		dc.b id_SBZ, 2		; Final Zone
-		else
+LevSel_Ptrs:
 		; correct level order
 		dc.b id_GHZ, 0
 		dc.b id_GHZ, 1
@@ -2299,21 +2229,13 @@ LevSel_Ptrs:	if Revision=0
 		dc.b id_SBZ, 1
 		dc.b id_LZ, 3
 		dc.b id_SBZ, 2
-		endc
 		dc.b id_SS, 0		; Special Stage
 		dc.w $8000		; Sound Test
 		even
 ; ---------------------------------------------------------------------------
 ; Level	select codes
 ; ---------------------------------------------------------------------------
-LevSelCode_J:	if Revision=0
-		dc.b btnUp,btnDn,btnL,btnR,0,$FF
-		else
-		dc.b btnUp,btnDn,btnDn,btnDn,btnL,btnR,0,$FF
-		endc
-		even
-
-LevSelCode_US:	dc.b btnUp,btnDn,btnL,btnR,0,$FF
+LevSelCode:	dc.b btnUp,btnDn,btnL,btnR,0,$FF
 		even
 ; ===========================================================================
 
@@ -2370,10 +2292,7 @@ Demo_Level:
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
-		if Revision=0
-		else
-			move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		endc
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		rts	
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -2551,11 +2470,8 @@ LevSel_ChgLine:
 ; ---------------------------------------------------------------------------
 ; Level	select menu text
 ; ---------------------------------------------------------------------------
-LevelMenuText:	if Revision=0
+LevelMenuText:
 		incbin	"misc\Level Select Text.bin"
-		else
-		incbin	"misc\Level Select Text (JP1).bin"
-		endc
 		even
 ; ---------------------------------------------------------------------------
 ; Music	playlist
@@ -2867,11 +2783,8 @@ Level_MainLoop:
 		bsr.w	MoveSonicInDemo
 		bsr.w	LZWaterFeatures
 		jsr	(ExecuteObjects).l
-		if Revision=0
-		else
-			tst.w   (f_restart).w
-			bne     GM_Level
-		endc
+		tst.w   (f_restart).w
+		bne     GM_Level
 		tst.w	(v_debuguse).w	; is debug mode being used?
 		bne.s	Level_DoScroll	; if yes, branch
 		cmpi.b	#6,(v_player+obRoutine).w ; has Sonic just died?
@@ -2891,11 +2804,6 @@ Level_MainLoop:
 
 		cmpi.b	#id_Demo,(v_gamemode).w
 		beq.s	Level_ChkDemo	; if mode is 8 (demo), branch
-		if Revision=0
-		tst.w	(f_restart).w	; is the level set to restart?
-		bne.w	GM_Level	; if yes, branch
-		else
-		endc
 		cmpi.b	#id_Level,(v_gamemode).w
 		beq.w	Level_MainLoop	; if mode is $C (level), branch
 		rts	
@@ -3191,11 +3099,7 @@ SS_MainLoop:
 		beq.w	SS_MainLoop	; if yes, branch
 
 		tst.w	(f_demo).w	; is demo mode on?
-		if Revision=0
-		bne.w	SS_ToSegaScreen	; if yes, branch
-		else
 		bne.w	SS_ToLevel
-		endc
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
 		cmpi.w	#(id_SBZ<<8)+3,(v_zone).w ; is level number higher than FZ?
 		blo.s	SS_Finish	; if not, branch
@@ -3282,12 +3186,9 @@ SS_ToSegaScreen:
 		move.b	#id_Sega,(v_gamemode).w ; goto Sega screen
 		rts
 
-		if Revision=0
-		else
 SS_ToLevel:	cmpi.b	#id_Level,(v_gamemode).w
 		beq.s	SS_ToSegaScreen
 		rts
-		endc
 
 ; ---------------------------------------------------------------------------
 ; Special stage	background loading subroutine
@@ -4139,13 +4040,8 @@ Demo_EndSBZ2:	incbin	"demodata\Ending - SBZ2.bin"
 Demo_EndGHZ2:	incbin	"demodata\Ending - GHZ2.bin"
 		even
 
-		if Revision=0
-		include	"_inc\LevelSizeLoad & BgScrollSpeed.asm"
-		include	"_inc\DeformLayers.asm"
-		else
-		include	"_inc\LevelSizeLoad & BgScrollSpeed (JP1).asm"
-		include	"_inc\DeformLayers (JP1).asm"
-		endc
+	include	"_inc\LevelSizeLoad & BgScrollSpeed.asm"
+	include	"_inc\DeformLayers.asm"
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -4183,13 +4079,13 @@ LoadTilesAsYouMove:
 		lea	(v_bg2_scroll_flags_dup).w,a2	; Scroll block 2 scroll flags
 		lea	(v_bg2screenposx_dup).w,a3	; Scroll block 2 X coordinate
 		bsr.w	DrawBGScrollBlock2
-		if Revision>=1
+
 		; REV01 added a third scroll block, though, technically,
 		; the RAM for it was already there in REV00
 		lea	(v_bg3_scroll_flags_dup).w,a2	; Scroll block 3 scroll flags
 		lea	(v_bg3screenposx_dup).w,a3	; Scroll block 3 X coordinate
 		bsr.w	DrawBGScrollBlock3
-		endc
+
 		; Then, update the foreground
 		lea	(v_fg_scroll_flags_dup).w,a2	; Foreground scroll flags
 		lea	(v_screenposx_dup).w,a3		; Foreground X coordinate
@@ -4260,12 +4156,9 @@ DrawBGScrollBlock1:
 		bsr.w	Calc_VRAM_Pos
 		moveq	#-16,d4
 		moveq	#-16,d5
-		if Revision=0
-		moveq	#(512/16)-1,d6	 ; Draw entire row of plane
-		bsr.w	DrawBlocks_LR_2
-		else
-			bsr.w	DrawBlocks_LR
-		endc
+
+		bsr.w	DrawBlocks_LR
+
 
 loc_6972:
 		bclr	#1,(a2)
@@ -4276,105 +4169,56 @@ loc_6972:
 		bsr.w	Calc_VRAM_Pos
 		move.w	#224,d4
 		moveq	#-16,d5
-		if Revision=0
-		moveq	#(512/16)-1,d6
-		bsr.w	DrawBlocks_LR_2
-		else
-			bsr.w	DrawBlocks_LR
-		endc
+
+		bsr.w	DrawBlocks_LR
+
 
 loc_698E:
 		bclr	#2,(a2)
 
-		if Revision=0
-		beq.s	loc_69BE
+		beq.s	loc_6D56
 		; Draw new tiles on the left
 		moveq	#-16,d4
 		moveq	#-16,d5
 		bsr.w	Calc_VRAM_Pos
 		moveq	#-16,d4
 		moveq	#-16,d5
-		move.w	(v_scroll_block_1_size).w,d6
-		move.w	4(a3),d1
-		andi.w	#-16,d1		; Floor camera Y coordinate to the nearest block
-		sub.w	d1,d6
-		blt.s	loc_69BE	; If scroll block 1 is offscreen, skip loading its tiles
-		lsr.w	#4,d6		; Get number of rows not above the screen
-		cmpi.w	#((224+16+16)/16)-1,d6
-		blo.s	loc_69BA
-		moveq	#((224+16+16)/16)-1,d6	; Cap at height of screen
+		bsr.w	DrawBlocks_TB
+loc_6D56:
 
-loc_69BA:
-		bsr.w	DrawBlocks_TB_2
-
-loc_69BE:
 		bclr	#3,(a2)
-		beq.s	locret_69F2
+		beq.s	loc_6D70
 		; Draw new tiles on the right
 		moveq	#-16,d4
 		move.w	#320,d5
 		bsr.w	Calc_VRAM_Pos
 		moveq	#-16,d4
 		move.w	#320,d5
-		move.w	(v_scroll_block_1_size).w,d6
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d6
-		blt.s	locret_69F2
-		lsr.w	#4,d6
-		cmpi.w	#((224+16+16)/16)-1,d6
-		blo.s	loc_69EE
-		moveq	#((224+16+16)/16)-1,d6
+		bsr.w	DrawBlocks_TB
+loc_6D70:
 
-loc_69EE:
-		bsr.w	DrawBlocks_TB_2
+		bclr	#4,(a2)
+		beq.s	loc_6D88
+		; Draw entire row at the top
+		moveq	#-16,d4
+		moveq	#0,d5
+		bsr.w	Calc_VRAM_Pos_2
+		moveq	#-16,d4
+		moveq	#0,d5
+		moveq	#(512/16)-1,d6
+		bsr.w	DrawBlocks_LR_3
+loc_6D88:
 
-		else
-
-			beq.s	locj_6D56
-			; Draw new tiles on the left
-			moveq	#-16,d4
-			moveq	#-16,d5
-			bsr.w	Calc_VRAM_Pos
-			moveq	#-16,d4
-			moveq	#-16,d5
-			bsr.w	DrawBlocks_TB
-	locj_6D56:
-
-			bclr	#3,(a2)
-			beq.s	locj_6D70
-			; Draw new tiles on the right
-			moveq	#-16,d4
-			move.w	#320,d5
-			bsr.w	Calc_VRAM_Pos
-			moveq	#-16,d4
-			move.w	#320,d5
-			bsr.w	DrawBlocks_TB
-	locj_6D70:
-
-			bclr	#4,(a2)
-			beq.s	locj_6D88
-			; Draw entire row at the top
-			moveq	#-16,d4
-			moveq	#0,d5
-			bsr.w	Calc_VRAM_Pos_2
-			moveq	#-16,d4
-			moveq	#0,d5
-			moveq	#(512/16)-1,d6
-			bsr.w	DrawBlocks_LR_3
-	locj_6D88:
-
-			bclr	#5,(a2)
-			beq.s	locret_69F2
-			; Draw entire row at the bottom
-			move.w	#224,d4
-			moveq	#0,d5
-			bsr.w	Calc_VRAM_Pos_2
-			move.w	#224,d4
-			moveq	#0,d5
-			moveq	#(512/16)-1,d6
-			bsr.w	DrawBlocks_LR_3
-		endc
+		bclr	#5,(a2)
+		beq.s	locret_69F2
+		; Draw entire row at the bottom
+		move.w	#224,d4
+		moveq	#0,d5
+		bsr.w	Calc_VRAM_Pos_2
+		move.w	#224,d4
+		moveq	#0,d5
+		moveq	#(512/16)-1,d6
+		bsr.w	DrawBlocks_LR_3
 
 locret_69F2:
 		rts	
@@ -4386,105 +4230,6 @@ locret_69F2:
 ; Essentially, this draws everything that isn't scroll block 1
 ; sub_69F4:
 DrawBGScrollBlock2:
-		if Revision=0
-
-		tst.b	(a2)
-		beq.w	locret_6A80
-		bclr	#2,(a2)
-		beq.s	loc_6A3E
-		; Draw new tiles on the left
-		cmpi.w	#16,(a3)
-		blo.s	loc_6A3E
-		move.w	(v_scroll_block_1_size).w,d4
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d4	; Get remaining coverage of screen that isn't scroll block 1
-		move.w	d4,-(sp)
-		moveq	#-16,d5
-		bsr.w	Calc_VRAM_Pos
-		move.w	(sp)+,d4
-		moveq	#-16,d5
-		move.w	(v_scroll_block_1_size).w,d6
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d6
-		blt.s	loc_6A3E	; If scroll block 1 is completely offscreen, branch?
-		lsr.w	#4,d6
-		subi.w	#((224+16)/16)-1,d6	; Get however many of the rows on screen are not scroll block 1
-		bhs.s	loc_6A3E
-		neg.w	d6
-		bsr.w	DrawBlocks_TB_2
-
-loc_6A3E:
-		bclr	#3,(a2)
-		beq.s	locret_6A80
-		; Draw new tiles on the right
-		move.w	(v_scroll_block_1_size).w,d4
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d4
-		move.w	d4,-(sp)
-		move.w	#320,d5
-		bsr.w	Calc_VRAM_Pos
-		move.w	(sp)+,d4
-		move.w	#320,d5
-		move.w	(v_scroll_block_1_size).w,d6
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d6
-		blt.s	locret_6A80
-		lsr.w	#4,d6
-		subi.w	#((224+16)/16)-1,d6
-		bhs.s	locret_6A80
-		neg.w	d6
-		bsr.w	DrawBlocks_TB_2
-
-locret_6A80:
-		rts	
-; End of function DrawBGScrollBlock2
-
-; ===========================================================================
-
-; Abandoned unused scroll block code.
-; This would have drawn a scroll block that started at 208 pixels down, and was 48 pixels long.
-		tst.b	(a2)
-		beq.s	locret_6AD6
-		bclr	#2,(a2)
-		beq.s	loc_6AAC
-		; Draw new tiles on the left
-		move.w	#224-16,d4	; Note that full screen coverage is normally 224+16+16. This is exactly three blocks less.
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d4
-		move.w	d4,-(sp)
-		moveq	#-16,d5
-		bsr.w	Calc_VRAM_Pos_Unknown
-		move.w	(sp)+,d4
-		moveq	#-16,d5
-		moveq	#3-1,d6	; Draw only three rows
-		bsr.w	DrawBlocks_TB_2
-
-loc_6AAC:
-		bclr	#3,(a2)
-		beq.s	locret_6AD6
-		; Draw new tiles on the right
-		move.w	#224-16,d4
-		move.w	4(a3),d1
-		andi.w	#-16,d1
-		sub.w	d1,d4
-		move.w	d4,-(sp)
-		move.w	#320,d5
-		bsr.w	Calc_VRAM_Pos_Unknown
-		move.w	(sp)+,d4
-		move.w	#320,d5
-		moveq	#3-1,d6
-		bsr.w	DrawBlocks_TB_2
-
-locret_6AD6:
-		rts	
-
-		else
-
 			tst.b	(a2)
 			beq.w	locj_6DF2
 			cmpi.b	#id_SBZ,(v_zone).w
@@ -4689,7 +4434,6 @@ locret_6AD6:
 			clr.b	(a2)
 			rts			
 
-		endc
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -4716,7 +4460,6 @@ DrawBlocks_LR_2:
 		rts
 ; End of function DrawBlocks_LR
 
-		if Revision>=1
 ; DrawTiles_LR_3:
 DrawBlocks_LR_3:
 		move.l	#$800000,d7
@@ -4734,7 +4477,6 @@ DrawBlocks_LR_3:
 		dbf	d6,@loop
 		rts	
 ; End of function DrawBlocks_LR_3
-		endc
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -4836,31 +4578,7 @@ DrawFlipXY:
 ; End of function DrawBlocks
 
 ; ===========================================================================
-; unused garbage
-		if Revision=0
-; This is interesting. It draws a block, but not before
-; incrementing its palette lines by 1. This may have been
-; a debug function to discolour mirrored tiles, to test
-; if they're loading properly.
-		rts	
-		move.l	d0,(a5)
-		move.w	#$2000,d5
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		add.l	d7,d0
-		move.l	d0,(a5)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		move.w	(a1)+,d4
-		add.w	d5,d4
-		move.w	d4,(a6)
-		rts
-		endc
+
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -4874,16 +4592,10 @@ DrawFlipXY:
 ; a1 = Address of block
 ; DrawBlocks:
 GetBlockData:
-		if Revision=0
-		movea.l	(v_16x16).l,a1	; MJ: load Block's location
-		add.w	4(a3),d4	; MJ: load Y position to d4
 		add.w	(a3),d5		; MJ: load X position to d5
-		else
-			add.w	(a3),d5		; MJ: load X position to d5
-	GetBlockData_2:
-			add.w	4(a3),d4	; MJ: load Y position to d4
-			movea.l	(v_16x16).l,a1	; MJ: load Block's location
-		endc
+GetBlockData_2:
+		add.w	4(a3),d4	; MJ: load Y position to d4
+		movea.l	(v_16x16).l,a1	; MJ: load Block's location
 		; Turn Y coordinate into index into level layout
 		move.w	d4,d3		; MJ: copy Y position to d3
 		andi.w	#$780,d3	; MJ: get within 780 (Not 380) (E00 pixels (not 700)) in multiples of 80
@@ -4930,14 +4642,9 @@ locret_6C1E:
 ; d5 = Relative X coordinate
 ; Returns VDP command in d0
 Calc_VRAM_Pos:
-		if Revision=0
-		add.w	4(a3),d4	; Add camera Y coordinate
-		add.w	(a3),d5		; Add camera X coordinate
-		else
-			add.w	(a3),d5
-	Calc_VRAM_Pos_2:
-			add.w	4(a3),d4
-		endc
+		add.w	(a3),d5
+Calc_VRAM_Pos_2:
+		add.w	4(a3),d4
 		; Floor the coordinates to the nearest pair of tiles (the size of a block).
 		; Also note that this wraps the value to the size of the plane:
 		; The plane is 64*8 wide, so wrap at $100, and it's 32*8 tall, so wrap at $200
@@ -4953,29 +4660,6 @@ Calc_VRAM_Pos:
 		rts	
 ; End of function Calc_VRAM_Pos
 
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-; not used
-
-; This is just like Calc_VRAM_Pos, but seemingly for an earlier
-; VRAM layout: the only difference is the high bits of the
-; plane's VRAM address, which are 10 instead of 11.
-; Both the foreground and background are at $C000 and $E000
-; respectively, so this one starting at $8000 makes no sense.
-; sub_6C3C:
-Calc_VRAM_Pos_Unknown:
-		add.w	4(a3),d4
-		add.w	(a3),d5
-		andi.w	#$F0,d4
-		andi.w	#$1F0,d5
-		lsl.w	#4,d4
-		lsr.w	#2,d5
-		add.w	d5,d4
-		moveq	#2,d0
-		swap	d0
-		move.w	d4,d0
-		rts	
-; End of function Calc_VRAM_Pos_Unknown
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load tiles as soon as the level	appears
@@ -4994,17 +4678,14 @@ LoadTilesFromStart:
 		lea	(v_bgscreenposx).w,a3
 		movea.l	(v_lvllayoutbg).w,a4	; MJ: Load address of layout BG
 		move.w	#$6000,d2
-		if Revision=0
-		else
-			tst.b	(v_zone).w
-			beq.w	Draw_GHz_Bg
-			cmpi.b	#id_MZ,(v_zone).w
-			beq.w	Draw_Mz_Bg
-			cmpi.w	#(id_SBZ<<8)+0,(v_zone).w
-			beq.w	Draw_SBz_Bg
-			cmpi.b	#id_EndZ,(v_zone).w
-			beq.w	Draw_GHz_Bg
-		endc
+		tst.b	(v_zone).w
+		beq.w	Draw_GHz_Bg
+		cmpi.b	#id_MZ,(v_zone).w
+		beq.w	Draw_Mz_Bg
+		cmpi.w	#(id_SBZ<<8)+0,(v_zone).w
+		beq.w	Draw_SBz_Bg
+		cmpi.b	#id_EndZ,(v_zone).w
+		beq.w	Draw_GHz_Bg
 ; End of function LoadTilesFromStart
 
 
@@ -5030,7 +4711,6 @@ DrawChunks:
 		rts	
 ; End of function DrawChunks
 
-		if Revision>=1
 	Draw_GHz_Bg:
 			moveq	#0,d4
 			moveq	#((224+16+16)/16)-1,d6
@@ -5101,7 +4781,6 @@ DrawChunks:
 			bsr.w	DrawBlocks_LR_3
 	locj_72EE:
 			rts
-		endc
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to load basic level data
@@ -5679,11 +5358,9 @@ Map_Missile:	include	"_maps\Buzz Bomber Missile.asm"
 		include	"_incObj\7C Ring Flash.asm"
 
 		include	"_anim\Rings.asm"
-		if Revision=0
+
 Map_Ring:	include	"_maps\Rings.asm"
-		else
-Map_Ring:		include	"_maps\Rings (JP1).asm"
-		endc
+
 Map_GRing:	include	"_maps\Giant Ring.asm"
 Map_Flash:	include	"_maps\Ring Flash.asm"
 		include	"_incObj\26 Monitor.asm"
@@ -6941,17 +6618,14 @@ ResumeMusic:
 		move.w	#bgm_SBZ,d0	; play SBZ music
 
 	@notsbz:
-		if Revision=0
-		else
-			tst.b	(v_invinc).w ; is Sonic invincible?
-			beq.s	@notinvinc ; if not, branch
-			move.w	#bgm_Invincible,d0
+		tst.b	(v_invinc).w ; is Sonic invincible?
+		beq.s	@notinvinc ; if not, branch
+		move.w	#bgm_Invincible,d0
 	@notinvinc:
-			tst.b	(f_lockscreen).w ; is Sonic at a boss?
-			beq.s	@playselected ; if not, branch
-			move.w	#bgm_Boss,d0
+		tst.b	(f_lockscreen).w ; is Sonic at a boss?
+		beq.s	@playselected ; if not, branch
+		move.w	#bgm_Boss,d0
 	@playselected:
-		endc
 
 		jsr	(PlaySound).l
 
@@ -8242,43 +7916,23 @@ Map_HUD:	include	"_maps\HUD.asm"
 
 AddPoints:
 		move.b	#1,(f_scorecount).w ; set score counter to update
-
-		if Revision=0
-		lea	(v_scorecopy).w,a2
-		lea	(v_score).w,a3
-		add.l	d0,(a3)		; add d0*10 to the score
-		move.l	#999999,d1
-		cmp.l	(a3),d1		; is score below 999999?
-		bhi.w	@belowmax	; if yes, branch
-		move.l	d1,(a3)		; reset	score to 999999
-		move.l	d1,(a2)
-
+		lea     (v_score).w,a3
+		add.l   d0,(a3)
+		move.l  #999999,d1
+		cmp.l   (a3),d1 ; is score below 999999?
+		bhi.s   @belowmax ; if yes, branch
+		move.l  d1,(a3) ; reset score to 999999
 	@belowmax:
-		move.l	(a3),d0
-		cmp.l	(a2),d0
-		blo.w	@locret_1C6B6
-		move.l	d0,(a2)
+		move.l  (a3),d0
+		cmp.l   (v_scorelife).w,d0 ; has Sonic got 50000+ points?
+		blo.s   @noextralife ; if not, branch
 
-		else
-
-			lea     (v_score).w,a3
-			add.l   d0,(a3)
-			move.l  #999999,d1
-			cmp.l   (a3),d1 ; is score below 999999?
-			bhi.s   @belowmax ; if yes, branch
-			move.l  d1,(a3) ; reset score to 999999
-		@belowmax:
-			move.l  (a3),d0
-			cmp.l   (v_scorelife).w,d0 ; has Sonic got 50000+ points?
-			blo.s   @noextralife ; if not, branch
-
-			addi.l  #5000,(v_scorelife).w ; increase requirement by 50000
-			tst.b   (v_megadrive).w
-			bmi.s   @noextralife ; branch if Mega Drive is Japanese
-			addq.b  #1,(v_lives).w ; give extra life
-			addq.b  #1,(f_lifecount).w
-			music	bgm_ExtraLife,1,0,0
-		endc
+		addi.l  #5000,(v_scorelife).w ; increase requirement by 50000
+		tst.b   (v_megadrive).w
+		bmi.s   @noextralife ; branch if Mega Drive is Japanese
+		addq.b  #1,(v_lives).w ; give extra life
+		addq.b  #1,(f_lifecount).w
+		music	bgm_ExtraLife,1,0,0
 
 @locret_1C6B6:
 @noextralife:
@@ -8353,18 +8007,12 @@ Art_LivesNums:	incbin	"artunc\Lives Counter Numbers.bin" ; 8x8 pixel numbers on 
 		include	"_inc\Pattern Load Cues.asm"
 
 		align	$200,$FF
-		if Revision=0
+
 Nem_SegaLogo:	incbin	"artnem\Sega Logo.bin"	; large Sega logo
 		even
 Eni_SegaLogo:	incbin	"tilemaps\Sega Logo.bin" ; large Sega logo (mappings)
 		even
-		else
-			dcb.b	$300,$FF
-	Nem_SegaLogo:	incbin	"artnem\Sega Logo (JP1).bin" ; large Sega logo
-			even
-	Eni_SegaLogo:	incbin	"tilemaps\Sega Logo (JP1).bin" ; large Sega logo (mappings)
-			even
-		endc
+
 Eni_Title:	incbin	"tilemaps\Title Screen.bin" ; title screen foreground (mappings) (Unc Chunks)
 		even
 Nem_TitleFg:	incbin	"artnem\Title Screen Foreground.bin"
@@ -8389,28 +8037,11 @@ Art_Sonic:	incbin	"artunc\Sonic.bin"	; Sonic
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------
-		if Revision=0
-Nem_Smoke:	incbin	"artnem\Unused - Smoke.bin"
-		even
-Nem_SyzSparkle:	incbin	"artnem\Unused - SYZ Sparkles.bin"
-		even
-		else
-		endc
+
 Nem_Shield:	incbin	"artnem\Shield.bin"
 		even
 Nem_Stars:	incbin	"artnem\Invincibility Stars.bin"
 		even
-		if Revision=0
-Nem_LzSonic:	incbin	"artnem\Unused - LZ Sonic.bin" ; Sonic holding his breath
-		even
-Nem_UnkFire:	incbin	"artnem\Unused - Fireball.bin" ; unused fireball
-		even
-Nem_Warp:	incbin	"artnem\Unused - SStage Flash.bin" ; entry to special stage flash
-		even
-Nem_Goggle:	incbin	"artnem\Unused - Goggles.bin" ; unused goggles
-		even
-		else
-		endc
 
 		include	"_maps\SS Walls.asm"
 
@@ -8712,11 +8343,7 @@ Blk16_MZ:	incbin	"map16\MZ.bin"
 		even
 Nem_MZ:		incbin	"artnem\8x8 - MZ.bin"	; MZ primary patterns
 		even
-Blk128_MZ:	if Revision=0
-		incbin	"map128\MZ.bin"
-		else
-		incbin	"map128\MZ (JP1).bin"
-		endc
+Blk128_MZ:	incbin	"map128\MZ.bin"
 		even
 Blk16_SLZ:	incbin	"map16\SLZ.bin"
 		even
@@ -8734,11 +8361,7 @@ Blk16_SBZ:	incbin	"map16\SBZ.bin"
 		even
 Nem_SBZ:	incbin	"artnem\8x8 - SBZ.bin"	; SBZ primary patterns
 		even
-Blk128_SBZ:	if Revision=0
-		incbin	"map128\SBZ.bin"
-		else
-		incbin	"map128\SBZ (JP1).bin"
-		endc
+Blk128_SBZ:	incbin	"map128\SBZ.bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - bosses and ending sequence
@@ -8763,11 +8386,6 @@ Nem_EndSonic:	incbin	"artnem\Ending - Sonic.bin"
 		even
 Nem_TryAgain:	incbin	"artnem\Ending - Try Again.bin"
 		even
-Nem_EndEggman:	if Revision=0
-		incbin	"artnem\Unused - Eggman Ending.bin"
-		else
-		endc
-		even
 Kos_EndFlowers:	incbin	"artkos\Flowers at Ending.bin" ; ending sequence animated flowers
 		even
 Nem_EndFlower:	incbin	"artnem\Ending - Flowers.bin"
@@ -8777,11 +8395,8 @@ Nem_CreditText:	incbin	"artnem\Ending - Credits.bin"
 Nem_EndStH:	incbin	"artnem\Ending - StH Logo.bin"
 		even
 
-		if Revision=0
-		dcb.b $104,$FF			; why?
-		else
 		dcb.b $40,$FF
-		endc
+
 ; ---------------------------------------------------------------------------
 ; Collision data
 ; ---------------------------------------------------------------------------
@@ -8826,15 +8441,9 @@ SS_3:		incbin	"sslayout\3.bin"
 		even
 SS_4:		incbin	"sslayout\4.bin"
 		even
-		if Revision=0
 SS_5:		incbin	"sslayout\5.bin"
 		even
 SS_6:		incbin	"sslayout\6.bin"
-		else
-	SS_5:		incbin	"sslayout\5 (JP1).bin"
-			even
-	SS_6:		incbin	"sslayout\6 (JP1).bin"
-		endc
 		even
 ; ---------------------------------------------------------------------------
 ; Animated uncompressed graphics
@@ -8999,25 +8608,13 @@ ObjPos_GHZ1:	incbin	"objpos\ghz1.bin"
 		even
 ObjPos_GHZ2:	incbin	"objpos\ghz2.bin"
 		even
-ObjPos_GHZ3:	if Revision=0
-		incbin	"objpos\ghz3.bin"
-		else
-		incbin	"objpos\ghz3 (JP1).bin"
-		endc
+ObjPos_GHZ3:	incbin	"objpos\ghz3.bin"
 		even
-ObjPos_LZ1:	if Revision=0
-		incbin	"objpos\lz1.bin"
-		else
-		incbin	"objpos\lz1 (JP1).bin"
-		endc
+ObjPos_LZ1:		incbin	"objpos\lz1.bin"
 		even
-ObjPos_LZ2:	incbin	"objpos\lz2.bin"
+ObjPos_LZ2:		incbin	"objpos\lz2.bin"
 		even
-ObjPos_LZ3:	if Revision=0
-		incbin	"objpos\lz3.bin"
-		else
-		incbin	"objpos\lz3 (JP1).bin"
-		endc
+ObjPos_LZ3:		incbin	"objpos\lz3.bin"
 		even
 ObjPos_SBZ3:	incbin	"objpos\sbz3.bin"
 		even
@@ -9033,15 +8630,11 @@ ObjPos_LZ3pf1:	incbin	"objpos\lz3pf1.bin"
 		even
 ObjPos_LZ3pf2:	incbin	"objpos\lz3pf2.bin"
 		even
-ObjPos_MZ1:	if Revision=0
-		incbin	"objpos\mz1.bin"
-		else
-		incbin	"objpos\mz1 (JP1).bin"
-		endc
+ObjPos_MZ1:		incbin	"objpos\mz1.bin"
 		even
-ObjPos_MZ2:	incbin	"objpos\mz2.bin"
+ObjPos_MZ2:		incbin	"objpos\mz2.bin"
 		even
-ObjPos_MZ3:	incbin	"objpos\mz3.bin"
+ObjPos_MZ3:		incbin	"objpos\mz3.bin"
 		even
 ObjPos_SLZ1:	incbin	"objpos\slz1.bin"
 		even
@@ -9053,21 +8646,13 @@ ObjPos_SYZ1:	incbin	"objpos\syz1.bin"
 		even
 ObjPos_SYZ2:	incbin	"objpos\syz2.bin"
 		even
-ObjPos_SYZ3:	if Revision=0
-		incbin	"objpos\syz3.bin"
-		else
-		incbin	"objpos\syz3 (JP1).bin"
-		endc
+ObjPos_SYZ3:	incbin	"objpos\syz3.bin"
 		even
-ObjPos_SBZ1:	if Revision=0
-		incbin	"objpos\sbz1.bin"
-		else
-		incbin	"objpos\sbz1 (JP1).bin"
-		endc
+ObjPos_SBZ1:	incbin	"objpos\sbz1.bin"
 		even
 ObjPos_SBZ2:	incbin	"objpos\sbz2.bin"
 		even
-ObjPos_FZ:	incbin	"objpos\fz.bin"
+ObjPos_FZ:		incbin	"objpos\fz.bin"
 		even
 ObjPos_SBZ1pf1:	incbin	"objpos\sbz1pf1.bin"
 		even
@@ -9085,11 +8670,8 @@ ObjPos_End:	incbin	"objpos\ending.bin"
 		even
 ObjPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
 
-		if Revision=0
-		dcb.b $62A,$FF
-		else
 		dcb.b $63C,$FF
-		endc
+
 		;dcb.b ($10000-(*%$10000))-(EndOfRom-SoundDriver),$FF
 
 SoundDriver:	include "s1.sounddriver.asm"
