@@ -6463,7 +6463,8 @@ Sonic_Normal:
 		move.w	Sonic_Index(pc,d0.w),d1
 		jmp	Sonic_Index(pc,d1.w)
 ; ===========================================================================
-Sonic_Index:	dc.w Sonic_Main-Sonic_Index
+Sonic_Index:
+		dc.w Sonic_Main-Sonic_Index
 		dc.w Sonic_Control-Sonic_Index
 		dc.w Sonic_Hurt-Sonic_Index
 		dc.w Sonic_Death-Sonic_Index
@@ -6481,9 +6482,8 @@ Sonic_Main:	; Routine 0
 		move.b	#2,obPriority(a0)
 		move.b	#$18,obActWid(a0)
 		move.b	#4,obRender(a0)
-		move.w	#$600,(v_sonspeedmax).w ; Sonic's top speed
-		move.w	#$C,(v_sonspeedacc).w ; Sonic's acceleration
-		move.w	#$80,(v_sonspeeddec).w ; Sonic's deceleration
+		lea     (v_sonspeedmax).w,a2	; Load Sonic_top_speed into a2
+		bsr.w   ApplySpeedSettings		; Fetch Speed settings
 
 Sonic_Control:	; Routine 2
 		tst.w	(f_debugmode).w	; is debug cheat enabled?
@@ -6630,6 +6630,7 @@ loc_12EA6:
 		include	"_anim\Sonic.asm"
 		include	"_incObj\Sonic LoadGfx.asm"
 
+		include "_incObj\sub ApplySpeedSettings.asm"
 		include	"_incObj\0A Drowning Countdown.asm"
 
 

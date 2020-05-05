@@ -185,6 +185,8 @@ Debug_ChgItem:
 		move.b	d0,(v_player+obAnim).w
 		move.w	d0,obX+2(a0)
 		move.w	d0,obY+2(a0)
+		lea     (v_sonspeedmax).w,a2    ; Load Sonic_top_speed into a2
+		jsr		ApplySpeedSettings
 		move.w	(v_limittopdb).w,(v_limittop2).w ; restore level boundaries
 		move.w	(v_limitbtmdb).w,(v_limitbtm1).w
 		cmpi.b	#id_Special,(v_gamemode).w ; are you in the special stage?

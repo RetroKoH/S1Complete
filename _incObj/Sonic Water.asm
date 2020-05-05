@@ -22,9 +22,8 @@ Sonic_Water:
 		bsr.w	ResumeMusic
 		move.b	#id_DrownCount,(v_objspace+$340).w ; load bubbles object from Sonic's mouth
 		move.b	#$81,(v_objspace+$340+obSubtype).w
-		move.w	#$300,(v_sonspeedmax).w ; change Sonic's top speed
-		move.w	#6,(v_sonspeedacc).w ; change Sonic's acceleration
-		move.w	#$40,(v_sonspeeddec).w ; change Sonic's deceleration
+		lea     (v_sonspeedmax).w,a2  ; Load Sonic_top_speed into a2
+		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
 		asr	obVelX(a0)
 		asr	obVelY(a0)
 		asr	obVelY(a0)	; slow Sonic

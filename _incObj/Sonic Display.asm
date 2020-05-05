@@ -2,7 +2,7 @@
 ; Subroutine to display Sonic and set music
 ; ---------------------------------------------------------------------------
 
-Sonic_Display:
+Sonic_Display: 	; Invulnerability flashing
 		move.w	flashtime(a0),d0
 		beq.s	@display
 		subq.w	#1,flashtime(a0)
@@ -44,9 +44,8 @@ Sonic_Display:
 		beq.s	@exit
 		subq.w	#1,shoetime(a0)	; subtract 1 from time
 		bne.s	@exit
-		move.w	#$600,(v_sonspeedmax).w ; restore Sonic's speed
-		move.w	#$C,(v_sonspeedacc).w ; restore Sonic's acceleration
-		move.w	#$80,(v_sonspeeddec).w ; restore Sonic's deceleration
+		lea     (v_sonspeedmax).w,a2    ; Load Sonic_top_speed into a2
+		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
 		move.b	#0,(v_shoes).w	; cancel speed shoes
 		music	bgm_Slowdown,1,0,0	; run music at normal speed
 
