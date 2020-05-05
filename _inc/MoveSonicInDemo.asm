@@ -65,7 +65,7 @@ MDemo_On:
 		move.b	(a1),d0
 		lea	(v_jpadhold1).w,a0
 		move.b	d0,d1
-		moveq	#0,d2
+		move.b	v_jpadhold2-v_jpadhold1(a0),d2 ; Fix Demo Playback
 		eor.b	d2,d0
 		move.b	d1,(a0)+
 		and.b	d1,d0
