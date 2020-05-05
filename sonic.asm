@@ -6108,7 +6108,11 @@ OPL_Main:
 OPL_ClrList:
 		clr.l	(a2)+
 		dbf	d0,OPL_ClrList	; clear	pre-destroyed object list
+		cmpi.b	#id_SLZ,(v_zone).w
+		bne.s	@notSLZ
+		move.b	#id_Pylon,(v_lvlobjspace).w
 
+	@notSLZ:
 		lea	(v_objstate).w,a2
 		moveq	#0,d2
 		move.w	(v_screenposx).w,d6
