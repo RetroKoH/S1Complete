@@ -66,7 +66,7 @@ Buzz_Action:	; Routine 2
 		addi.w	#$1C,obY(a1)
 		move.w	#$200,obVelY(a1) ; move missile downwards
 		move.w	#$200,obVelX(a1) ; move missile to the right
-		move.w	#$18,d0
+		move.w	#$14,d0
 		btst	#0,obStatus(a0)	; is Buzz Bomber facing	left?
 		bne.s	@noflip2	; if not, branch
 		neg.w	d0

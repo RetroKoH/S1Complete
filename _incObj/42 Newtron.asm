@@ -67,6 +67,10 @@ Newt_Action:	; Routine 2
 @type00:
 		cmpi.b	#4,obFrame(a0)	; has "appearing" animation finished?
 		bcc.s	@fall		; is yes, branch
+		cmpi.b	#2,obFrame(a0)
+		bcs.s	@next
+		move.b	#$C,obColType(a0)
+	@next:
 		bset	#0,obStatus(a0)
 		move.w	(v_player+obX).w,d0
 		sub.w	obX(a0),d0
