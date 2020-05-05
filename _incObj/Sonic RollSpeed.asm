@@ -56,6 +56,15 @@ loc_131AA:
 		subq.w	#5,obY(a0)
 
 loc_131CC:
+	cmp.w	#$60,(v_lookshift).w
+	beq.s	@cont2
+	bcc.s	@cont1
+	addq.w	#4,(v_lookshift).w
+
+@cont1:
+	subq.w	#2,(v_lookshift).w
+
+@cont2:
 		move.b	obAngle(a0),d0
 		jsr	(CalcSine).l
 		muls.w	obInertia(a0),d0
@@ -95,7 +104,7 @@ loc_1320A:
 loc_13218:
 		sub.w	d4,d0
 		bcc.s	loc_13220
-		move.w	#-$80,d0
+		clr.w	d0
 
 loc_13220:
 		move.w	d0,obInertia(a0)
@@ -117,7 +126,7 @@ Sonic_RollRight:
 loc_1323A:
 		add.w	d4,d0
 		bcc.s	loc_13242
-		move.w	#$80,d0
+		clr.w	d0
 
 loc_13242:
 		move.w	d0,obInertia(a0)
