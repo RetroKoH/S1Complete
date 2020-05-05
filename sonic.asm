@@ -1993,7 +1993,7 @@ GM_Title:
 		copyTilemap	Eni_Title,$C208,$21,$15 ; Load Title Chunks from ROM
 
 		locVRAM	0
-		lea	(Nem_GHZ_1st).l,a0 ; load GHZ patterns
+		lea		(Nem_Title).l,a0 ; load GHZ patterns
 		bsr.w	NemDec
 		moveq	#palid_GHZ,d0	; load GHZ palette
 		bsr.w	PalLoad1
@@ -3649,6 +3649,8 @@ End_LoadData:
 		bsr.w	DeformLayers
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad
+		move.b  #$C,(v_vbla_routine).w 	; the two lines above LoadTilesFromStart to fix a bug. - VLADIKOMPER
+		bsr.w   WaitForVBla
 		bsr.w	LoadTilesFromStart
 		move.l	#Col_GHZ_1,(v_colladdr1).w ; MJ: Set first collision for ending
 		move.l	#Col_GHZ_2,(v_colladdr2).w ; MJ: Set second collision for ending
@@ -4789,6 +4791,24 @@ DrawChunks:
 			rts
 
 ; ---------------------------------------------------------------------------
+; Subroutine to load level art patterns
+; ---------------------------------------------------------------------------
+ 
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+LoadLevelArt:
+        move.w  d0,-(sp)        ; store level ID to stack
+        lsl.w   #2,d0           ; shift 2 bits left
+        move.l  LLA_ArtList(pc,d0.w),a0 ; get correct entry from art file list
+ 
+        move.l  #$40000000,d4       ; set "VRAM Write to $0000"
+        bsr.w   LoadCompArt     ; load comper compressed art
+        move.w  (sp)+,d0        ; get old level ID from stack again
+        rts          		    ; return to subroutine
+ 
+        ; list of art patterns used in levels
+LLA_ArtList:    dc.l LvlArt_GHZ, LvlArt_LZ, LvlArt_MZ, LvlArt_SLZ, LvlArt_SYZ, LvlArt_SBZ, LvlArt_GHZ
+
+; ---------------------------------------------------------------------------
 ; Subroutine to load basic level data
 ; ---------------------------------------------------------------------------
 
@@ -4798,6 +4818,7 @@ DrawChunks:
 LevelDataLoad:
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
+		bsr.s   LoadLevelArt        ; load level tiles
 		lsl.w	#4,d0
 		lea	(LevelHeaders).l,a2
 		lea	(a2,d0.w),a2
@@ -8333,41 +8354,41 @@ Nem_Squirrel:	incbin	"artnem\Animal Squirrel.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - primary patterns and block mappings
 ; ---------------------------------------------------------------------------
+Nem_Title:	incbin	"artnem\Title Screen Background.bin"	; Title patterns
+		even
+LvlArt_GHZ:	incbin	"lvlart\GHZ.bin"	; GHZ primary patterns
+		even
 Blk16_GHZ:	incbin	"map16\GHZ.bin"
-		even
-Nem_GHZ_1st:	incbin	"artnem\8x8 - GHZ1.bin"	; GHZ primary patterns
-		even
-Nem_GHZ_2nd:	incbin	"artnem\8x8 - GHZ2.bin"	; GHZ secondary patterns
 		even
 Blk128_GHZ:	incbin	"map128\GHZ.bin"
 		even
-Blk16_LZ:	incbin	"map16\LZ.bin"
+LvlArt_LZ:	incbin	"lvlart\LZ.bin"		; LZ primary patterns
 		even
-Nem_LZ:		incbin	"artnem\8x8 - LZ.bin"	; LZ primary patterns
+Blk16_LZ:	incbin	"map16\LZ.bin"
 		even
 Blk128_LZ:	incbin	"map128\LZ.bin"
 		even
-Blk16_MZ:	incbin	"map16\MZ.bin"
+LvlArt_MZ:	incbin	"lvlart\MZ.bin"		; MZ primary patterns
 		even
-Nem_MZ:		incbin	"artnem\8x8 - MZ.bin"	; MZ primary patterns
+Blk16_MZ:	incbin	"map16\MZ.bin"
 		even
 Blk128_MZ:	incbin	"map128\MZ.bin"
 		even
-Blk16_SLZ:	incbin	"map16\SLZ.bin"
+LvlArt_SLZ:	incbin	"lvlart\SLZ.bin" 	; SLZ primary patterns
 		even
-Nem_SLZ:	incbin	"artnem\8x8 - SLZ.bin"	; SLZ primary patterns
+Blk16_SLZ:	incbin	"map16\SLZ.bin"
 		even
 Blk128_SLZ:	incbin	"map128\SLZ.bin"
 		even
-Blk16_SYZ:	incbin	"map16\SYZ.bin"
+LvlArt_SYZ:	incbin	"lvlart\SYZ.bin"	; SYZ primary patterns
 		even
-Nem_SYZ:	incbin	"artnem\8x8 - SYZ.bin"	; SYZ primary patterns
+Blk16_SYZ:	incbin	"map16\SYZ.bin"
 		even
 Blk128_SYZ:	incbin	"map128\SYZ.bin"
 		even
-Blk16_SBZ:	incbin	"map16\SBZ.bin"
+LvlArt_SBZ:	incbin	"lvlart\SBZ.bin"	; SBZ primary patterns
 		even
-Nem_SBZ:	incbin	"artnem\8x8 - SBZ.bin"	; SBZ primary patterns
+Blk16_SBZ:	incbin	"map16\SBZ.bin"
 		even
 Blk128_SBZ:	incbin	"map128\SBZ.bin"
 		even
