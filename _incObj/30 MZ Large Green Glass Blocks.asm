@@ -30,13 +30,13 @@ Glass_Vars2:	dc.b 6,	0, 2
 ; ===========================================================================
 
 Glass_Main:	; Routine 0
-		lea	(Glass_Vars1).l,a2
+		lea		(Glass_Vars1).l,a2
 		moveq	#1,d1
 		move.b	#$48,obHeight(a0)
 		cmpi.b	#3,obSubtype(a0) ; is object type 0/1/2 ?
 		bcs.s	@IsType012	; if yes, branch
 
-		lea	(Glass_Vars2).l,a2
+		lea		(Glass_Vars2).l,a2
 		moveq	#1,d1
 		move.b	#$38,obHeight(a0)
 
@@ -63,13 +63,13 @@ Glass_Main:	; Routine 0
 		move.w	obY(a1),$30(a1)
 		move.b	obSubtype(a0),obSubtype(a1)
 		move.b	#$20,obActWid(a1)
-		move.b	#4,obPriority(a1)
+		move.w	#$200,obPriority(a1)
 		move.b	(a2)+,obFrame(a1)
 		move.l	a0,glass_parent(a1)
 		dbf	d1,@Repeat	; repeat once to load "reflection object"
 
 		move.b	#$10,obActWid(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		addq.b	#8,obSubtype(a1)
 		andi.b	#$F,obSubtype(a1)
 

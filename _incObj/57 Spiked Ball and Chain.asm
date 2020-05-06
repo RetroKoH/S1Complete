@@ -25,7 +25,7 @@ SBall_Main:	; Routine 0
 		move.l	#Map_SBall,obMap(a0)
 		move.w	#$3BA,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		move.w	obX(a0),sball_origX(a0)
 		move.w	obY(a0),sball_origY(a0)
@@ -75,7 +75,7 @@ SBall_Main:	; Routine 0
 		move.l	obMap(a0),obMap(a1)
 		move.w	obGfx(a0),obGfx(a1)
 		move.b	obRender(a0),obRender(a1)
-		move.b	obPriority(a0),obPriority(a1)
+		move.w	obPriority(a0),obPriority(a1)
 		move.b	obActWid(a0),obActWid(a1)
 		move.b	obColType(a0),obColType(a1)
 		subi.b	#$10,d3

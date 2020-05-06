@@ -21,7 +21,7 @@ Cred_Main:	; Routine 0
 		move.w	(v_creditsnum).w,d0 ; load credits index number
 		move.b	d0,obFrame(a0)	; display appropriate sprite
 		move.b	#0,obRender(a0)
-		move.b	#0,obPriority(a0)
+		clr.w	obPriority(a0)
 
 		cmpi.b	#id_Title,(v_gamemode).w ; is the mode #4 (title screen)?
 		bne.s	Cred_Display	; if not, branch
@@ -34,8 +34,8 @@ Cred_Main:	; Routine 0
 		bne.s	Cred_Display	; if not, branch
 		move.w	#cWhite,(v_pal_dry_dup+$40).w ; 3rd palette, 1st entry = white
 		move.w	#$880,(v_pal_dry_dup+$42).w ; 3rd palette, 2nd entry = cyan
-		jmp	(DeleteObject).l
+		jmp		(DeleteObject).l
 ; ===========================================================================
 
 Cred_Display:	; Routine 2
-		jmp	DisplaySprite
+		jmp		DisplaySprite

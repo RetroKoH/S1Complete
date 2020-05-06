@@ -68,7 +68,7 @@ Anml_Ending:	; Routine 0
 		move.b	#$C,obHeight(a0)
 		move.b	#4,obRender(a0)
 		bset	#0,obRender(a0)
-		move.b	#6,obPriority(a0)
+		move.w	#$300,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#7,obTimeFrame(a0)
 		bra.w	DisplaySprite
@@ -100,7 +100,7 @@ loc_90C0:
 		move.b	#$C,obHeight(a0)
 		move.b	#4,obRender(a0)
 		bset	#0,obRender(a0)
-		move.b	#6,obPriority(a0)
+		move.w	#$300,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#7,obTimeFrame(a0)
 		move.b	#2,obFrame(a0)
@@ -225,7 +225,7 @@ loc_9240:
 		subq.w	#1,$36(a0)
 		bne.w	loc_925C
 		move.b	#2,obRoutine(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 
 loc_925C:
 		bra.w	DisplaySprite

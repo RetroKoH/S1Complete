@@ -24,7 +24,7 @@ Msl_Main:	; Routine 0
 		move.l	#Map_Missile,obMap(a0)
 		move.w	#$2444,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		andi.b	#3,obStatus(a0)
 		tst.b	obSubtype(a0)	; was object created by	a Newtron?

@@ -28,12 +28,12 @@ LBlk_Main:	; Routine 0
 		move.l	#Map_LBlock,obMap(a0)
 		move.w	#$43E6,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		moveq	#0,d0
 		move.b	obSubtype(a0),d0 ; get block type
 		lsr.w	#3,d0		; read only the 1st digit
 		andi.w	#$E,d0
-		lea	LBlk_Var(pc,d0.w),a2
+		lea		LBlk_Var(pc,d0.w),a2
 		move.b	(a2)+,obActWid(a0) ; set width
 		move.b	(a2),lblk_height(a0) ; set height
 		lsr.w	#1,d0

@@ -29,7 +29,7 @@ Sto_Main:	; Routine 0
 		move.b	obSubtype(a0),d0
 		lsr.w	#2,d0
 		andi.w	#$1C,d0
-		lea	Sto_Var(pc,d0.w),a3
+		lea		Sto_Var(pc,d0.w),a3
 		move.b	(a3)+,obActWid(a0)
 		move.b	(a3)+,sto_height(a0)
 		lsr.w	#2,d0
@@ -42,7 +42,7 @@ Sto_Main:	; Routine 0
 		beq.s	@isSBZ3
 
 @chkdel:
-		lea	(v_objstate).w,a2
+		lea		(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		beq.s	@delete
@@ -68,7 +68,7 @@ Sto_Main:	; Routine 0
 
 @isSBZ12:
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.w	obX(a0),sto_origX(a0)
 		move.w	obY(a0),sto_origY(a0)
 		moveq	#0,d0

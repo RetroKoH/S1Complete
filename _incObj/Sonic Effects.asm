@@ -16,7 +16,7 @@ Effects_Init:
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Effects,obMap(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#1,obPriority(a0)
+		move.w	#$80,obPriority(a0)
 		move.b	#$10,obActWid(a0)
 		move.b	#0,obAnim(a0)
 		move.w	#$7A0,obGfx(a0)

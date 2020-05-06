@@ -38,7 +38,7 @@ PSwapper_Init:
 		move.w	#$27B2,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
-		move.b	#5,obPriority(a0)
+		move.w	#$280,obPriority(a0)
 		move.b	obSubtype(a0),d0
 		btst	#2,d0
 		beq.s	PSwapper_Init_CheckX

@@ -23,7 +23,7 @@ Buzz_Main:	; Routine 0
 		move.l	#Map_Buzz,obMap(a0)
 		move.w	#$444,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#8,obColType(a0)
 		move.b	#$18,obActWid(a0)
 
@@ -31,8 +31,8 @@ Buzz_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
 		move.w	@index(pc,d0.w),d1
-		jsr	@index(pc,d1.w)
-		lea	(Ani_Buzz).l,a1
+		jsr		@index(pc,d1.w)
+		lea		(Ani_Buzz).l,a1
 		bsr.w	AnimateSprite
 		bra.w	RememberState
 ; ===========================================================================

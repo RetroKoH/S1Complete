@@ -24,7 +24,7 @@ EEgg_Main:	; Routine 0
 		move.l	#Map_EEgg,obMap(a0)
 		move.w	#$3E1,obGfx(a0)
 		move.b	#0,obRender(a0)
-		move.b	#2,obPriority(a0)
+		move.w	#$100,obPriority(a0)
 		move.b	#2,obAnim(a0)	; use "END" animation
 		cmpi.b	#6,(v_emeralds).w ; do you have all 6 emeralds?
 		beq.s	EEgg_Animate	; if yes, branch

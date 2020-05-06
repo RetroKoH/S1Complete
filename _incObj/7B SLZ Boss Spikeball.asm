@@ -6,7 +6,7 @@ BossSpikeball:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Obj7B_Index(pc,d0.w),d0
-		jsr	Obj7B_Index(pc,d0.w)
+		jsr		Obj7B_Index(pc,d0.w)
 		move.w	$30(a0),d0
 		andi.w	#$FF80,d0
 		move.w	(v_screenposx).w,d1
@@ -16,7 +16,7 @@ BossSpikeball:
 		bmi.w	Obj7A_Delete
 		cmpi.w	#$280,d0
 		bhi.w	Obj7A_Delete
-		jmp	(DisplaySprite).l
+		jmp		(DisplaySprite).l
 ; ===========================================================================
 Obj7B_Index:	dc.w Obj7B_Main-Obj7B_Index
 		dc.w Obj7B_Fall-Obj7B_Index
@@ -31,7 +31,7 @@ Obj7B_Main:	; Routine 0
 		move.w	#$518,obGfx(a0)
 		move.b	#1,obFrame(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$8B,obColType(a0)
 		move.b	#$C,obActWid(a0)
 		movea.l	$3C(a0),a1
@@ -327,7 +327,7 @@ Obj7B_Loop:
 		move.b	#id_BossSpikeball,(a1) ; load shrapnel object
 		move.b	#$A,obRoutine(a1)
 		move.l	#Map_BSBall,obMap(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.w	#$518,obGfx(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)

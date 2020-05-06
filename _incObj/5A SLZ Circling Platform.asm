@@ -23,7 +23,7 @@ Circ_Main:	; Routine 0
 		move.l	#Map_Circ,obMap(a0)
 		move.w	#$4000,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$18,obActWid(a0)
 		move.w	obX(a0),circ_origX(a0)
 		move.w	obY(a0),circ_origY(a0)
@@ -31,18 +31,18 @@ Circ_Main:	; Routine 0
 Circ_Platform:	; Routine 2
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
-		jsr	(PlatformObject).l
+		jsr		(PlatformObject).l
 		bra.w	Circ_Types
 ; ===========================================================================
 
 Circ_Action:	; Routine 4
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
-		jsr	(ExitPlatform).l
+		jsr		(ExitPlatform).l
 		move.w	obX(a0),-(sp)
 		bsr.w	Circ_Types
 		move.w	(sp)+,d2
-		jmp	(MvSonicOnPtfm2).l
+		jmp		(MvSonicOnPtfm2).l
 ; ===========================================================================
 
 Circ_Types:

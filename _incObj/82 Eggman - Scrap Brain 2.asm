@@ -12,7 +12,8 @@ SEgg_Index:	dc.w SEgg_Main-SEgg_Index
 		dc.w SEgg_Eggman-SEgg_Index
 		dc.w SEgg_Switch-SEgg_Index
 
-SEgg_ObjData:	dc.b 2,	0, 3		; routine number, animation, priority
+SEgg_ObjData:
+		dc.b 2,	0, 3		; routine number, animation, priority
 		dc.b 4,	0, 3
 ; ===========================================================================
 
@@ -27,6 +28,12 @@ SEgg_Main:	; Routine 0
 		move.b	(a2)+,obRoutine(a0)
 		move.b	(a2)+,obAnim(a0)
 		move.b	(a2)+,obPriority(a0)
+
+		move.w  obPriority(a0),d0
+		lsr.w   #1,d0
+		andi.w  #$380,d0
+		move.w  d0,obPriority(a0)
+
 		move.l	#Map_SEgg,obMap(a0)
 		move.w	#$400,obGfx(a0)
 		move.b	#4,obRender(a0)
@@ -42,6 +49,12 @@ SEgg_Main:	; Routine 0
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obAnim(a1)
 		move.b	(a2)+,obPriority(a1)
+
+		move.w  obPriority(a1),d0
+		lsr.w   #1,d0
+		andi.w  #$380,d0
+		move.w  d0,obPriority(a1)
+
 		move.l	#Map_But,obMap(a1)
 		move.w	#$4A4,obGfx(a1)
 		move.b	#4,obRender(a1)

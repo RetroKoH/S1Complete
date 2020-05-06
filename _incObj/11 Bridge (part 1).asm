@@ -18,7 +18,7 @@ Bri_Main:	; Routine 0
 		move.l	#Map_Bri,obMap(a0)
 		move.w	#$438E,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#$80,obActWid(a0)
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
@@ -65,7 +65,7 @@ Bri_Main:	; Routine 0
 		move.l	#Map_Bri,obMap(a1)
 		move.w	#$438E,obGfx(a1)
 		move.b	#4,obRender(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.b	#8,obActWid(a1)
 		addi.w	#$10,d3
 		dbf	d1,@buildloop ; repeat d1 times (length of bridge)

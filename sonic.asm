@@ -3526,7 +3526,7 @@ GM_Continue:
 		move.b	#id_ContSonic,(v_player).w ; load Sonic object
 		move.b	#id_ContScrItem,(v_objspace+$40).w ; load continue screen objects
 		move.b	#id_ContScrItem,(v_objspace+$80).w
-		move.b	#3,(v_objspace+$80+obPriority).w
+		move.w	#$180,(v_objspace+$80+obPriority).w
 		move.b	#4,(v_objspace+$80+obFrame).w
 		move.b	#id_ContScrItem,(v_objspace+$C0).w
 		move.b	#4,(v_objspace+$C0+obRoutine).w
@@ -5154,7 +5154,7 @@ loc_84B2:
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	obGfx(a0),obGfx(a1)
-		move.b	obPriority(a0),obPriority(a1)
+		move.w	obPriority(a0),obPriority(a1)
 		move.b	obActWid(a0),obActWid(a1)
 		move.b	(a4)+,ledge_timedelay(a1)
 		cmpa.l	a0,a1
@@ -6498,7 +6498,7 @@ Sonic_Init:	; Routine 0
 		move.b	#9,obWidth(a0)
 		move.l	#Map_Sonic,obMap(a0)
 		move.w	#$780,obGfx(a0)
-		move.b	#2,obPriority(a0)
+		move.w	#$100,obPriority(a0)
 		move.b	#$18,obActWid(a0)
 		move.b	#4,obRender(a0)
 		lea     (v_sonspeedmax).w,a2	; Load Sonic_top_speed into a2

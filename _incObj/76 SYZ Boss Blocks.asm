@@ -32,7 +32,7 @@ Obj76_MakeBlock:
 		move.b	#4,obRender(a1)
 		move.b	#$10,obActWid(a1)
 		move.b	#$10,obHeight(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.w	d5,obX(a1)	; set x-position
 		move.w	#$582,obY(a1)
 		move.w	d4,obSubtype(a1)

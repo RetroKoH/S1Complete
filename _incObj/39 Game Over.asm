@@ -31,7 +31,7 @@ Over_Main:
 		move.l	#Map_Over,obMap(a0)
 		move.w	#$855E,obGfx(a0)
 		move.b	#0,obRender(a0)
-		move.b	#0,obPriority(a0)
+		clr.w	obPriority(a0)
 
 Over_Move:	; Routine 2
 		moveq	#$10,d1		; set horizontal speed

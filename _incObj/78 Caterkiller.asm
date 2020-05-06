@@ -16,6 +16,7 @@ Cat_Index:	dc.w Cat_Main-Cat_Index
 		dc.w Cat_Delete-Cat_Index
 		dc.w loc_16CC0-Cat_Index
 
+catIntertia: equ $1E
 cat_parent:	equ $3C		; address of parent object
 ; ===========================================================================
 
@@ -26,8 +27,8 @@ locret_16950:
 Cat_Main:	; Routine 0
 		move.b	#7,obHeight(a0)
 		move.b	#8,obWidth(a0)
-		jsr	(ObjectFall).l
-		jsr	(ObjFloorDist).l
+		jsr		(ObjectFall).l
+		jsr		(ObjFloorDist).l
 		tst.w	d1
 		bpl.s	locret_16950
 		add.w	d1,obY(a0)
@@ -43,7 +44,7 @@ Cat_Main:	; Routine 0
 		andi.b	#3,obRender(a0)
 		ori.b	#4,obRender(a0)
 		move.b	obRender(a0),obStatus(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#$B,obColType(a0)
 		move.w	obX(a0),d2
@@ -62,12 +63,12 @@ Cat_Main:	; Routine 0
 Cat_Loop:
 		jsr	(FindNextFreeObj).l
 		bne.w	Cat_ChkGone
-		move.b	#id_Caterkiller,0(a1) ; load body segment object
-		move.b	d6,obRoutine(a1) ; goto Cat_BodySeg1 or Cat_BodySeg2 next
-		addq.b	#2,d6		; alternate between the two
+		move.b	#id_Caterkiller,0(a1)	; load body segment object
+		move.b	d6,obRoutine(a1)		; goto Cat_BodySeg1 or Cat_BodySeg2 next
+		addq.b	#2,d6					; alternate between the two
 		move.l	obMap(a0),obMap(a1)
 		move.w	obGfx(a0),obGfx(a1)
-		move.b	#5,obPriority(a1)
+		move.w	#$280,obPriority(a1)
 		move.b	#8,obActWid(a1)
 		move.b	#$CB,obColType(a1)
 		add.w	d5,d2
@@ -143,11 +144,11 @@ Cat_Index2:	dc.w @wait-Cat_Index2
 		addq.b	#2,ob2ndRout(a0)
 		move.b	#$10,$2A(a0)
 		move.w	#-$C0,obVelX(a0)
-		move.w	#$40,obInertia(a0)
+		move.w	#$40,catIntertia(a0)
 		bchg	#4,$2B(a0)
 		bne.s	loc_16AFC
 		clr.w	obVelX(a0)
-		neg.w	obInertia(a0)
+		neg.w	catIntertia(a0)
 
 loc_16AFC:
 		bset	#7,$2B(a0)
@@ -192,7 +193,7 @@ loc_16B02:
 		subq.b	#2,ob2ndRout(a0)
 		move.b	#7,$2A(a0)
 		clr.w	obVelX(a0)
-		clr.w	obInertia(a0)
+		clr.w	catIntertia(a0)
 		rts	
 ; ===========================================================================
 
@@ -241,9 +242,9 @@ Cat_BodySeg1:	; Routine 4, 8
 		move.b	$2B(a1),$2B(a0)
 		move.b	ob2ndRout(a1),ob2ndRout(a0)
 		beq.w	loc_16C64
-		move.w	obInertia(a1),obInertia(a0)
+		move.w	catIntertia(a1),catIntertia(a0)
 		move.w	obVelX(a1),d0
-		add.w	obInertia(a0),d0
+		add.w	catIntertia(a0),d0
 		move.w	d0,obVelX(a0)
 		move.l	obX(a0),d2
 		move.l	d2,d3

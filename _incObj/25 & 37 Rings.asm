@@ -89,7 +89,7 @@ loc_9BBA:
 		move.l	#Map_Ring,obMap(a1)
 		move.w	#$27B2,obGfx(a1)
 		move.b	#4,obRender(a1)
-		move.b	#2,obPriority(a1)
+		move.w	#$100,obPriority(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
 		move.b	obRespawnNo(a0),obRespawnNo(a1)
@@ -116,7 +116,7 @@ Ring_Animate:	; Routine 2
 Ring_Collect:	; Routine 4
 		addq.b	#2,obRoutine(a0)
 		move.b	#0,obColType(a0)
-		move.b	#1,obPriority(a0)
+		move.w	#$80,obPriority(a0)
 		bsr.w	CollectRing
 		lea	(v_objstate).w,a2
 		moveq	#0,d0
@@ -205,7 +205,7 @@ RLoss_Count:	; Routine 0
 		move.l	#Map_Ring,obMap(a1)
 		move.w	#$27B2,obGfx(a1)
 		move.b	#4,obRender(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
 		tst.w	d4
@@ -277,12 +277,12 @@ RLoss_Bounce:	; Routine 2
 
 RLoss_Collect:	; Routine 4
 		addq.b	#2,obRoutine(a0)
-		move.b	#0,obColType(a0)
-		move.b	#1,obPriority(a0)
+		clr.b	obColType(a0)
+		move.w	#$80,obPriority(a0)
 		bsr.w	CollectRing
 
 RLoss_Sparkle:	; Routine 6
-		lea	(Ani_Ring).l,a1
+		lea		(Ani_Ring).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
 ; ===========================================================================

@@ -24,7 +24,7 @@ ESth_Main:	; Routine 0
 		move.l	#Map_ESTH,obMap(a0)
 		move.w	#$5C5,obGfx(a0)
 		move.b	#0,obRender(a0)
-		move.b	#0,obPriority(a0)
+		clr.w	obPriority(a0)
 
 ESth_Move:	; Routine 2
 		cmpi.w	#$C0,obX(a0)	; has object reached $C0?

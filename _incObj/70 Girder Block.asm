@@ -24,7 +24,7 @@ Gird_Main:	; Routine 0
 		move.l	#Map_Gird,obMap(a0)
 		move.w	#$42F0,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$60,obActWid(a0)
 		move.b	#$18,gird_height(a0)
 		move.w	obX(a0),gird_origX(a0)

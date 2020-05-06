@@ -22,7 +22,7 @@ GFire_Main:	; Routine 0
 		move.w	#$345,obGfx(a0)
 		move.w	obX(a0),gfire_origX(a0)
 		move.b	#4,obRender(a0)
-		move.b	#1,obPriority(a0)
+		move.w	#$80,obPriority(a0)
 		move.b	#$8B,obColType(a0)
 		move.b	#8,obActWid(a0)
 		sfx	sfx_Burning,0,0,0	 ; play burning sound

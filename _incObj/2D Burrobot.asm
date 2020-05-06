@@ -21,7 +21,7 @@ Burro_Main:	; Routine 0
 		move.l	#Map_Burro,obMap(a0)
 		move.w	#$4A6,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#5,obColType(a0)
 		move.b	#$C,obActWid(a0)
 		addq.b	#6,ob2ndRout(a0) ; run "Burro_ChkSonic" routine

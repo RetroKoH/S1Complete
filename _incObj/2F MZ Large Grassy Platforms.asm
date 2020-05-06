@@ -27,7 +27,7 @@ LGrass_Main:	; Routine 0
 		move.l	#Map_LGrass,obMap(a0)
 		move.w	#$C000,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#5,obPriority(a0)
+		move.w	#$280,obPriority(a0)
 		move.w	obY(a0),lgrass_origY(a0)
 		move.w	obX(a0),lgrass_origX(a0)
 		moveq	#0,d0

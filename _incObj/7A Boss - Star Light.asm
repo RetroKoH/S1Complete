@@ -14,7 +14,8 @@ Obj7A_Index:	dc.w Obj7A_Main-Obj7A_Index
 		dc.w Obj7A_FlameMain-Obj7A_Index
 		dc.w Obj7A_TubeMain-Obj7A_Index
 
-Obj7A_ObjData:	dc.b 2,	0, 4		; routine number, animation, priority
+Obj7A_ObjData:		; routine number, animation, priority
+		dc.b 2,	0, 4
 		dc.b 4,	1, 4
 		dc.b 6,	7, 4
 		dc.b 8,	0, 3
@@ -46,6 +47,12 @@ Obj7A_LoadBoss:
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obAnim(a1)
 		move.b	(a2)+,obPriority(a1)
+
+		move.w  obPriority(a1),d0
+		lsr.w   #1,d0
+		andi.w  #$380,d0
+		move.w  d0,obPriority(a1)
+
 		move.l	#Map_Eggman,obMap(a1)
 		move.w	#$400,obGfx(a1)
 		move.b	#4,obRender(a1)

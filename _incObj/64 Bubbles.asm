@@ -27,7 +27,7 @@ Bub_Main:	; Routine 0
 		move.w	#$8348,obGfx(a0)
 		move.b	#$84,obRender(a0)
 		move.b	#$10,obActWid(a0)
-		move.b	#1,obPriority(a0)
+		move.w	#$80,obPriority(a0)
 		move.b	obSubtype(a0),d0 ; get bubble type
 		bpl.s	@bubble		; if type is $0-$7F, branch
 

@@ -28,7 +28,7 @@ PushB_Main:	; Routine 0
 
 	@notLZ:
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.w	obX(a0),$34(a0)
 		move.w	obY(a0),$36(a0)
 		moveq	#0,d0

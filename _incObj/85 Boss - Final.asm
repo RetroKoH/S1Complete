@@ -12,7 +12,8 @@ BossFinal:
 		move.w	Obj85_Index(pc,d0.w),d0
 		jmp	Obj85_Index(pc,d0.w)
 ; ===========================================================================
-Obj85_Index:	dc.w Obj85_Main-Obj85_Index
+Obj85_Index:
+		dc.w Obj85_Main-Obj85_Index
 		dc.w Obj85_Eggman-Obj85_Index
 		dc.w loc_1A38E-Obj85_Index
 		dc.w loc_1A346-Obj85_Index
@@ -20,8 +21,9 @@ Obj85_Index:	dc.w Obj85_Main-Obj85_Index
 		dc.w loc_1A3AC-Obj85_Index
 		dc.w loc_1A264-Obj85_Index
 
-Obj85_ObjData:	dc.w $100, $100, $470	; X pos, Y pos,	VRAM setting
-		dc.l Map_SEgg		; mappings pointer
+Obj85_ObjData:
+		dc.w $100, $100, $470	; X pos, Y pos,	VRAM setting
+		dc.l Map_SEgg			; mappings pointer
 		dc.w $25B0, $590, $300
 		dc.l Map_EggCyl
 		dc.w $26E0, $596, $3A0
@@ -33,7 +35,8 @@ Obj85_ObjData:	dc.w $100, $100, $470	; X pos, Y pos,	VRAM setting
 		dc.w $26E0, $596, $400
 		dc.l Map_Eggman
 
-Obj85_ObjData2:	dc.b 2,	0, 4, $20, $19	; routine num, animation, sprite priority, width, height
+Obj85_ObjData2:	; routine num, animation, sprite priority, width, height
+		dc.b 2,	0, 4, $20, $19
 		dc.b 4,	0, 1, $12, 8
 		dc.b 6,	0, 3, 0, 0
 		dc.b 8,	0, 3, 0, 0
@@ -42,15 +45,15 @@ Obj85_ObjData2:	dc.b 2,	0, 4, $20, $19	; routine num, animation, sprite priority
 ; ===========================================================================
 
 Obj85_Main:	; Routine 0
-		lea	Obj85_ObjData(pc),a2
-		lea	Obj85_ObjData2(pc),a3
+		lea		Obj85_ObjData(pc),a2
+		lea		Obj85_ObjData2(pc),a3
 		movea.l	a0,a1
 		moveq	#5,d1
 		bra.s	Obj85_LoadBoss
 ; ===========================================================================
 
 Obj85_Loop:
-		jsr	(FindNextFreeObj).l
+		jsr		(FindNextFreeObj).l
 		bne.s	loc_19E20
 
 Obj85_LoadBoss:
@@ -62,21 +65,27 @@ Obj85_LoadBoss:
 		move.b	(a3)+,obRoutine(a1)
 		move.b	(a3)+,obAnim(a1)
 		move.b	(a3)+,obPriority(a1)
+
+		move.w  obPriority(a1),d0
+		lsr.w   #1,d0
+		andi.w  #$380,d0
+		move.w  d0,obPriority(a1)
+
 		move.b	(a3)+,obActWid(a1)
 		move.b	(a3)+,obHeight(a1)
 		move.b	#4,obRender(a1)
 		bset	#7,obRender(a0)
 		move.l	a0,$34(a1)
-		dbf	d1,Obj85_Loop
+		dbf		d1,Obj85_Loop
 
 loc_19E20:
-		lea	$36(a0),a2
-		jsr	(FindFreeObj).l
+		lea		$36(a0),a2
+		jsr		(FindFreeObj).l
 		bne.s	loc_19E5A
 		move.b	#id_BossPlasma,(a1) ; load energy ball object
 		move.w	a1,(a2)
 		move.l	a0,$34(a1)
-		lea	$38(a0),a2
+		lea		$38(a0),a2
 		moveq	#0,d2
 		moveq	#3,d1
 
@@ -504,7 +513,7 @@ loc_1A312:
 		tst.b	1(a0)
 		bpl.w	Obj85_Delete
 		bsr.w	BossDefeated
-		move.b	#2,obPriority(a0)
+		move.w	#$100,obPriority(a0)
 		move.b	#0,obAnim(a0)
 		move.l	#Map_FZDamaged,obMap(a0)
 		move.w	#$3A0,obGfx(a0)

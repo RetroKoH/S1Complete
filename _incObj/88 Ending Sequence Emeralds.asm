@@ -39,7 +39,7 @@ ECha_CreateEms:
 		move.l	#Map_ECha,obMap(a1)
 		move.w	#$3C5,obGfx(a1)
 		move.b	#4,obRender(a1)
-		move.b	#1,obPriority(a1)
+		move.w	#$80,obPriority(a1)
 		move.w	obX(a0),echa_origX(a1)
 		move.w	obY(a0),echa_origY(a1)
 		move.b	d2,obAnim(a1)

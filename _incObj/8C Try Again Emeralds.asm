@@ -26,7 +26,7 @@ TCha_Main:	; Routine 0
 		move.l	#Map_ECha,obMap(a1)
 		move.w	#$3C5,obGfx(a1)
 		move.b	#0,obRender(a1)
-		move.b	#1,obPriority(a1)
+		move.w	#$80,obPriority(a1)
 		move.w	#$104,obX(a1)
 		move.w	#$120,$38(a1)
 		move.w	#$EC,obScreenY(a1)

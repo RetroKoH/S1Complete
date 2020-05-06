@@ -21,7 +21,7 @@ Ledge_Main:	; Routine 0
 		move.l	#Map_Ledge,obMap(a0)
 		move.w	#$4000,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#7,ledge_timedelay(a0) ; set time delay for collapse
 		move.b	#$64,obActWid(a0)
 		move.b	obSubtype(a0),obFrame(a0)

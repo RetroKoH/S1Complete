@@ -12,11 +12,13 @@ EggmanCylinder:
 		move.w	Obj84_Index(pc,d0.w),d0
 		jmp	Obj84_Index(pc,d0.w)
 ; ===========================================================================
-Obj84_Index:	dc.w Obj84_Main-Obj84_Index
+Obj84_Index:
+		dc.w Obj84_Main-Obj84_Index
 		dc.w loc_1A4CE-Obj84_Index
 		dc.w loc_1A57E-Obj84_Index
 
-Obj84_PosData:	dc.w $24D0, $620
+Obj84_PosData:
+		dc.w $24D0, $620
 		dc.w $2550, $620
 		dc.w $2490, $4C0
 		dc.w $2510, $4C0
@@ -40,7 +42,7 @@ Obj84_Main:	; Routine
 		move.b	#$60,obWidth(a0)
 		move.b	#$20,obActWid(a0)
 		move.b	#$60,obHeight(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		addq.b	#2,obRoutine(a0)
 
 loc_1A4CE:	; Routine 2

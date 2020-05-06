@@ -21,7 +21,7 @@ Fan_Main:	; Routine 0
 		move.w	#$43A0,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 
 Fan_Delay:	; Routine 2
 		btst	#1,obSubtype(a0) ; is object type 02/03 (always on)?

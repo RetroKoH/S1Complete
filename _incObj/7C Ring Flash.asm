@@ -18,7 +18,7 @@ Flash_Main:	; Routine 0
 		move.l	#Map_Flash,obMap(a0)
 		move.w	#$2462,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#0,obPriority(a0)
+		clr.b	obPriority(a0)
 		move.b	#$20,obActWid(a0)
 		move.b	#$FF,obFrame(a0)
 

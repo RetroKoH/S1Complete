@@ -64,7 +64,7 @@ Card_Loop:
 		move.w	#$8580,obGfx(a1)
 		move.b	#$78,obActWid(a1)
 		move.b	#0,obRender(a1)
-		move.b	#0,obPriority(a1)
+		clr.w	obPriority(a1)
 		move.w	#60,obTimeFrame(a1) ; set time delay to 1 second
 		lea	$40(a1),a1	; next object
 		dbf	d1,Card_Loop	; repeat sequence another 3 times

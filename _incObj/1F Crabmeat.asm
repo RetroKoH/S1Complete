@@ -31,7 +31,7 @@ Crab_Main:	; Routine 0
 		move.l	#Map_Crab,obMap(a0)
 		move.w	#$400,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#6,obColType(a0)
 		move.b	#$15,obActWid(a0)
 		bsr.w	ObjectFall
@@ -197,7 +197,7 @@ Crab_BallMain:	; Routine 6
 		move.l	#Map_Crab,obMap(a0)
 		move.w	#$400,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#$87,obColType(a0)
 		move.b	#8,obActWid(a0)
 		move.w	#-$400,obVelY(a0)

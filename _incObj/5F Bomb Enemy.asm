@@ -23,7 +23,7 @@ Bom_Main:	; Routine 0
 		move.l	#Map_Bomb,obMap(a0)
 		move.w	#$400,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#$C,obActWid(a0)
 		move.b	obSubtype(a0),d0
 		beq.s	loc_11A3C

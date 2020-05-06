@@ -18,7 +18,7 @@ Bas_Main:	; Routine 0
 		move.w	#$84B8,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$C,obHeight(a0)
-		move.b	#2,obPriority(a0)
+		move.w	#$100,obPriority(a0)
 		move.b	#$B,obColType(a0)
 		move.b	#$10,obActWid(a0)
 

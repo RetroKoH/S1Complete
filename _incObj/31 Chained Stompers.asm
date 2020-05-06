@@ -36,7 +36,7 @@ CStom_Main:	; Routine 0
 		bpl.s	loc_B6CE
 		andi.w	#$7F,d0
 		add.w	d0,d0
-		lea	CStom_SwchNums(pc,d0.w),a2
+		lea		CStom_SwchNums(pc,d0.w),a2
 		move.b	(a2)+,CStom_switch(a0)
 		move.b	(a2)+,d0
 		move.b	d0,obSubtype(a0)
@@ -75,7 +75,7 @@ CStom_MakeStomper:
 		move.b	obSubtype(a0),obSubtype(a1)
 		move.b	#$10,obActWid(a1)
 		move.w	d2,$34(a1)
-		move.b	#4,obPriority(a1)
+		move.w	#$200,obPriority(a1)
 		move.b	(a2)+,obFrame(a1)
 		cmpi.b	#1,obFrame(a1)
 		bne.s	loc_B76A
@@ -92,7 +92,7 @@ loc_B76A:
 		move.l	a0,$3C(a1)
 		dbf	d1,CStom_Loop
 
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 
 CStom_SetSize:
 		moveq	#0,d0

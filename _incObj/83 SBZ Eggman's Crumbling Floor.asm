@@ -38,7 +38,7 @@ FFloor_MakeBlock:
 		move.b	#4,obRender(a1)
 		move.b	#$10,obActWid(a1)
 		move.b	#$10,obHeight(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.w	d5,obX(a1)	; set X	position
 		move.w	#$5D0,obY(a1)
 		addi.w	#$20,d5		; add $20 for next X position

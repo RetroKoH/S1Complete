@@ -22,7 +22,7 @@ CSon_Main:	; Routine 0
 		move.l	#Map_Sonic,obMap(a0)
 		move.w	#$780,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#2,obPriority(a0)
+		move.w	#$100,obPriority(a0)
 		move.b	#aniID_Float3,obAnim(a0) ; use "floating" animation
 		move.w	#$400,obVelY(a0) ; make Sonic fall from above
 

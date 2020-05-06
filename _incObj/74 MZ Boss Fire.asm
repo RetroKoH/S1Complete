@@ -21,7 +21,7 @@ Obj74_Main:	; Routine 0
 		move.l	#Map_Fire,obMap(a0)
 		move.w	#$345,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#5,obPriority(a0)
+		move.w	#$280,obPriority(a0)
 		move.w	obY(a0),$38(a0)
 		move.b	#8,obActWid(a0)
 		addq.b	#2,obRoutine(a0)

@@ -46,7 +46,7 @@ Stair_Main:	; Routine 0
 		move.l	#Map_Stair,obMap(a1)
 		move.w	#$4000,obGfx(a1)
 		move.b	#4,obRender(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.b	#$10,obActWid(a1)
 		move.b	obSubtype(a0),obSubtype(a1)
 		move.w	d2,obX(a1)

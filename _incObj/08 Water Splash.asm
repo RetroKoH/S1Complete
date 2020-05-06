@@ -17,7 +17,7 @@ Spla_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Splash,obMap(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#1,obPriority(a0)
+		move.w	#$80,obPriority(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$4259,obGfx(a0)
 		move.w	(v_player+obX).w,obX(a0) ; copy x-position from Sonic

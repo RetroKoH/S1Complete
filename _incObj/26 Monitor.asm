@@ -22,9 +22,9 @@ Mon_Main:	; Routine 0
 		move.l	#Map_Monitor,obMap(a0)
 		move.w	#$680,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#$F,obActWid(a0)
-		lea	(v_objstate).w,a2
+		lea		(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		bclr	#7,2(a2,d0.w)

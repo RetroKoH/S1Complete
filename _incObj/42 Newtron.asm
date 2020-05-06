@@ -18,7 +18,7 @@ Newt_Main:	; Routine 0
 		move.l	#Map_Newt,obMap(a0)
 		move.w	#$49B,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$14,obActWid(a0)
 		move.b	#$10,obHeight(a0)
 		move.b	#8,obWidth(a0)

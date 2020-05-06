@@ -21,7 +21,7 @@ Brick_Main:	; Routine 0
 		move.l	#Map_Brick,obMap(a0)
 		move.w	#$4000,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#3,obPriority(a0)
+		move.w	#$180,obPriority(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	obY(a0),brick_origY(a0)
 		move.w	#$5C0,$32(a0)

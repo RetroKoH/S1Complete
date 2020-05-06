@@ -34,7 +34,7 @@ Spring_Main:	; Routine 0
 		move.w	#$523,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	obSubtype(a0),d0
 		btst	#4,d0		; does the spring face left/right?
 		beq.s	Spring_NotLR	; if not, branch

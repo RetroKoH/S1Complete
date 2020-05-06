@@ -24,7 +24,7 @@ But_Main:	; Routine 0
 	But_IsMZ:
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		addq.w	#3,obY(a0)
 
 But_Pressed:	; Routine 2

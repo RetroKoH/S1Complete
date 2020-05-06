@@ -38,7 +38,7 @@ BGHZ_LoadBoss:
 		move.w	#$400,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
-		move.b	#3,obPriority(a1)
+		move.w	#$180,obPriority(a1)
 		move.b	(a2)+,obAnim(a1)
 		move.l	a0,$34(a1)
 		dbf	d1,BGHZ_Loop	; repeat sequence 2 more times

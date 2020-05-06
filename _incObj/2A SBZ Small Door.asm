@@ -18,7 +18,7 @@ ADoor_Main:	; Routine 0
 		move.w	#$42E8,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#8,obActWid(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 
 ADoor_OpenShut:	; Routine 2
 		move.w	#$40,d1		; set range for door detection

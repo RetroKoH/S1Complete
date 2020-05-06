@@ -8,7 +8,8 @@ SpinningLight:
 		move.w	Light_Index(pc,d0.w),d1
 		jmp	Light_Index(pc,d1.w)
 ; ===========================================================================
-Light_Index:	dc.w Light_Main-Light_Index
+Light_Index:
+		dc.w Light_Main-Light_Index
 		dc.w Light_Animate-Light_Index
 ; ===========================================================================
 
@@ -18,7 +19,7 @@ Light_Main:	; Routine 0
 		move.w	#0,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
-		move.b	#6,obPriority(a0)
+		move.w	#$300,obPriority(a0)
 
 Light_Animate:	; Routine 2
 		subq.b	#1,obTimeFrame(a0)

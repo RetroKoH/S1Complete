@@ -20,14 +20,14 @@ Chop_Main:	; Routine 0
 		move.l	#Map_Chop,obMap(a0)
 		move.w	#$47B,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#9,obColType(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#-$700,obVelY(a0) ; set vertical speed
 		move.w	obY(a0),chop_origY(a0) ; save original position
 
 Chop_ChgSpeed:	; Routine 2
-		lea	(Ani_Chop).l,a1
+		lea		(Ani_Chop).l,a1
 		bsr.w	AnimateSprite
 		bsr.w	SpeedToPos
 		addi.w	#$18,obVelY(a0)	; reduce speed

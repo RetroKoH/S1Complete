@@ -18,7 +18,7 @@ Moto_Main:	; Routine 0
 		move.l	#Map_Moto,obMap(a0)
 		move.w	#$4F0,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$14,obActWid(a0)
 		tst.b	obAnim(a0)	; is object a smoke trail?
 		bne.s	@smoke		; if yes, branch

@@ -6,7 +6,7 @@ Harpoon:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Harp_Index(pc,d0.w),d1
-		jmp	Harp_Index(pc,d1.w)
+		jmp		Harp_Index(pc,d1.w)
 ; ===========================================================================
 Harp_Index:	dc.w Harp_Main-Harp_Index
 		dc.w Harp_Move-Harp_Index
@@ -20,13 +20,13 @@ Harp_Main:	; Routine 0
 		move.l	#Map_Harp,obMap(a0)
 		move.w	#$3CC,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	obSubtype(a0),obAnim(a0) ; get type (vert/horiz)
 		move.b	#$14,obActWid(a0)
 		move.w	#60,harp_time(a0) ; set time to 1 second
 
 Harp_Move:	; Routine 2
-		lea	(Ani_Harp).l,a1
+		lea		(Ani_Harp).l,a1
 		bsr.w	AnimateSprite
 		moveq	#0,d0
 		move.b	obFrame(a0),d0	; get frame number

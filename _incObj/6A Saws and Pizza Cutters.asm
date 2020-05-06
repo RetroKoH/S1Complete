@@ -21,7 +21,7 @@ Saw_Main:	; Routine 0
 		move.l	#Map_Saw,obMap(a0)
 		move.w	#$43B5,obGfx(a0)
 		move.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$20,obActWid(a0)
 		move.w	obX(a0),saw_origX(a0)
 		move.w	obY(a0),saw_origY(a0)
