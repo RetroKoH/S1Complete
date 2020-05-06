@@ -22,7 +22,7 @@ lamp_time:	equ $36		; length of time to twirl the lamp
 Lamp_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Lamp,obMap(a0)
-		move.w	#$7A0,obGfx(a0)
+		move.w	#($D800/$20),obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#5,obPriority(a0)

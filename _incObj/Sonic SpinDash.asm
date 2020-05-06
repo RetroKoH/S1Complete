@@ -8,15 +8,15 @@ Sonic_SpinDash:
 		beq.w	locret_1AC8C
 		move.b	#aniID_SpinDash,obAnim(a0)
 		
-;		move.b	#1,(v_objspace+$1C0+obAnim).w
-;		move.b	#0,(v_objspace+$1C0+obTimeFrame).w
+		move.b	#1,(v_objspace+$1C0+obAnim).w
+		move.b	#0,(v_objspace+$1C0+obTimeFrame).w
 	
 
 ;		move.w	#$80,(obRevSpeed)(a0) ; Spin Dash Cancel
 		move.w	#0,(obRevSpeed)(a0) ; No Spindash cancel
 	
-;		move.w	#sfx_SpinDash,d0
-;		jsr		(PlaySound_Special).l
+		move.w	#sfx_SpinDash,d0
+		jsr		(PlaySound_Special).l
 		addq.l	#4,sp
 		bset	#staSpinDash,obStatus2(a0)
  
@@ -99,14 +99,13 @@ loc_1AD48:
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
 		beq.w	loc_1AD78
-		move.w	#(aniID_SpinDash<<8),obAnim(a0)
 		addi.w	#$200,(obRevSpeed)(a0)
 		cmpi.w	#$800,(obRevSpeed)(a0)
 		bcs.s	@sound
 		move.w	#$800,(obRevSpeed)(a0)
 	@sound:
-;		move.w	#sfx_SpinDash,d0
-;		jsr	(PlaySound_Special).l
+		move.w	#sfx_SpinDash,d0
+		jsr	(PlaySound_Special).l
  
 loc_1AD78:
 		addq.l	#4,sp			; increase stack ptr
