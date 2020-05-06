@@ -121,6 +121,7 @@ bitDn:		equ 1
 bitUp:		equ 0
 
 ; Object variables
+obID:		equ 0	; Object ID number
 obRender:	equ 1	; bitfield for x/y flip, display mode
 obGfx:		equ 2	; palette line & VRAM setting (2 bytes)
 obMap:		equ 4	; mappings address (4 bytes)
@@ -341,3 +342,264 @@ bgm_Slowdown:	equ ((ptr_flgE3-Sound_ExIndex)/4)+flg__First
 bgm_Stop:	equ ((ptr_flgE4-Sound_ExIndex)/4)+flg__First
 flg__Last:	equ ((ptr_flgend-Sound_ExIndex-4)/4)+flg__First
 
+; ---------------------------------------------------------------------------
+; NEW VRAM and tile art base addresses, to make VRAM shifting less of a headache.
+
+Art_LevelArt:			equ 0
+
+; Shared art between zones
+ArtNem_Splash_locVRAM:			equ $5560
+ArtNem_Splash:					equ $4000+(ArtNem_WaterSplash_locVRAM/$20) ; BZ/JZ/LZ
+
+ArtNem_WaterSurface_locVRAM:	equ $5BE0
+ArtNem_WaterSurface:			equ $C000+(ArtNem_WaterSurface_locVRAM/$20) ; BZ/JZ/LZ
+
+ArtNem_Bubbles_locVRAM:			equ $64E0
+ArtNem_Bubbles:					equ $A000+(ArtNem_Bubbles_locVRAM/$20) ; BZ/JZ/LZ
+
+ArtNem_SwingPtform_locVRAM:		equ $6FC0
+ArtNem_SwingPtform:				equ $4000+(ArtNem_SwingPtform_locVRAM/$20) ; GHZ/MZ
+
+ArtNem_Bridge_locVRAM:			equ $7180
+ArtNem_Bridge:					equ $4000+(ArtNem_Bridge_locVRAM/$20) ; GHZ/BZ	- SHIFT THIS DOWN in GHZ to make room for Bubbles in BZ
+
+ArtNem_PurpleRock_locVRAM:		equ $79C0
+ArtNem_PurpleRock:				equ $6000+(ArtNem_PurpleRock_locVRAM/$20) ; GHZ/BZ
+
+ArtNem_Crabmeat_locVRAM:		equ $7CC0
+ArtNem_Crabmeat:				equ $2000+(ArtNem_Crabmeat_locVRAM/$20) ; GHZ/SYZ
+
+ArtNem_BuzzBomber_locVRAM:		equ $8540
+ArtNem_BuzzBomber_Missile:		equ (ArtNem_BuzzBomber_locVRAM/$20)
+ArtNem_BuzzBomber:				equ $2000+(ArtNem_BuzzBomber_Missile) ; GHZ/BZ/MZ/JZ/SYZ
+
+ArtNem_Orbinaut_locVRAM:		equ $85A0
+ArtNem_Orbinaut:				equ (ArtNem_Orbinaut_locVRAM/$20) ; LZ/SLZ
+ArtNem_Orbinaut2:				equ $2000+(ArtNem_Orbinaut) ; LZ/SLZ
+
+ArtNem_Chopper_locVRAM:			equ $8C20
+ArtNem_Chopper:					equ $2000+(ArtNem_Chopper_locVRAM/$20) ; GHZ/BZ/JZ
+
+ArtNem_Switch_locVRAM:			equ $8C20
+ArtNem_Switch:					equ $2000+(ArtNem_Switch_locVRAM/$20)+4
+ArtNem_MZSwitch:				equ $4000+(ArtNem_Switch_locVRAM/$20) ; MZ/SYZ/LZ/SBZ
+
+ArtNem_Fireball_locVRAM:		equ $7180
+ArtNem_Fireball:				equ $2000+(ArtNem_Fireball_locVRAM/$20) ; MZ/SLZ
+
+ArtNem_Caterkiller_locVRAM:		equ $9320
+ArtNem_Caterkiller:				equ $2000+(ArtNem_Caterkiller_locVRAM/$20) ; MZ/SYZ/SBZ
+
+ArtNem_Yadrin_locVRAM:			equ $9520
+ArtNem_Yadrin:					equ $2000+(ArtNem_Yadrin_locVRAM/$20) ; MZ/SYZ
+
+ArtNem_Bomb_locVRAM:			equ $9B20
+ArtNem_Bomb:					equ $2000+(ArtNem_Bomb_locVRAM/$20) ; SLZ/SBZ/SKBZ
+
+; GHZ
+ArtUnc_BigFlower_locVRAM:		equ $67C0
+ArtUnc_SmallFlower_locVRAM:		equ $69C0
+ArtUnc_Waterfall_locVRAM:		equ $6B40
+ArtNem_FlowerStalk_locVRAM:		equ $6C40
+
+ArtNem_GHZEdgeWall_locVRAM:		equ $6CC0
+ArtNem_GHZEdgeWall:				equ $4000+(ArtNem_GHZEdgeWall_locVRAM/$20)
+
+ArtNem_GHZBreakWall_locVRAM:	equ $6E40
+ArtNem_GHZBreakWall:			equ $4000+(ArtNem_GHZBreakWall_locVRAM/$20)
+
+ArtNem_GHZSpikePole_locVRAM:	equ $72C0
+ArtNem_GHZSpikePole:			equ $4000+(ArtNem_GHZSpikePole_locVRAM/$20)
+
+ArtNem_GHZBall_locVRAM:			equ $7500
+ArtNem_GHZBall:					equ $4000+(ArtNem_GHZBall_locVRAM/$20)
+
+ArtNem_Newtron_locVRAM:			equ $9020
+ArtNem_Newtron_blue:			equ (ArtNem_Newtron_locVRAM/$20)
+ArtNem_Newtron_green:			equ $2000+(ArtNem_Newtron_blue)
+
+ArtNem_Motobug_locVRAM:			equ $9AC0
+ArtNem_Motobug:					equ $2000+(ArtNem_Motobug_locVRAM/$20)
+; 15 tiles free at 9E60
+
+; MZ
+ArtUnc_FlowingLava_locVRAM:		equ $52E0
+ArtUnc_LavaSurface_locVRAM:		equ (ArtUnc_FlowingLava_locVRAM+$200)
+ArtUnc_Torch_locVRAM:			equ $55E0
+
+ArtNem_MZLavaGeyser_locVRAM:	equ $56A0
+ArtNem_MZLavaGeyser:			equ $6000+(ArtNem_MZLavaGeyser_locVRAM/$20)
+ArtNem_MZLavaGeyser_2:			equ $8000+(ArtNem_MZLavaGeyser)
+; 21 tiles free at 6A20
+
+ArtNem_MZBlock_locVRAM:			equ $6CC0
+ArtNem_MZBlock:					equ $4000+(ArtNem_MZBlock_locVRAM/$20)
+ArtNem_MZBlock_Long:			equ $8000+(ArtNem_MZBlock)
+
+ArtNem_MZGlass_locVRAM:			equ $7700
+ArtNem_MZGlass:					equ $C000+(ArtNem_MZGlass_locVRAM/$20)
+
+ArtNem_MZMetal_locVRAM:			equ $7A40
+ArtNem_MZMetal:					equ $2000+(ArtNem_MZMetal_locVRAM/$20)
+; 19 tiles free at 82E0
+
+ArtNem_Basaran_locVRAM:			equ $8DA0
+ArtNem_Basaran:					equ $A000+(ArtNem_Basaran_locVRAM/$20)
+; 3 tiles free at 92C0
+; 28 tiles free at 9CC0
+
+; SYZ
+ArtNem_SYZSpike_locVRAM:		equ $6E40
+ArtNem_SYZSpike:				equ $2000+(ArtNem_SYZSpike_locVRAM/$20)
+
+ArtNem_SYZSmallSpike_locVRAM:	equ $7140
+ArtNem_SYZSmallSpike:			equ $2000+(ArtNem_SYZSmallSpike_locVRAM/$20)
+
+ArtNem_Roller_locVRAM:			equ $71C0
+ArtNem_Roller:					equ $2000+(ArtNem_Roller_locVRAM/$20)
+; 8 tiles free at 7BC0
+
+ArtNem_Splats_locVRAM:			equ $8DA0
+ArtNem_Splats:					equ $2000+(ArtNem_Splats_locVRAM/$20)
+; 15 tiles free at 9140
+
+ArtNem_Bumper_locVRAM:			equ $9CC0
+ArtNem_Bumper:					equ $2000+(ArtNem_Bumper_locVRAM/$20)
+
+ArtNem_Sparkle_locVRAM:			equ $9F80
+ArtNem_Sparkle:					equ $2000+(ArtNem_Sparkle_locVRAM/$20)
+; 3 tiles free at 9FE0
+
+; LZ
+ArtNem_LZBlock1_locVRAM:		equ $38C0
+ArtNem_LZBlock1:				equ $4000+(ArtNem_LZBlock1_locVRAM/$20)
+
+ArtNem_LZBlock2_locVRAM:		equ $3AC0
+ArtNem_LZBlock2:				equ $4000+(ArtNem_LZBlock2_locVRAM/$20)
+
+ArtNem_LZWaterfall_locVRAM:		equ $47C0
+ArtNem_LZWaterfall:				equ $4000+(ArtNem_LZWaterfall_locVRAM/$20)
+
+ArtNem_LZGargoyle_locVRAM:		equ $59C0
+ArtNem_LZGargoyle:				equ $4000+(ArtNem_LZGargoyle_locVRAM/$20)
+
+ArtNem_LZSpikeball_locVRAM:		equ $5DE0
+ArtNem_LZSpikeball:				equ $2000+(ArtNem_LZSpikeball_locVRAM/$20)
+
+ArtNem_LZFlapDoor_locVRAM:		equ $60E0
+ArtNem_LZFlapDoor:				equ $4000+(ArtNem_LZFlapDoor_locVRAM/$20)
+
+ArtNem_LZBlock3_locVRAM:		equ $7360
+ArtNem_LZBlock3:				equ $4000+(ArtNem_LZBlock3_locVRAM/$20)
+
+ArtNem_LZDoor1_locVRAM:			equ $7460
+ArtNem_LZDoor1:					equ $4000+(ArtNem_LZDoor1_locVRAM/$20)
+
+ArtNem_LZHarpoon_locVRAM:		equ $7560
+ArtNem_LZHarpoon:				equ (ArtNem_LZHarpoon_locVRAM/$20)
+
+ArtNem_LZDoor2_locVRAM:			equ $77A0
+ArtNem_LZDoor2:					equ $4000+(ArtNem_LZDoor2_locVRAM/$20)
+
+ArtNem_LZWheel_locVRAM:			equ $79A0
+ArtNem_LZWheel:					equ (ArtNem_LZWheel_locVRAM/$20)
+ArtNem_LZWheel2:				equ $4000+(ArtNem_LZWheel_locVRAM/$20)
+
+ArtNem_LZPlatfm_locVRAM:		equ $82A0
+ArtNem_LZPlatfm:				equ $4000+(ArtNem_LZPlatfm_locVRAM/$20)
+
+ArtNem_LZCork_locVRAM:			equ $8980
+ArtNem_LZCork:					equ $4000+(ArtNem_LZCork_locVRAM/$20)
+; 5 tiles free at 8B80
+
+ArtNem_LZPole_locVRAM:			equ $8DA0
+ArtNem_LZPole:					equ $4000+(ArtNem_LZPole_locVRAM/$20)
+
+ArtNem_Burrobot_locVRAM:		equ $8EA0
+ArtNem_Burrobot:				equ $2000+(ArtNem_Burrobot_locVRAM/$20)
+
+ArtNem_Jaws_locVRAM:			equ $99E0
+ArtNem_Jaws:					equ $2000+(ArtNem_Jaws_locVRAM/$20)
+; 19 tiles free at 9DE0
+
+; SLZ
+; 8 tiles free at 6E40
+ArtNem_SLZBreakWall_locVRAM:	equ $6E40
+ArtNem_SLZBreakWall:			equ $4000+(ArtNem_SLZBreakWall_locVRAM/$20)
+; 18 tiles free at 6F40
+
+ArtNem_SLZSeesaw_locVRAM:		equ $7700
+ArtNem_SLZSeesaw:				equ $2000+(ArtNem_SLZSeesaw_locVRAM/$20)
+
+ArtNem_SLZPylon_locVRAM:		equ $6F80
+ArtNem_SLZPylon:				equ $A000+(ArtNem_SLZPylon_locVRAM/$20)
+
+ArtNem_SLZSpike_locVRAM:		equ $7E80
+ArtNem_SLZSpike:				equ $2000+(ArtNem_SLZSpike_locVRAM/$20)
+; 23 tiles free at 80C0
+
+ArtNem_SLZBlock_locVRAM:		equ $83A0
+ArtNem_SLZBlock:				equ $4000+(ArtNem_SLZBlock_locVRAM/$20)
+
+ArtNem_SLZCannon_locVRAM:		equ $8980
+ArtNem_SLZCannon:				equ $4000+(ArtNem_SLZCannon_locVRAM/$20)
+; 57 tiles free at 8A80
+
+ArtNem_SLZFan_locVRAM:			equ $91A0
+ArtNem_SLZFan:					equ $4000+(ArtNem_SLZFan_locVRAM/$20)
+
+ArtNem_SLZSwing_locVRAM:		equ $9720
+ArtNem_SLZSwing:				equ $4000+(ArtNem_SLZSwing_locVRAM/$20)
+
+; SBZ
+ArtUnc_SBZSmokePuff1_locVRAM:	equ $5520
+ArtUnc_SBZSmokePuff2_locVRAM:	equ $56A0
+
+ArtNem_SBZStomper_locVRAM:		equ $5820
+ArtNem_SBZStomper:				equ $2000+(ArtNem_SBZStomper_locVRAM/$20)
+
+ArtNem_SBZDoor1_locVRAM:		equ $5D20
+ArtNem_SBZDoor1:				equ $4000+(ArtNem_SBZDoor1_locVRAM/$20)
+
+ArtNem_SBZGirder_locVRAM:		equ $5E20
+ArtNem_SBZGirder:				equ $4000+(ArtNem_SBZGirder_locVRAM/$20)
+
+ArtNem_Ballhog_locVRAM:			equ $6060
+ArtNem_Ballhog:					equ $2000+(ArtNem_Ballhog_locVRAM/$20)
+
+ArtNem_SBZSpike_locVRAM:		equ $6640
+ArtNem_SBZSpike:				equ (ArtNem_SBZSpike_locVRAM/$20)
+
+ArtNem_SBZWheel1_locVRAM:		equ $6AC0
+ArtNem_SBZWheel1:				equ $C000+(ArtNem_SBZWheel1_locVRAM/$20)
+
+ArtNem_SBZWheel2_locVRAM:		equ $6B40
+ArtNem_SBZWheel2:				equ $4000+(ArtNem_SBZWheel2_locVRAM/$20)
+
+ArtNem_SBZCutter_locVRAM:		equ $7460
+ArtNem_SBZCutter:				equ $4000+(ArtNem_SBZCutter_locVRAM/$20)
+
+ArtNem_SBZTrapdoor_locVRAM:		equ $78E0
+ArtNem_SBZTrapdoor:				equ $4000+(ArtNem_SBZTrapdoor_locVRAM/$20)
+
+ArtNem_SBZDoor2_locVRAM:		equ $7F00
+ArtNem_SBZDoor2:				equ $4000+(ArtNem_SBZDoor2_locVRAM/$20)
+
+ArtNem_SBZFloor1_locVRAM:		equ $80E0
+ArtNem_SBZFloor2_locVRAM:		equ $8160
+ArtNem_SBZFloor:				equ $4000+(ArtNem_SBZFloor1_locVRAM/$20)
+
+ArtNem_SBZSpinPlatfm_locVRAM:	equ $81E0
+ArtNem_SBZSpinPlatfm:			equ $2000+(ArtNem_SBZSpinPlatfm_locVRAM/$20)
+
+ArtNem_SBZElectric_locVRAM:		equ $87E0
+ArtNem_SBZElectric:				equ $2000+(ArtNem_SBZElectric_locVRAM/$20)
+
+ArtNem_SBZBlock_locVRAM:		equ $8DA0
+ArtNem_SBZBlock:				equ $4000+(ArtNem_SBZBlock_locVRAM/$20)
+
+ArtNem_SBZFlamepipe_locVRAM:	equ $9520
+ArtNem_SBZFlamepipe:			equ $A000+(ArtNem_SBZFlamepipe_locVRAM/$20)
+
+ArtNem_SBZSlideFloor_locVRAM:	equ $98A0
+ArtNem_SBZSlideFloor:			equ $4000+(ArtNem_SBZSlideFloor_locVRAM/$20)

@@ -6467,24 +6467,30 @@ Map_WFall	include	"_maps\Waterfalls.asm"
 SonicPlayer:
 		tst.w	(v_debuguse).w	; is debug mode	being used?
 		beq.s	Sonic_Normal	; if not, branch
-		jmp	(DebugMode).l
+		jmp		(DebugMode).l
 ; ===========================================================================
 
 Sonic_Normal:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Sonic_Index(pc,d0.w),d1
-		jmp	Sonic_Index(pc,d1.w)
+		jmp		Sonic_Index(pc,d1.w)
 ; ===========================================================================
 Sonic_Index:
-		dc.w Sonic_Main-Sonic_Index
-		dc.w Sonic_Control-Sonic_Index
-		dc.w Sonic_Hurt-Sonic_Index
-		dc.w Sonic_Death-Sonic_Index
-		dc.w Sonic_ResetLevel-Sonic_Index
+ptr_Sonic_Init:		dc.w Sonic_Init-Sonic_Index
+ptr_Sonic_Control:	dc.w Sonic_Control-Sonic_Index
+ptr_Sonic_Hurt:		dc.w Sonic_Hurt-Sonic_Index
+ptr_Sonic_Death:	dc.w Sonic_Death-Sonic_Index
+ptr_Sonic_Reset:	dc.w Sonic_ResetLevel-Sonic_Index
+
+id_Sonic_Init:		equ ptr_Sonic_Init-Sonic_Index		; 0
+id_Sonic_Control:	equ ptr_Sonic_Control-Sonic_Index	; 2
+id_Sonic_Hurt:		equ ptr_Sonic_Hurt-Sonic_Index		; 4
+id_Sonic_Death:		equ ptr_Sonic_Death-Sonic_Index		; 6
+id_Sonic_Reset:		equ ptr_Sonic_Reset-Sonic_Index		; 8
 ; ===========================================================================
 
-Sonic_Main:	; Routine 0
+Sonic_Init:	; Routine 0
 		move.b	#$C,(v_top_solid_bit).w	; MJ: set collision to 1st
 		move.b	#$D,(v_lrb_solid_bit).w	; MJ: set collision to 1st
 		addq.b	#2,obRoutine(a0)
