@@ -314,6 +314,7 @@ HurtSonic:
 		neg.w	obVelX(a0)	; if Sonic is right of the object, reverse
 
 	@isleft:
+		bclr	#staDash,obStatus2(a0)		; clear Dash flag
 		bclr	#staSpinDash,obStatus2(a0)	; clear Spin Dash flag
 		move.w	#0,obInertia(a0)
 		move.b	#aniID_Hurt,obAnim(a0)

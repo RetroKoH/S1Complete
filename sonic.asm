@@ -6580,6 +6580,7 @@ MusicList2:
 ; ---------------------------------------------------------------------------
 
 Sonic_MdNormal:
+		bsr.w	Sonic_Dash
 		bsr.w	Sonic_SpinDash
 		bsr.w	Sonic_Jump
 		bsr.w	Sonic_SlopeResist
@@ -6593,6 +6594,7 @@ Sonic_MdNormal:
 ; ===========================================================================
 
 Sonic_MdJump:
+		bclr	#staDash,obStatus2(a0)
 		bclr	#staSpinDash,obStatus2(a0)
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_JumpDirection
@@ -6620,6 +6622,7 @@ Sonic_MdRoll:
 ; ===========================================================================
 
 Sonic_MdJump2:
+		bclr	#staDash,obStatus2(a0)
 		bclr	#staSpinDash,obStatus2(a0)
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_JumpDirection
@@ -6641,6 +6644,7 @@ loc_12EA6:
 		include	"_incObj\Sonic Roll.asm"
 		include	"_incObj\Sonic Jump.asm"
 		include	"_incObj\Sonic JumpHeight.asm"
+		include	"_incObj\Sonic Peelout.asm"
 		include	"_incObj\Sonic SpinDash.asm"
 		include	"_incObj\Sonic SlopeResist.asm"
 		include	"_incObj\Sonic RollRepel.asm"

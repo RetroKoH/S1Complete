@@ -106,6 +106,10 @@ Sonic_Animate:
 		neg.w	d2		; modulus speed
 
 	@nomodspeed:
+		lea	(SonAni_Dash).l,a1 ; use Dashing animation
+		cmpi.w	#$A00,d2	; is Sonic at Dashing speed?
+		bcc.s	@running	; if yes, branch
+
 		lea	(SonAni_Run).l,a1 ; use	running	animation
 		cmpi.w	#$600,d2	; is Sonic at running speed?
 		bcc.s	@running	; if yes, branch
