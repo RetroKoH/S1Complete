@@ -71,19 +71,33 @@ loc_12F62:
 		bne.s	Sonic_LookUp
 
 loc_12F6A:
-		bset	#0,obStatus(a0)
+		bset	#staFacing,obStatus(a0)
 
 loc_12F70:
 		move.b	#aniID_Balance,obAnim(a0) ; use "balancing" animation
-		bra.s	Sonic_ResetScr
+		bra.w	Sonic_ResetScr
 ; ===========================================================================
 
 Sonic_LookUp:
 		btst	#bitUp,(v_jpadhold2).w ; is up being pressed?
 		beq.s	Sonic_Duck	; if not, branch
 		move.b	#aniID_LookUp,obAnim(a0) ; use "looking up" animation
-		cmpi.w	#$C8,(v_lookshift).w
-		beq.s	loc_12FC2
+; S2 Scroll Delay
+		addq.b	#1,(v_scrolldelay).w			; add 1 to the scroll timer
+		cmpi.b	#120,(v_scrolldelay).w	; is it equal to or greater than the scroll delay?
+		bcs.s	Sonic_LookReset				; if not, skip ahead without looking up
+		move.b	#120,(v_scrolldelay).w 	; move the scroll delay value into the scroll timer so it won't continue to count higher
+
+		move.w	(v_screenposy).w,d0	; get camera top coordinate
+		sub.w	(v_limittop2).w,d0	; subtract zone's top bound from it
+		add.w	(v_lookshift).w,d0	; add default offset
+		cmpi.w	#$C8,d0				; is offset <= $C8?
+		ble.s	@skip				; if so, branch
+		move.w	#$C8,d0				; set offset to $C8
+		
+	@skip:
+		cmp.w	(v_lookshift).w,d0 	; Look Shift Fix
+		ble.s	loc_12FC2
 		addq.w	#2,(v_lookshift).w
 		bra.s	loc_12FC2
 ; ===========================================================================
@@ -92,13 +106,33 @@ Sonic_Duck:
 		btst	#bitDn,(v_jpadhold2).w ; is down being pressed?
 		beq.s	Sonic_ResetScr	; if not, branch
 		move.b	#aniID_Duck,obAnim(a0) ; use "ducking" animation
-		cmpi.w	#8,(v_lookshift).w
-		beq.s	loc_12FC2
+; S2 Scroll Delay
+		addq.b	#1,(v_scrolldelay).w			; add 1 to the scroll timer
+		cmpi.b	#120,(v_scrolldelay).w	; is it equal to or greater than the scroll delay?
+		bcs.s	Sonic_LookReset				; if not, skip ahead without looking up
+		move.b	#120,(v_scrolldelay).w 	; move the scroll delay value into the scroll timer so it won't continue to count higher
+
+		move.w	(v_screenposy).w,d0	; get camera top coordinate
+		sub.w	(v_limitbtm2).w,d0	; subtract zone's bottom bound from it (creating a negative number)
+		add.w	(v_lookshift).w,d0	; add default offset
+		cmpi.w	#8,d0			; is offset < 8?
+		blt.s	@set			; if so, branch
+		bgt.s	@skip			; if greater than 8, branch
+		
+	@set:
+		move.w	#8,d0	; set offset to 8
+		
+	@skip:
+		cmp.w	(v_lookshift).w,d0 ; Look Shift Fix
+		bge.s	loc_12FC2
 		subq.w	#2,(v_lookshift).w
 		bra.s	loc_12FC2
 ; ===========================================================================
 
 Sonic_ResetScr:
+		move.b	#0,(v_scrolldelay).w	; clear the scroll timer, because up/down are not being held
+
+Sonic_LookReset:	; added branch point that the new scroll delay code skips ahead to
 		cmpi.w	#$60,(v_lookshift).w ; is screen in its default position?
 		beq.s	loc_12FC2	; if yes, branch
 		bcc.s	loc_12FBE

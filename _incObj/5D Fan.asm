@@ -73,6 +73,7 @@ Fan_Delay:	; Routine 2
 
 	@movesonic:
 		add.w	d0,obX(a1)	; push Sonic away from the fan
+		clr.b	(v_cameralag).w
 
 @animate:
 		subq.b	#1,obTimeFrame(a0)

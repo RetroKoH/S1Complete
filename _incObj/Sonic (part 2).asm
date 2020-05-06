@@ -3,6 +3,7 @@
 ; ---------------------------------------------------------------------------
 
 Sonic_Hurt:	; Routine 4
+		clr.b	(v_cameralag).w
 		jsr		(SpeedToPos).l
 		addi.w	#$30,obVelY(a0)
 		btst	#6,obStatus(a0)
@@ -46,6 +47,7 @@ locret_13860:
 ; ---------------------------------------------------------------------------
 
 Sonic_Death:	; Routine 6
+		clr.b	(v_cameralag).w
 		bsr.w	GameOver
 		jsr		(ObjectFall).l
 		bsr.w	Sonic_RecordPosition

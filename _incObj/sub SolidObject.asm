@@ -127,6 +127,18 @@ loc_FAD0:
 		ext.w	d3
 		add.w	d3,d2
 		move.w	obY(a1),d3
+
+		cmpi.b	#aniID_SpinDash,obAnim(a1)
+		beq.s	@short
+	
+		cmpi.b	#aniID_Duck,obAnim(a1)
+		bne.s	@skip
+		
+	@short:
+		subi.w	#5,d2
+		addi.w	#5,d3
+		
+	@skip:
 		sub.w	obY(a0),d3
 		addq.w	#4,d3
 		add.w	d2,d3

@@ -76,14 +76,6 @@ LevelSizeArray:
 		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
 		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
 
-; ---------------------------------------------------------------------------
-; Ending start location array
-; ---------------------------------------------------------------------------
-EndingStLocArray:
-		include	"_inc\Start Location Array - Ending.asm"
-
-; ===========================================================================
-
 LevSz_ChkLamp:
 		tst.b	(v_lastlamp).w	; have any lampposts been hit?
 		beq.s	LevSz_StartLoc	; if not, branch
@@ -94,11 +86,23 @@ LevSz_ChkLamp:
 		bra.s	LevSz_SkipStartPos
 ; ===========================================================================
 
+; ---------------------------------------------------------------------------
+; Ending start location array
+; ---------------------------------------------------------------------------
+EndingStLocArray:
+		include	"_inc\Start Location Array - Ending.asm"
+
+; ===========================================================================
+
 LevSz_StartLoc:
 		move.w	(v_zone).w,d0
 		lsl.b	#6,d0
 		lsr.w	#4,d0
-		lea	StartLocArray(pc,d0.w),a1 ; MJ: load Sonic's start location address
+
+		;lea		StartLocArray(pc,d0.w),a1	; MJ: load Sonic's start location address
+		lea		StartLocArray,a1
+		adda.w	d0,a1 							; MJ: load Sonic's start location address
+
 		tst.w	(f_demo).w	; is ending demo mode on?
 		bpl.s	LevSz_SonicPos	; if not, branch
 
@@ -125,6 +129,15 @@ LevSz_SonicPos:
 
 SetScreen:
 	LevSz_SkipStartPos:
+		clr.b	(v_cameralag).w
+		clr.w	(v_trackpos).w		; reset Sonic's position tracking index
+		lea		(v_tracksonic).w,a2	; load the tracking array into a2
+		moveq	#63,d2			; begin a 64-step loop
+	@looppoint:
+		move.w	d1,(a2)+		; fill in X
+		move.w	d0,(a2)+		; fill in Y
+		dbf		d2,@looppoint		; loop
+
 		subi.w	#160,d1		; is Sonic more than 160px from left edge?
 		bcc.s	SetScr_WithinLeft ; if yes, branch
 		moveq	#0,d1

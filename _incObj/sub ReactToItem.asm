@@ -14,15 +14,20 @@ ReactToItem:
 		move.b	obHeight(a0),d5	; load Sonic's height
 		subq.b	#3,d5
 		sub.w	d5,d3
-		cmpi.b	#aniID_Duck,obAnim(a0) ; is Sonic ducking? (Check frame as well)
-		bne.s	@notducking	; if not, branch
+		cmpi.b	#aniID_SpinDash,obAnim(a0)
+		beq.s	@short
+	
+		cmpi.b	#aniID_Duck,obAnim(a0)
+		bne.s	@notducking
+		
+	@short:
 		addi.w	#$C,d3
 		moveq	#$A,d5
-
+		
 	@notducking:
 		move.w	#$10,d4
 		add.w	d5,d5
-		lea	(v_objspace+$800).w,a1 ; set object RAM start address
+		lea		(v_objspace+$800).w,a1 ; set object RAM start address
 		move.w	#$5F,d6
 
 @loop:
@@ -32,8 +37,8 @@ ReactToItem:
 		bne.s	@proximity	; if nonzero, branch
 
 	@next:
-		lea	$40(a1),a1	; next object RAM
-		dbf	d6,@loop	; repeat $5F more times
+		lea		$40(a1),a1	; next object RAM
+		dbf		d6,@loop	; repeat $5F more times
 
 		moveq	#0,d0
 		rts	
@@ -80,7 +85,7 @@ ReactToItem:
 @proximity:
 		andi.w	#$3F,d0
 		add.w	d0,d0
-		lea	@sizes-2(pc,d0.w),a2
+		lea		@sizes-2(pc,d0.w),a2
 		moveq	#0,d1
 		move.b	(a2)+,d1
 		move.w	obX(a1),d0
@@ -167,6 +172,8 @@ React_Monitor:
 React_Enemy:
 		tst.b	(v_invinc).w	; is Sonic invincible?
 		bne.s	@donthurtsonic	; if yes, branch
+		cmpi.b	#aniID_SpinDash,obAnim(a0)	; is Sonic Spin Dashing?
+		beq.w	@breakenemy	; if yes, branch
 		cmpi.b	#aniID_Roll,obAnim(a0) ; is Sonic rolling/jumping?
 		bne.w	React_ChkHurt	; if not, branch
 
@@ -307,6 +314,7 @@ HurtSonic:
 		neg.w	obVelX(a0)	; if Sonic is right of the object, reverse
 
 	@isleft:
+		bclr	#staSpinDash,obStatus2(a0)	; clear Spin Dash flag
 		move.w	#0,obInertia(a0)
 		move.b	#aniID_Hurt,obAnim(a0)
 		move.w	#120,$30(a0)	; set temp invincible time to 2 seconds
@@ -344,7 +352,6 @@ KillSonic:
 		move.w	#-$700,obVelY(a0)
 		move.w	#0,obVelX(a0)
 		move.w	#0,obInertia(a0)
-		move.w	obY(a0),$38(a0)
 		move.b	#aniID_Death,obAnim(a0)
 		bset	#7,obGfx(a0)
 		move.w	#sfx_Death,d0	; play normal death sound

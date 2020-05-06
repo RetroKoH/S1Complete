@@ -224,7 +224,8 @@ Drown_Countdown:; Routine $A
 		lea	(v_player).w,a0
 		bsr.w	Sonic_ResetOnFloor
 		move.b	#aniID_Drown,obAnim(a0)	; use Sonic's drowning animation
-		bset	#1,obStatus(a0)
+		bclr	#staSpinDash,obStatus2(a0)	; clear Spin Dash flag
+		bset	#staAir,obStatus(a0)
 		bset	#7,obGfx(a0)
 		move.w	#0,obVelY(a0)
 		move.w	#0,obVelX(a0)

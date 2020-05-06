@@ -308,6 +308,10 @@ v_lamp_lives:	equ v_lastlamp+$24 ; lives counter at lamppost
 v_emeralds:	equ $FFFFFE57	; number of chaos emeralds
 v_emldlist:	equ $FFFFFE58	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
 v_oscillate:	equ $FFFFFE5E	; values which oscillate - for swinging platforms, et al ($42 bytes)
+
+v_cameralag:	= $FFFFFEB3	; camera lag after launching Spin Dash (1 byte)
+v_scrolldelay:	= $FFFFFEBE	; scroll delay timer
+
 v_ani0_time:	equ $FFFFFEC0	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
 v_ani0_frame:	equ $FFFFFEC1	; synchronised sprite animation 0 - current frame
 v_ani1_time:	equ $FFFFFEC2	; synchronised sprite animation 1 - time until next frame

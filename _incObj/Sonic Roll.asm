@@ -18,7 +18,7 @@ Sonic_Roll:
 		move.b	(v_jpadhold2).w,d0
 		andi.b	#btnL+btnR,d0	; is left/right	being pressed?
 		bne.s	@noroll   ; if yes, branch
-		move.w	$14(a0),d0
+		move.w	obInertia(a0),d0
 		bpl.s	@cont ; If ground speed is positive, continue
 		neg.w	d0 ; If not, negate it to get the absolute value
 

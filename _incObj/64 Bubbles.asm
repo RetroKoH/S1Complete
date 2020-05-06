@@ -78,6 +78,8 @@ Bub_ChkWater:	; Routine 4
 		beq.s	@display
 		bsr.w	Bub_ChkSonic	; has Sonic touched the	bubble?
 		beq.s	@display	; if not, branch
+		cmpi.b	#aniID_Spindash,obAnim(a1)
+		beq.s	@display
 
 		bsr.w	ResumeMusic	; cancel countdown music
 		sfx	sfx_Bubble,0,0,0	; play collecting bubble sound

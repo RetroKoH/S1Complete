@@ -5307,6 +5307,17 @@ Obj44_SolidWall2:
 		ext.w	d3
 		add.w	d3,d2
 		move.w	obY(a1),d3
+
+		cmpi.b	#aniID_SpinDash,obAnim(a1)
+		beq.s	@short
+		cmpi.b	#aniID_Duck,obAnim(a1)
+		bne.s	@skip
+		
+	@short:
+		subi.w	#5,d2
+		addi.w	#5,d3
+		
+	@skip:
 		sub.w	obY(a0),d3
 		add.w	d2,d3
 		bmi.s	loc_8B48
@@ -6446,6 +6457,8 @@ Map_Bub:	include	"_maps\Bubbles.asm"
 		include	"_anim\Waterfalls.asm"
 Map_WFall	include	"_maps\Waterfalls.asm"
 
+		include "_incObj\Sonic Effects.asm"
+
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Object 01 - Sonic
@@ -6484,6 +6497,7 @@ Sonic_Main:	; Routine 0
 		move.b	#4,obRender(a0)
 		lea     (v_sonspeedmax).w,a2	; Load Sonic_top_speed into a2
 		bsr.w   ApplySpeedSettings		; Fetch Speed settings
+		move.b	#id_Effects,(v_objspace+$1C0).w
 
 Sonic_Control:	; Routine 2
 		tst.w	(f_debugmode).w	; is debug cheat enabled?
@@ -6560,18 +6574,20 @@ MusicList2:
 ; ---------------------------------------------------------------------------
 
 Sonic_MdNormal:
+		bsr.w	Sonic_SpinDash
 		bsr.w	Sonic_Jump
 		bsr.w	Sonic_SlopeResist
 		bsr.w	Sonic_Move
 		bsr.w	Sonic_Roll
 		bsr.w	Sonic_LevelBound
-		jsr	(SpeedToPos).l
+		jsr		(SpeedToPos).l
 		bsr.w	Sonic_AnglePos
 		bsr.w	Sonic_SlopeRepel
 		rts	
 ; ===========================================================================
 
 Sonic_MdJump:
+		bclr	#staSpinDash,obStatus2(a0)
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_JumpDirection
 		bsr.w	Sonic_LevelBound
@@ -6598,6 +6614,7 @@ Sonic_MdRoll:
 ; ===========================================================================
 
 Sonic_MdJump2:
+		bclr	#staSpinDash,obStatus2(a0)
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_JumpDirection
 		bsr.w	Sonic_LevelBound
@@ -6618,6 +6635,7 @@ loc_12EA6:
 		include	"_incObj\Sonic Roll.asm"
 		include	"_incObj\Sonic Jump.asm"
 		include	"_incObj\Sonic JumpHeight.asm"
+		include	"_incObj\Sonic SpinDash.asm"
 		include	"_incObj\Sonic SlopeResist.asm"
 		include	"_incObj\Sonic RollRepel.asm"
 		include	"_incObj\Sonic SlopeRepel.asm"
@@ -8064,6 +8082,13 @@ SonicDynPLC:	include	"_maps\Sonic - Dynamic Gfx Script.asm"
 ; ---------------------------------------------------------------------------
 Art_Sonic:	incbin	"artunc\Sonic.bin"	; Sonic
 		even
+Art_Effects:	incbin	"artunc\Dust Effects.bin"	; Spindash/Skid Dust
+		even
+
+		include "_maps\Effects.asm"
+		include "_maps\Effects - Dynamic Gfx Script.asm"
+		include "_anim\Effects.asm"
+
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------

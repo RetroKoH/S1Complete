@@ -131,12 +131,13 @@ Spring_BounceLR:
 		move.b	#aniID_Walk,obAnim(a1)	; use walking animation
 
 loc_DC56:
-		bclr	#5,obStatus(a0)
-		bclr	#5,obStatus(a1)
-		sfx	sfx_Spring,0,0,0	; play spring sound
+		bclr	#staPush,obStatus(a0)
+		bclr	#staPush,obStatus(a1)
+		clr.b	(v_cameralag).w 	; clear camera lag
+		sfx		sfx_Spring,0,0,0	; play spring sound
 
 Spring_AniLR:	; Routine $A
-		lea	(Ani_Spring).l,a1
+		lea		(Ani_Spring).l,a1
 		bra.w	AnimateSprite
 ; ===========================================================================
 

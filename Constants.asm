@@ -154,6 +154,18 @@ obSolid:	equ ob2ndRout ; solid status flag
 flashtime:	equ $30	; time between flashes after getting hit
 invtime:	equ $32	; time left for invincibility
 shoetime:	equ $34	; time left for speed shoes
+obInvuln:	equ $30	; Invulnerable (blinking) timer ; $31 reserved as well
+obInvinc:	equ $32	; Invincibility timer ; $33 reserved as well
+obShoes:	equ $34	; Speed Shoes timer ; $35 reserved as well
+obFrontAngle:	equ $36
+obRearAngle:	equ $37
+obOnWheel:	equ $38	; on convex wheel flag
+obStatus2:	equ $39	; status for abilities such as Spin Dash
+obRevSpeed:	equ $3A	; rev speed for Spin Dash or Dash
+obRestartTimer:	equ $3A ; level restart timer
+obJumping:	equ $3C	; jumping flag
+obPlatformID:	equ $3D	; ost slot of the object Sonic's on top of
+obLRLock:	equ $3E	; flag for preventing left and right input
 
 ; Object variables (Sonic 2 disassembly nomenclature)
 render_flags:	equ 1	; bitfield for x/y flip, display mode
@@ -190,6 +202,10 @@ staRollJump:	equ 4
 staPush:	equ 5
 staWater:	equ 6
 staSSJump:	equ 7
+
+; Secondary Status
+staSpinDash:	equ 0
+staDash:		equ 1
 
 ; NEW GLOBAL Animation IDs - To make easier the usage of animations across all 6 characters
 aniID_Null:			equ 0		; Null animation
