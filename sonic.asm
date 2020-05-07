@@ -2903,31 +2903,27 @@ ColPointers:	dc.l Col_GHZ_1	; MJ: each zone now has two entries
 
 SynchroAnimate:
 
-; Used for GHZ spiked log
-Sync1:
+Sync1: ; Used for GHZ spiked log
 		subq.b	#1,(v_ani0_time).w ; has timer reached 0?
 		bpl.s	Sync2		; if not, branch
 		move.b	#$B,(v_ani0_time).w ; reset timer
 		subq.b	#1,(v_ani0_frame).w ; next frame
 		andi.b	#7,(v_ani0_frame).w ; max frame is 7
 
-; Used for rings and giant rings
-Sync2:
-		subq.b	#1,(v_ani1_time).w
-		bpl.s	Sync3
-		move.b	#7,(v_ani1_time).w
-		addq.b	#1,(v_ani1_frame).w
-		andi.b	#3,(v_ani1_frame).w
+Sync2: ; Unused unless I can find another purpose for it. (Currently for rings)
+		subq.b	#1,(v_ani1_time).w  ; decrement timer
+		bpl.s	Sync3               ; if timer !=0, branch
+		move.b	#7,(v_ani1_time).w  ; reset timer
+		addq.b	#1,(v_ani1_frame).w ; next frame
+		andi.b	#3,(v_ani1_frame).w ; max frame is 3
 
-; Used for nothing
+; Used for 8 frame Rings and Giant Rings
 Sync3:
-		subq.b	#1,(v_ani2_time).w
-		bpl.s	Sync4
-		move.b	#7,(v_ani2_time).w
-		addq.b	#1,(v_ani2_frame).w
-		cmpi.b	#6,(v_ani2_frame).w
-		blo.s	Sync4
-		move.b	#0,(v_ani2_frame).w
+		subq.b	#1,(v_ani2_time).w  ; decrement timer
+		bpl.s	Sync4               ; if timer !=0, branch
+		move.b	#3,(v_ani2_time).w  ; reset timer
+		addq.b	#1,(v_ani2_frame).w ; next frame
+		andi.b	#7,(v_ani2_frame).w ; max frame is 7
 
 ; Used for bouncing rings
 Sync4:
@@ -5390,7 +5386,9 @@ Map_Missile:	include	"_maps\Buzz Bomber Missile.asm"
 
 Map_Ring:	include	"_maps\Rings.asm"
 
-Map_GRing:	include	"_maps\Giant Ring.asm"
+		include	"_maps\Giant Ring.asm"
+		include "_maps\Giant Ring - Dynamic Gfx Script.asm"
+
 Map_Flash:	include	"_maps\Ring Flash.asm"
 		include	"_incObj\26 Monitor.asm"
 		include	"_incObj\2E Monitor Content Power-Up.asm"
@@ -8083,13 +8081,15 @@ Map_Sonic:	include	"_maps\Sonic.asm"
 SonicDynPLC:	include	"_maps\Sonic - Dynamic Gfx Script.asm"
 
 ; ---------------------------------------------------------------------------
-; Uncompressed graphics	- Sonic
+; Uncompressed graphics
 ; ---------------------------------------------------------------------------
-Art_Sonic:	incbin	"artunc\Sonic.bin"	; Sonic
+Art_Sonic:		incbin	"artunc\Sonic.bin"	; Sonic
 		even
 Art_Effects:	incbin	"artunc\Dust Effects.bin"	; Spindash/Skid Dust
 		even
 Art_SignPost:	incbin	"artunc\Signpost.bin"	; end of level signpost
+		even
+Art_BigRing:	incbin	"artunc\Giant Ring.bin"
 		even
 
 		include "_maps\Effects.asm"
@@ -8607,9 +8607,6 @@ Level_SBZ2:	incbin	"levels\sbz2.bin"
 Level_End:	incbin	"levels\ending.bin"
 		even
 Level_EndGood:	incbin	"levels\ending_good.bin"
-		even
-
-Art_BigRing:	incbin	"artunc\Giant Ring.bin"
 		even
 
 		align	$100,$FF
