@@ -37,7 +37,7 @@ Obj7A_Main:
 Obj7A_Loop:
 		jsr	(FindNextFreeObj).l
 		bne.s	loc_1895C
-		move.b	#id_BossStarLight,0(a1)
+		move.b	#id_BossStarLight,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
@@ -54,7 +54,7 @@ Obj7A_LoadBoss:
 		move.w  d0,obPriority(a1)
 
 		move.l	#Map_Eggman,obMap(a1)
-		move.w	#$400,obGfx(a1)
+		move.w	#ArtNem_Eggman,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.l	a0,$34(a1)
@@ -411,6 +411,6 @@ Obj7A_TubeMain:	; Routine 8
 
 loc_18CB8:
 		move.l	#Map_BossItems,obMap(a0)
-		move.w	#$246C,obGfx(a0)
+		move.w	#ArtNem_Weapons,obGfx(a0)
 		move.b	#3,obFrame(a0)
 		bra.s	loc_18C78

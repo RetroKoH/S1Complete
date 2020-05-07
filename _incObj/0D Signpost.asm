@@ -9,6 +9,21 @@ Signpost:
 		jsr		Sign_Index(pc,d1.w)
 		lea		(Ani_Sign).l,a1
 		bsr.w	AnimateSprite
+
+		; The below checks how close to the signpost the camera is,
+		; If the sign is nearly onscreen, the art loads.
+		move.w	(v_player+obX).w,d0		; Get the Character's X position.
+		addi.w	#$E0,d0					; add 224 to it.
+		sub.w	x_pos(a0),d0			; Subtract the signpost's x postion.
+		tst.w	d0						; Check if d0 is 0 or great (Sonic is less than
+		blt.s	@skip					; If d0 is lower than 0, branch.
+
+; Add this to prevent DPLCs from loading AFTER the signpost stops spinning
+; This will prevent graphic bugs in the Special Stage
+		cmpi.b	#6,obRoutine(a0)
+		bgt.s	@skip
+		bsr.w	Signpost_LoadGfx
+	@skip:
 		out_of_range	DeleteObject
 		bra.w	DisplaySprite
 ; ===========================================================================
@@ -27,7 +42,7 @@ sparkle_id:		equ $34		; counter to keep track of sparkles
 Sign_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Sign,obMap(a0)
-		move.w	#$680,obGfx(a0)
+		move.w	#ArtNem_Signpost,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$18,obActWid(a0)
 		move.w	#$200,obPriority(a0)
@@ -64,10 +79,10 @@ Sign_Spin:	; Routine 4
 		move.b	sparkle_id(a0),d0 ; get sparkle id
 		addq.b	#2,sparkle_id(a0) ; increment sparkle counter
 		andi.b	#$E,sparkle_id(a0)
-		lea	Sign_SparkPos(pc,d0.w),a2 ; load sparkle position data
+		lea		Sign_SparkPos(pc,d0.w),a2 ; load sparkle position data
 		bsr.w	FindFreeObj
 		bne.s	@fail
-		move.b	#id_Rings,0(a1)	; load rings object
+		move.b	#id_Rings,obID(a1)	; load rings object
 		move.b	#id_Ring_Sparkle,obRoutine(a1) ; jump to ring sparkle subroutine
 		move.b	(a2)+,d0
 		ext.w	d0
@@ -78,7 +93,7 @@ Sign_Spin:	; Routine 4
 		add.w	obY(a0),d0
 		move.w	d0,obY(a1)
 		move.l	#Map_Ring,obMap(a1)
-		move.w	#$27B2,obGfx(a1)
+		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	#$100,obPriority(a1)
 		move.b	#8,obActWid(a1)
@@ -171,3 +186,47 @@ TimeBonuses:	dc.w 5000, 5000, 1000, 500, 400, 400, 300, 300,	200, 200
 
 Sign_Exit:	; Routine 8
 		rts	
+
+; ---------------------------------------------------------------------------
+; Signpost dynamic pattern loading subroutine
+; ---------------------------------------------------------------------------
+
+Signpost_LoadGfx:
+		moveq	#0,d0
+		move.b	mapping_frame(a0),d0	; load frame number
+;		cmpi.b	#4,d0
+;		bne.s	@notchar
+;		add.b	(v_player+character_id).w,d0	; Add Character ID to d0
+;	For now, only use Sonic's frame
+
+	@notchar:
+		lea	(SignpostDynPLC).l,a2
+		add.w	d0,d0
+		adda.w	(a2,d0.w),a2
+		moveq	#0,d5
+		move.b	(a2)+,d5          ; read "number of entries" value
+		subq.w	#1,d5
+		bmi.s	SignpostDPLC_Return ; if zero, branch
+		move.w	#$D000,d4
+		move.l	#Art_Signpost,d6
+
+SignpostPLC_ReadEntry:
+		moveq	#0,d1
+		move.b	(a2)+,d1
+		lsl.w	#8,d1
+		move.b	(a2)+,d1
+		move.w	d1,d3
+		lsr.w	#8,d3
+		andi.w	#$F0,d3
+		addi.w	#$10,d3
+		andi.w	#$FFF,d1
+		lsl.l	#5,d1
+		add.l	d6,d1
+		move.w	d4,d2
+		add.w	d3,d4
+		add.w	d3,d4
+		jsr	(QueueDMATransfer).l
+		dbf	d5,SignpostPLC_ReadEntry	; repeat for number of entries
+
+SignpostDPLC_Return:
+		rts

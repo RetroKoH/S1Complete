@@ -8,19 +8,19 @@
 AnimateLevelGfx:
 		tst.w	(f_pause).w	; is the game paused?
 		bne.s	@ispaused	; if yes, branch
-		lea	(vdp_data_port).l,a6
-		bsr.w	AniArt_GiantRing
+		lea		(vdp_data_port).l,a6
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		add.w	d0,d0
 		move.w	AniArt_Index(pc,d0.w),d0
-		jmp	AniArt_Index(pc,d0.w)
+		jmp		AniArt_Index(pc,d0.w)
 
 	@ispaused:
 		rts	
 
 ; ===========================================================================
-AniArt_Index:	dc.w AniArt_GHZ-AniArt_Index, AniArt_none-AniArt_Index
+AniArt_Index:
+		dc.w AniArt_GHZ-AniArt_Index, AniArt_none-AniArt_Index
 		dc.w AniArt_MZ-AniArt_Index, AniArt_none-AniArt_Index
 		dc.w AniArt_none-AniArt_Index, AniArt_SBZ-AniArt_Index
 		zonewarning AniArt_Index,2
@@ -48,8 +48,8 @@ AniArt_GHZ_Waterfall:
 		lea	@size*$20(a1),a1 ; use graphics for frame 1
 
 	@isframe0:
-		locVRAM	$6F00		; VRAM address
-		move.w	#@size-1,d1	; number of 8x8	tiles
+		locVRAM	ArtUnc_Waterfall_locVRAM	; VRAM address
+		move.w	#@size-1,d1					; number of 8x8	tiles
 		bra.w	LoadTiles
 ; ===========================================================================
 
@@ -61,15 +61,15 @@ AniArt_GHZ_Bigflower:
 		bpl.s	AniArt_GHZ_Smallflower
 
 		move.b	#$F,(v_lani1_time).w
-		lea	(Art_GhzFlower1).l,a1 ;	load big flower	patterns
+		lea		(Art_GhzFlower1).l,a1 ;	load big flower	patterns
 		move.b	(v_lani1_frame).w,d0
 		addq.b	#1,(v_lani1_frame).w
 		andi.w	#1,d0
 		beq.s	@isframe0
-		lea	@size*$20(a1),a1
+		lea		@size*$20(a1),a1
 
 	@isframe0:
-		locVRAM	$6B80
+		locVRAM	ArtUnc_BigFlower_locVRAM
 		move.w	#@size-1,d1
 		bra.w	LoadTiles
 ; ===========================================================================
@@ -95,9 +95,9 @@ AniArt_GHZ_Smallflower:
 		move.w	d0,d1
 		add.w	d0,d0
 		add.w	d1,d0		; multiply that by 3 (i.e. frame num times 12 * $20)
-		locVRAM	$6D80
-		lea	(Art_GhzFlower2).l,a1 ;	load small flower patterns
-		lea	(a1,d0.w),a1	; jump to appropriate tile
+		locVRAM	ArtUnc_SmallFlower_locVRAM
+		lea		(Art_GhzFlower2).l,a1 ;	load small flower patterns
+		lea		(a1,d0.w),a1	; jump to appropriate tile
 		move.w	#@size-1,d1
 		bsr.w	LoadTiles
 
@@ -132,7 +132,7 @@ AniArt_MZ_Lava:
 		move.b	d0,(v_lani0_frame).w
 		mulu.w	#@size*$20,d0
 		adda.w	d0,a1		; jump to appropriate tile
-		locVRAM	$5C40
+		locVRAM	ArtUnc_LavaSurface_locVRAM
 		move.w	#@size-1,d1
 		bsr.w	LoadTiles
 
@@ -146,7 +146,7 @@ AniArt_MZ_Magma:
 		lea	(Art_MzLava2).l,a4 ; load magma gfx
 		ror.w	#7,d0		; multiply frame num by $200
 		adda.w	d0,a4		; jump to appropriate tile
-		locVRAM	$5A40
+		locVRAM	ArtUnc_FlowingLava_locVRAM
 		moveq	#0,d3
 		move.b	(v_lani1_frame).w,d3
 		addq.b	#1,(v_lani1_frame).w ; increment frame counter (unused)
@@ -183,7 +183,7 @@ AniArt_MZ_Torch:
 		andi.b	#3,(v_lani3_frame).w ; there are 3 frames
 		mulu.w	#@size*$20,d0
 		adda.w	d0,a1		; jump to appropriate tile
-		locVRAM	$5E40
+		locVRAM	ArtUnc_Torch_locVRAM
 		move.w	#@size-1,d1
 		bra.w	LoadTiles
 
@@ -211,7 +211,7 @@ AniArt_SBZ:
 		
 		move.b	#7,(v_lani0_time).w ; time to display each frame
 		lea	(Art_SbzSmoke).l,a1 ; load smoke patterns
-		locVRAM	$8900
+		locVRAM	ArtUnc_SBZSmokePuff1_locVRAM
 		move.b	(v_lani0_frame).w,d0
 		addq.b	#1,(v_lani0_frame).w ; increment frame counter
 		andi.w	#7,d0
@@ -248,7 +248,7 @@ AniArt_SBZ:
 		
 		move.b	#7,(v_lani1_time).w ; time to display each frame
 		lea	(Art_SbzSmoke).l,a1 ; load smoke patterns
-		locVRAM	$8A80
+		locVRAM	ArtUnc_SBZSmokePuff2_locVRAM
 		move.b	(v_lani1_frame).w,d0
 		addq.b	#1,(v_lani1_frame).w ; increment frame counter
 		andi.w	#7,d0

@@ -19,17 +19,12 @@ orb_parent:	equ $3C		; address of parent object
 
 Orb_Main:	; Routine 0
 		move.l	#Map_Orb,obMap(a0)
-		move.w	#$429,obGfx(a0)	; SBZ specific code
-		cmpi.b	#id_SBZ,(v_zone).w ; check if level is SBZ
-		beq.s	@isscrap
-		move.w	#$2429,obGfx(a0) ; SLZ specific code
+		move.w	#ArtNem_Orbinaut,obGfx(a0) ; LZ specific code
+		cmpi.b	#id_LZ,(v_zone).w ; check if level is SBZ
+		beq.s	@islabyrinth
+		move.w	#ArtNem_Orbinaut2,obGfx(a0) ; SLZ specific code
 
-	@isscrap:
-		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
-		bne.s	@notlabyrinth
-		move.w	#$467,obGfx(a0)	; LZ specific code
-
-	@notlabyrinth:
+	@islabyrinth:
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$B,obColType(a0)

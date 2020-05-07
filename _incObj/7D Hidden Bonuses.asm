@@ -36,7 +36,7 @@ Bonus_Main:	; Routine 0
 		bne.s	@chkdel
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bonus,obMap(a0)
-		move.w	#$84B6,obGfx(a0)
+		move.w	#$A4B6,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		clr.b	obPriority(a0)
 		move.b	#$10,obActWid(a0)
@@ -47,7 +47,7 @@ Bonus_Main:	; Routine 0
 		move.b	obSubtype(a0),d0
 		add.w	d0,d0
 		move.w	@points(pc,d0.w),d0 ; load bonus points array
-		jsr	(AddPoints).l
+		jsr		(AddPoints).l
 
 	@chkdel:
 		out_of_range.s	@delete

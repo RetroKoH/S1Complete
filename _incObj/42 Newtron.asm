@@ -6,9 +6,10 @@ Newtron:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Newt_Index(pc,d0.w),d1
-		jmp	Newt_Index(pc,d1.w)
+		jmp		Newt_Index(pc,d1.w)
 ; ===========================================================================
-Newt_Index:	dc.w Newt_Main-Newt_Index
+Newt_Index:
+		dc.w Newt_Main-Newt_Index
 		dc.w Newt_Action-Newt_Index
 		dc.w Newt_Delete-Newt_Index
 ; ===========================================================================
@@ -16,7 +17,7 @@ Newt_Index:	dc.w Newt_Main-Newt_Index
 Newt_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Newt,obMap(a0)
-		move.w	#$49B,obGfx(a0)
+		move.w	#ArtNem_Newtron_blue,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$14,obActWid(a0)
@@ -27,12 +28,13 @@ Newt_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
 		move.w	@index(pc,d0.w),d1
-		jsr	@index(pc,d1.w)
-		lea	(Ani_Newt).l,a1
+		jsr		@index(pc,d1.w)
+		lea		(Ani_Newt).l,a1
 		bsr.w	AnimateSprite
 		bra.w	RememberState
 ; ===========================================================================
-@index:		dc.w @chkdistance-@index
+@index:
+		dc.w @chkdistance-@index
 		dc.w @type00-@index
 		dc.w @matchfloor-@index
 		dc.w @speed-@index
@@ -55,7 +57,7 @@ Newt_Action:	; Routine 2
 		tst.b	obSubtype(a0)	; check	object type
 		beq.s	@istype00	; if type is 00, branch
 
-		move.w	#$249B,obGfx(a0)
+		move.w	#ArtNem_Newtron_green,obGfx(a0)
 		move.b	#8,ob2ndRout(a0) ; goto @type01 next
 		move.b	#4,obAnim(a0)	; use different	animation
 
@@ -93,7 +95,7 @@ Newt_Action:	; Routine 2
 		bpl.s	@keepfalling	; if not, branch
 
 		add.w	d1,obY(a0)
-		move.w	#0,obVelY(a0)	; stop newtron falling
+		clr.w	obVelY(a0)	; stop newtron falling
 		addq.b	#2,ob2ndRout(a0)
 		move.b	#2,obAnim(a0)
 		btst	#5,obGfx(a0)
@@ -111,7 +113,7 @@ Newt_Action:	; Routine 2
 		rts	
 ; ===========================================================================
 
-@matchfloor:
+	@matchfloor:
 		bsr.w	SpeedToPos
 		bsr.w	ObjFloorDist
 		cmpi.w	#-8,d1
@@ -128,8 +130,7 @@ Newt_Action:	; Routine 2
 ; ===========================================================================
 
 @speed:
-		bsr.w	SpeedToPos
-		rts	
+		bra.w	SpeedToPos
 ; ===========================================================================
 
 @type01:
@@ -145,7 +146,7 @@ Newt_Action:	; Routine 2
 		move.b	#1,$32(a0)
 		bsr.w	FindFreeObj
 		bne.s	@fail
-		move.b	#id_Missile,0(a1) ; load missile object
+		move.b	#id_Missile,obID(a1) ; load missile object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		subq.w	#8,obY(a1)

@@ -51,14 +51,14 @@ Glass_Main:	; Routine 0
 
 @Load:
 		move.b	(a2)+,obRoutine(a1)
-		move.b	#id_GlassBlock,0(a1)
+		move.b	#id_GlassBlock,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.b	(a2)+,d0
 		ext.w	d0
 		add.w	obY(a0),d0
 		move.w	d0,obY(a1)
 		move.l	#Map_Glass,obMap(a1)
-		move.w	#$C38E,obGfx(a1)
+		move.w	#ArtNem_MZGlass,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	obY(a1),$30(a1)
 		move.b	obSubtype(a0),obSubtype(a1)

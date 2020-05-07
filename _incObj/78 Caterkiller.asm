@@ -16,7 +16,7 @@ Cat_Index:	dc.w Cat_Main-Cat_Index
 		dc.w Cat_Delete-Cat_Index
 		dc.w loc_16CC0-Cat_Index
 
-catIntertia: equ $14
+catIntertia: equ $1E
 cat_parent:	equ $3C		; address of parent object
 ; ===========================================================================
 
@@ -35,12 +35,7 @@ Cat_Main:	; Routine 0
 		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Cat,obMap(a0)
-		move.w	#$22B0,obGfx(a0)
-		cmpi.b	#id_SBZ,(v_zone).w ; if level is SBZ, branch
-		beq.s	@isscrapbrain
-		move.w	#$24FF,obGfx(a0) ; MZ specific code
-
-	@isscrapbrain:
+		move.w	#ArtNem_Caterkiller,obGfx(a0)
 		andi.b	#3,obRender(a0)
 		ori.b	#4,obRender(a0)
 		move.b	obRender(a0),obStatus(a0)

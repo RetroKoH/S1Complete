@@ -6,10 +6,11 @@ Chopper:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Chop_Index(pc,d0.w),d1
-		jsr	Chop_Index(pc,d1.w)
+		jsr		Chop_Index(pc,d1.w)
 		bra.w	RememberState
 ; ===========================================================================
-Chop_Index:	dc.w Chop_Main-Chop_Index
+Chop_Index:
+		dc.w Chop_Main-Chop_Index
 		dc.w Chop_ChgSpeed-Chop_Index
 
 chop_origY:	equ $30
@@ -18,7 +19,7 @@ chop_origY:	equ $30
 Chop_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Chop,obMap(a0)
-		move.w	#$47B,obGfx(a0)
+		move.w	#ArtNem_Chopper,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#9,obColType(a0)
@@ -42,7 +43,7 @@ Chop_ChgSpeed:	; Routine 2
 		subi.w	#$C0,d0
 		cmp.w	obY(a0),d0
 		bcc.s	@nochg
-		move.b	#0,obAnim(a0)	; use slow animation
+		clr.b	obAnim(a0)	; use slow animation
 		tst.w	obVelY(a0)	; is Chopper at	its highest point?
 		bmi.s	@nochg		; if not, branch
 		move.b	#2,obAnim(a0)	; use stationary animation

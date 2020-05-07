@@ -6,9 +6,10 @@ Scenery:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Scen_Index(pc,d0.w),d1
-		jmp	Scen_Index(pc,d1.w)
+		jmp		Scen_Index(pc,d1.w)
 ; ===========================================================================
-Scen_Index:	dc.w Scen_Main-Scen_Index
+Scen_Index:
+		dc.w Scen_Main-Scen_Index
 		dc.w Scen_ChkDel-Scen_Index
 ; ===========================================================================
 
@@ -37,16 +38,17 @@ Scen_ChkDel:	; Routine 2
 ; ---------------------------------------------------------------------------
 ; Variables for	object $1C are stored in an array
 ; ---------------------------------------------------------------------------
-Scen_Values:	dc.l Map_Scen		; mappings address
-		dc.w $44D8		; VRAM setting
-		dc.b 0,	8, 2, 0		; frame, width,	priority, collision response
-		dc.l Map_Scen
+Scen_Values:
+		dc.l Map_Scen			; mappings address
+		dc.w ArtNem_SLZCannon	; VRAM setting
+		dc.b 0,	8, 2, 0			; frame, width,	priority, collision response
+		dc.l ArtNem_SLZCannon
 		dc.w $44D8
 		dc.b 0,	8, 2, 0
-		dc.l Map_Scen
+		dc.l ArtNem_SLZCannon
 		dc.w $44D8
 		dc.b 0,	8, 2, 0
 		dc.l Map_Bri
-		dc.w $438E
+		dc.w ArtNem_Bridge
 		dc.b 1,	$10, 1,	0
 		even

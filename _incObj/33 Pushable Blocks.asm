@@ -21,7 +21,7 @@ PushB_Main:	; Routine 0
 		move.b	#$F,obHeight(a0)
 		move.b	#$F,obWidth(a0)
 		move.l	#Map_Push,obMap(a0)
-		move.w	#$42B8,obGfx(a0) ; MZ specific code
+		move.w	#ArtNem_MZBlock,obGfx(a0) ; MZ specific code
 		cmpi.b	#1,(v_zone).w
 		bne.s	@notLZ
 		move.w	#$43DE,obGfx(a0) ; LZ specific code
@@ -332,10 +332,10 @@ loc_C268:
 		move.w	#-$40,d1
 
 loc_C294:
-		lea	(v_player).w,a1
+		lea		(v_player).w,a1
 		add.w	d0,obX(a1)
 		move.w	d1,obInertia(a1)
-		move.w	#0,obVelX(a1)
+		clr.w	obVelX(a1)
 		move.w	d0,-(sp)
 		sfx	sfx_Push,0,0,0	 ; play pushing sound
 		move.w	(sp)+,d0

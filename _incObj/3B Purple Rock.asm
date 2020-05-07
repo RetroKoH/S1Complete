@@ -1,21 +1,25 @@
 ; ---------------------------------------------------------------------------
 ; Object 3B - purple rock (GHZ)
+; --- SCRATCH RAM --- No scratch RAM used on this object
+; $29-3F UNUSED
+; ---------------------------------------------------------------------------
 ; ---------------------------------------------------------------------------
 
 PurpleRock:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Rock_Index(pc,d0.w),d1
-		jmp	Rock_Index(pc,d1.w)
+		jmp		Rock_Index(pc,d1.w)
 ; ===========================================================================
-Rock_Index:	dc.w Rock_Main-Rock_Index
+Rock_Index:
+		dc.w Rock_Main-Rock_Index
 		dc.w Rock_Solid-Rock_Index
 ; ===========================================================================
 
 Rock_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_PRock,obMap(a0)
-		move.w	#$63D0,obGfx(a0)
+		move.w	#ArtNem_PurpleRock,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$13,obActWid(a0)
 		move.w	#$200,obPriority(a0)

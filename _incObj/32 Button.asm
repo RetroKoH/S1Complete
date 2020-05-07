@@ -15,13 +15,12 @@ But_Index:	dc.w But_Main-But_Index
 But_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_But,obMap(a0)
-		move.w	#$4513,obGfx(a0) ; MZ specific code
+		move.w	#ArtNem_Switch,obGfx(a0) ; SYZ, LZ and SBZ code
 		cmpi.b	#id_MZ,(v_zone).w ; is level Marble Zone?
-		beq.s	But_IsMZ	; if yes, branch
+		bne.s	But_NotMZ		; if not, branch
+		move.w	#ArtNem_MZSwitch,obGfx(a0)	; MZ specific code
 
-		move.w	#$513,obGfx(a0)	; SYZ, LZ and SBZ specific code
-
-	But_IsMZ:
+	But_NotMZ:
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$200,obPriority(a0)

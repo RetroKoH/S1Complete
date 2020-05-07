@@ -6,9 +6,10 @@ Electro:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Elec_Index(pc,d0.w),d1
-		jmp	Elec_Index(pc,d1.w)
+		jmp		Elec_Index(pc,d1.w)
 ; ===========================================================================
-Elec_Index:	dc.w Elec_Main-Elec_Index
+Elec_Index:
+		dc.w Elec_Main-Elec_Index
 		dc.w Elec_Shock-Elec_Index
 
 elec_freq:	equ $34		; frequency
@@ -17,7 +18,7 @@ elec_freq:	equ $34		; frequency
 Elec_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Elec,obMap(a0)
-		move.w	#$47E,obGfx(a0)
+		move.w	#ArtNem_SBZElectric,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$28,obActWid(a0)
 		moveq	#0,d0
@@ -34,12 +35,12 @@ Elec_Shock:	; Routine 2
 		move.b	#1,obAnim(a0)	; run "zap" animation
 		tst.b	obRender(a0)
 		bpl.s	@animate
-		sfx	sfx_Electric,0,0,0	; play electricity sound
+		sfx		sfx_Electric,0,0,0	; play electricity sound
 
 	@animate:
-		lea	(Ani_Elec).l,a1
-		jsr	(AnimateSprite).l
-		move.b	#0,obColType(a0)
+		lea		(Ani_Elec).l,a1
+		jsr		(AnimateSprite).l
+		clr.b	obColType(a0)
 		cmpi.b	#4,obFrame(a0)	; is 4th frame displayed?
 		bne.s	@display	; if not, branch
 		move.b	#$A4,obColType(a0) ; if yes, make object hurt Sonic

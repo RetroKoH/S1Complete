@@ -15,7 +15,7 @@ Bump_Index:	dc.w Bump_Main-Bump_Index
 Bump_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bump,obMap(a0)
-		move.w	#$380,obGfx(a0)
+		move.w	#ArtNem_Bumper,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$80,obPriority(a0)
@@ -57,7 +57,7 @@ Bump_Hit:	; Routine 2
 		jsr	(AddPoints).l	; add 10 to score
 		bsr.w	FindFreeObj
 		bne.s	@display
-		move.b	#id_Points,0(a1) ; load points object
+		move.b	#id_Points,obID(a1) ; load points object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	#4,obFrame(a1)

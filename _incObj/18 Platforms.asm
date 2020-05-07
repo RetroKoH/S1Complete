@@ -31,7 +31,6 @@ Plat_Main:	; Routine 0
 		bne.s	@notSLZ
 		move.l	#Map_Plat_SLZ,obMap(a0) ; SLZ specific code
 		move.b	#$20,obActWid(a0)
-		move.w	#$4000,obGfx(a0)
 		move.b	#3,obSubtype(a0)
 
 	@notSLZ:

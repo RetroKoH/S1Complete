@@ -6,7 +6,7 @@ Pole:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Pole_Index(pc,d0.w),d1
-		jmp	Pole_Index(pc,d1.w)
+		jmp		Pole_Index(pc,d1.w)
 ; ===========================================================================
 Pole_Index:	dc.w Pole_Main-Pole_Index
 		dc.w Pole_Action-Pole_Index
@@ -19,7 +19,7 @@ pole_grabbed:	equ $32		; flag set when Sonic grabs the pole
 Pole_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Pole,obMap(a0)
-		move.w	#$43DE,obGfx(a0)
+		move.w	#ArtNem_LZPole,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#8,obActWid(a0)
 		move.w	#$200,obPriority(a0)

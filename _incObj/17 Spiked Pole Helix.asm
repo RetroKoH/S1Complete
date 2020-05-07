@@ -6,7 +6,7 @@ Helix:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Hel_Index(pc,d0.w),d1
-		jmp	Hel_Index(pc,d1.w)
+		jmp		Hel_Index(pc,d1.w)
 ; ===========================================================================
 Hel_Index:	dc.w Hel_Main-Hel_Index
 		dc.w Hel_Action-Hel_Index
@@ -22,7 +22,7 @@ hel_frame:	equ $3E		; start frame (different for each spike)
 Hel_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Hel,obMap(a0)
-		move.w	#$4398,obGfx(a0)
+		move.w	#ArtNem_GHZSpikePole,obGfx(a0)
 		move.b	#7,obStatus(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
@@ -33,7 +33,7 @@ Hel_Main:	; Routine 0
 		lea	obSubtype(a0),a2 ; move helix length to a2
 		moveq	#0,d1
 		move.b	(a2),d1		; move helix length to d1
-		move.b	#0,(a2)+	; clear subtype
+		clr.b	(a2)+	; clear subtype
 		move.w	d1,d0
 		lsr.w	#1,d0
 		lsl.w	#4,d0
@@ -56,7 +56,7 @@ Hel_Build:
 		move.w	d2,ObY(a1)
 		move.w	d3,obX(a1)
 		move.l	obMap(a0),obMap(a1)
-		move.w	#$4398,obGfx(a1)
+		move.w	#ArtNem_GHZSpikePole,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	#$180,obPriority(a1)
 		move.b	#8,obActWid(a1)
@@ -85,7 +85,7 @@ Hel_Action:	; Routine 2, 4
 
 Hel_RotateSpikes:
 		move.b	(v_ani0_frame).w,d0
-		move.b	#0,obColType(a0) ; make object harmless
+		clr.b	obColType(a0) ; make object harmless
 		add.b	hel_frame(a0),d0
 		andi.b	#7,d0
 		move.b	d0,obFrame(a0)	; change current frame
@@ -120,8 +120,7 @@ Hel_DelAll:
 		dbf	d2,Hel_DelLoop ; repeat d2 times (helix length)
 
 Hel_Delete:	; Routine 6
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject
 ; ===========================================================================
 
 Hel_Display:	; Routine 8

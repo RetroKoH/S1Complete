@@ -26,7 +26,7 @@ lblk_untouched:	equ $38		; flag block as untouched
 LBlk_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_LBlock,obMap(a0)
-		move.w	#$43E6,obGfx(a0)
+		move.w	#ArtNem_LZDoor2,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		moveq	#0,d0

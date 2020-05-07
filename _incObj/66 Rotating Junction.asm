@@ -28,7 +28,7 @@ Jun_Main:	; Routine 0
 	@repeat:
 		jsr		FindFreeObj ; Was bsr.w
 		bne.s	@fail
-		move.b	#id_Junction,0(a1)
+		move.b	#id_Junction,obID(a1)
 		addq.b	#4,obRoutine(a1) ; goto Jun_Display next
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
@@ -37,7 +37,7 @@ Jun_Main:	; Routine 0
 
 @makeitem:
 		move.l	#Map_Jun,obMap(a1)
-		move.w	#$4348,obGfx(a1)
+		move.w	#ArtNem_SBZWheel2,obGfx(a1)
 		ori.b	#4,obRender(a1)
 		move.b	#$38,obActWid(a1)
 

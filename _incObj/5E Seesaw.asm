@@ -35,7 +35,7 @@ see_parent:	equ $3C		; RAM address of parent object
 See_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Seesaw,obMap(a0)
-		move.w	#$374,obGfx(a0)
+		move.w	#ArtNem_SLZSeesaw,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$30,obActWid(a0)
@@ -45,7 +45,7 @@ See_Main:	; Routine 0
 
 		bsr.w	FindNextFreeObj
 		bne.s	@noball
-		move.b	#id_Seesaw,0(a1) ; load spikeball object
+		move.b	#id_Seesaw,obID(a1) ; load spikeball object
 		addq.b	#6,obRoutine(a1) ; use See_Spikeball routine
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
@@ -129,7 +129,7 @@ See_ChgFrame:
 See_Spikeball:	; Routine 6
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_SSawBall,obMap(a0)
-		move.w	#$4F0,obGfx(a0)
+		move.w	#ArtNem_SLZSpike,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$8B,obColType(a0)

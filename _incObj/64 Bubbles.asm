@@ -24,7 +24,7 @@ bub_freq:	equ $33		; frequency of bubble spawn
 Bub_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bub,obMap(a0)
-		move.w	#$8348,obGfx(a0)
+		move.w	#ArtNem_Bubbles,obGfx(a0)
 		move.b	#$84,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$80,obPriority(a0)

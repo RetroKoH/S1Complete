@@ -19,17 +19,17 @@ cflo_collapse_flag:	equ $3A
 CFlo_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_CFlo,obMap(a0)
-		move.w	#$42B8,obGfx(a0)
+		move.w	#ArtNem_MZBlock,obGfx(a0)
 		cmpi.b	#id_SLZ,(v_zone).w ; check if level is SLZ
 		bne.s	@notSLZ
 
-		move.w	#$44E0,obGfx(a0) ; SLZ specific code
+		move.w	#ArtNem_SLZBlock,obGfx(a0) ; SLZ specific code
 		addq.b	#2,obFrame(a0)
 
 	@notSLZ:
 		cmpi.b	#id_SBZ,(v_zone).w ; check if level is SBZ
 		bne.s	@notSBZ
-		move.w	#$43F5,obGfx(a0) ; SBZ specific code
+		move.w	#ArtNem_SBZFloor,obGfx(a0) ; SBZ specific code
 
 	@notSBZ:
 		ori.b	#4,obRender(a0)
@@ -92,17 +92,17 @@ CFlo_Display:	; Routine 6
 loc_8402:
 		subq.b	#1,cflo_timedelay(a0)
 		bsr.w	CFlo_WalkOff
-		lea	(v_player).w,a1
+		lea		(v_player).w,a1
 		btst	#3,obStatus(a1)
 		beq.s	loc_842E
 		tst.b	cflo_timedelay(a0)
 		bne.s	locret_843A
 		bclr	#3,obStatus(a1)
 		bclr	#5,obStatus(a1)
-		move.b	#1,obNextAni(a1)
+		move.b	#aniID_Run,obNextAni(a1)
 
 loc_842E:
-		move.b	#0,cflo_collapse_flag(a0)
+		clr.b	cflo_collapse_flag(a0)
 		move.b	#6,obRoutine(a0) ; run "CFlo_Display" routine
 
 locret_843A:
@@ -121,7 +121,7 @@ CFlo_Delete:	; Routine 8
 ; ===========================================================================
 
 CFlo_Fragment:
-		move.b	#0,cflo_collapse_flag(a0)
+		clr.b	cflo_collapse_flag(a0)
 
 loc_8458:
 		lea	(CFlo_Data2).l,a4

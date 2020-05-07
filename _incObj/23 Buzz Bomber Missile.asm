@@ -22,7 +22,7 @@ Msl_Main:	; Routine 0
 		bpl.s	Msl_ChkCancel
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Missile,obMap(a0)
-		move.w	#$2444,obGfx(a0)
+		move.w	#ArtNem_BuzzBomber_Missile,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#8,obActWid(a0)

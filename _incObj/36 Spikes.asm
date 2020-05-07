@@ -25,7 +25,7 @@ Spik_Var:	dc.b 0,	$14		; frame	number,	object width
 Spik_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Spike,obMap(a0)
-		move.w	#$51B,obGfx(a0)
+		move.w	#ArtNem_Spikes,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	obSubtype(a0),d0

@@ -21,7 +21,7 @@ swing_origY:	equ $38		; original y-axis position
 Swing_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Swing_GHZ,obMap(a0) ; GHZ and MZ specific code
-		move.w	#$4380,obGfx(a0)
+		move.w	#ArtNem_SwingPtform,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#$18,obActWid(a0)
@@ -32,7 +32,7 @@ Swing_Main:	; Routine 0
 		bne.s	@notSLZ
 
 		move.l	#Map_Swing_SLZ,obMap(a0) ; SLZ specific code
-		move.w	#$43DC,obGfx(a0)
+		move.w	#ArtNem_SLZSwing,obGfx(a0)
 		move.b	#$20,obActWid(a0)
 		move.b	#$10,obHeight(a0)
 		move.b	#$99,obColType(a0)
@@ -42,8 +42,7 @@ Swing_Main:	; Routine 0
 		bne.s	@length
 
 		move.l	#Map_BBall,obMap(a0) ; SBZ specific code
-		move.w	#$391,obGfx(a0)
-		move.b	#$18,obActWid(a0)
+		move.w	#ArtNem_SBZSpike,obGfx(a0)
 		move.b	#$18,obHeight(a0)
 		move.b	#$86,obColType(a0)
 		move.b	#$C,obRoutine(a0) ; goto Swing_Action next

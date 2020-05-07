@@ -23,7 +23,7 @@ sball_speed:	equ $3E		; rate of spin (2 bytes)
 SBall_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_SBall,obMap(a0)
-		move.w	#$3BA,obGfx(a0)
+		move.w	#ArtNem_SYZSmallSpike,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#8,obActWid(a0)
@@ -33,8 +33,8 @@ SBall_Main:	; Routine 0
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		bne.s	@notlz
 
-		move.b	#0,obColType(a0) ; LZ specific code (chain doesn't hurt)
-		move.w	#$310,obGfx(a0)
+		clr.b	obColType(a0) ; LZ specific code (chain doesn't hurt)
+		move.w	#$2EF,obGfx(a0)
 		move.l	#Map_SBall2,obMap(a0)
 
 	@notlz:
@@ -71,7 +71,7 @@ SBall_Main:	; Routine 0
 		andi.w	#$7F,d5
 		move.b	d5,(a2)+	; copy child RAM number
 		move.b	#4,obRoutine(a1)
-		move.b	0(a0),0(a1)
+		move.b	obID(a0),obID(a1)
 		move.l	obMap(a0),obMap(a1)
 		move.w	obGfx(a0),obGfx(a1)
 		move.b	obRender(a0),obRender(a1)

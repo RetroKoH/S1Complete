@@ -69,7 +69,7 @@ CStom_MakeStomper:
 		add.w	obY(a0),d0
 		move.w	d0,obY(a1)
 		move.l	#Map_CStom,obMap(a1)
-		move.w	#$300,obGfx(a1)
+		move.w	#ArtNem_MZMetal,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	obY(a1),$30(a1)
 		move.b	obSubtype(a0),obSubtype(a1)

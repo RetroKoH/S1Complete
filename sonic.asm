@@ -2658,15 +2658,12 @@ Level_TtlCardLoop:
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
-;		tst.w	(f_demo).w
-;		bmi.s	Level_ChkDebug
-;		move.b	#id_HUD,(v_objspace+$40).w ; load HUD object
 
 Level_ChkDebug:
-		tst.b	(f_debugcheat).w ; has debug cheat been entered?
-		beq.s	Level_ChkWater	; if not, branch
-		btst	#bitA,(v_jpadhold1).w ; is A button held?
-		beq.s	Level_ChkWater	; if not, branch
+;		tst.b	(f_debugcheat).w ; has debug cheat been entered?
+;		beq.s	Level_ChkWater	; if not, branch
+;		btst	#bitA,(v_jpadhold1).w ; is A button held?
+;		beq.s	Level_ChkWater	; if not, branch
 		move.b	#1,(f_debugmode).w ; enable debug mode
 
 Level_ChkWater:
@@ -2804,7 +2801,7 @@ Level_MainLoop:
 		bsr.w	RunPLC
 		bsr.w	OscillateNumDo
 		bsr.w	SynchroAnimate
-		bsr.w	SignpostArtLoad
+		bsr.w	EndofActLoad
 
 		cmpi.b	#id_Demo,(v_gamemode).w
 		beq.s	Level_ChkDemo	; if mode is 8 (demo), branch
@@ -2950,18 +2947,17 @@ SyncEnd:
 ; End of function SynchroAnimate
 
 ; ---------------------------------------------------------------------------
-; End-of-act signpost pattern loading subroutine
+; End-of-act loading subroutine
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-SignpostArtLoad:
-		tst.w	(v_debuguse).w	; is debug mode	being used?
-		bne.w	@exit		; if yes, branch
+EndofActLoad:			; XREF: GM_Level
 		cmpi.b	#2,(v_act).w	; is act number 02 (act 3)?
 		beq.s	@exit		; if yes, branch
-
+		tst.w	(v_debuguse).w	; is debug mode	being used?
+		bne.w	@exit		; if yes, branch
 		move.w	(v_screenposx).w,d0
 		move.w	(v_limitright2).w,d1
 		subi.w	#$100,d1
@@ -2972,12 +2968,12 @@ SignpostArtLoad:
 		cmp.w	(v_limitleft2).w,d1
 		beq.s	@exit
 		move.w	d1,(v_limitleft2).w ; move left boundary to current screen position
-		moveq	#plcid_Signpost,d0
-		bra.w	NewPLC		; load signpost	patterns
+		moveq	#plcid_EndofAct,d0
+		bra.w	NewPLC		 ; load hidden points patterns
 
 	@exit:
 		rts	
-; End of function SignpostArtLoad
+; End of function EndofActLoad
 
 ; ===========================================================================
 Demo_GHZ:	incbin	"demodata\Intro - GHZ.bin"
@@ -3661,18 +3657,13 @@ End_LoadData:
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1	; load Sonic's palette
 		music	bgm_Ending,0,1,0	; play ending sequence music
-		btst	#bitA,(v_jpadhold1).w ; is button A pressed?
-		beq.s	End_LoadSonic	; if not, branch
-		move.b	#1,(f_debugmode).w ; enable debug mode
 
-End_LoadSonic:
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
 		bset	#0,(v_player+obStatus).w ; make Sonic face left
 		move.b	#1,(f_lockctrl).w ; lock controls
 		move.w	#(btnL<<8),(v_jpadhold2).w ; move Sonic to the left
 		move.w	#$F800,(v_player+obInertia).w ; set Sonic's speed
 		bset	#0,(f_level_started).w
-		;move.b	#id_HUD,(v_objspace+$40).w ; load HUD object
 		jsr	(ObjPosLoad).l
 		jsr	(ExecuteObjects).l
 		jsr	(BuildSprites).l
@@ -6367,7 +6358,8 @@ Map_Bump:	include	"_maps\Bumper.asm"
 
 		include	"_incObj\0D Signpost.asm" ; includes "GotThroughAct" subroutine
 		include	"_anim\Signpost.asm"
-Map_Sign:	include	"_maps\Signpost.asm"
+		include	"_maps\Signpost.asm"
+		include	"_maps\Signpost - Dynamic Gfx Script.asm"
 
 		include	"_incObj\4C & 4D Lava Geyser Maker.asm"
 		include	"_incObj\4E Wall of Lava.asm"
@@ -8097,6 +8089,8 @@ Art_Sonic:	incbin	"artunc\Sonic.bin"	; Sonic
 		even
 Art_Effects:	incbin	"artunc\Dust Effects.bin"	; Spindash/Skid Dust
 		even
+Art_SignPost:	incbin	"artunc\Signpost.bin"	; end of level signpost
+		even
 
 		include "_maps\Effects.asm"
 		include "_maps\Effects - Dynamic Gfx Script.asm"
@@ -8188,10 +8182,12 @@ Nem_GhzWall2:	incbin	"artnem\GHZ Edge Wall.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - LZ stuff
 ; ---------------------------------------------------------------------------
-Nem_Water:	incbin	"artnem\LZ Water Surface.bin"
+Nem_WaterSurface:	incbin	"artnem\LZ Water Surface.bin"
 		even
-Nem_Splash:	incbin	"artnem\LZ Water & Splashes.bin"
+Nem_Waterfall:	incbin	"artnem\LZ Water & Splashes.bin"
 		even
+;Nem_Splash:	incbin	"artnem\Water Splash.bin"
+;		even
 Nem_LzSpikeBall:incbin	"artnem\LZ Spiked Ball & Chain.bin"
 		even
 Nem_FlapDoor:	incbin	"artnem\LZ Flapping Door.bin"
@@ -8357,8 +8353,6 @@ Nem_GameOver:	incbin	"artnem\Game Over.bin"	; game over / time over
 Nem_HSpring:	incbin	"artnem\Spring Horizontal.bin"
 		even
 Nem_VSpring:	incbin	"artnem\Spring Vertical.bin"
-		even
-Nem_SignPost:	incbin	"artnem\Signpost.bin"	; end of level signpost
 		even
 Nem_Lamp:	incbin	"artnem\Lamppost.bin"
 		even

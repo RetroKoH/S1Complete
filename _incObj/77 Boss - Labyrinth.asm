@@ -36,7 +36,7 @@ Obj77_Main:	; Routine 0
 Obj77_Loop:
 		jsr	(FindNextFreeObj).l
 		bne.s	Obj77_ShipMain
-		move.b	#id_BossLabyrinth,0(a1)
+		move.b	#id_BossLabyrinth,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
@@ -47,7 +47,7 @@ Obj77_LoadBoss:
 		move.b	(a2)+,obAnim(a1)
 		move.w	obPriority(a0),obPriority(a1)
 		move.l	#Map_Eggman,obMap(a1)
-		move.w	#$400,obGfx(a1)
+		move.w	#ArtNem_Eggman,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.l	a0,$34(a1)

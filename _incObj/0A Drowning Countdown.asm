@@ -1,7 +1,6 @@
 ; ---------------------------------------------------------------------------
 ; Object 0A - drowning countdown numbers and small bubbles that float out of
 ; Sonic's mouth (LZ)
-;
 ; --- SCRATCH RAM ---
 ; $29-2B UNUSED
 ; $2C USED
@@ -50,7 +49,7 @@ drownTimer:			equ $38		; time between each number changes
 Drown_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bub,obMap(a0)
-		move.w	#$8348,obGfx(a0)
+		move.w	#ArtNem_Bubbles,obGfx(a0)
 		move.b	#$84,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$80,obPriority(a0)
@@ -59,7 +58,7 @@ Drown_Main:	; Routine 0
 
 		addq.b	#8,obRoutine(a0) ; goto Drown_Countdown next
 		move.l	#Map_Drown,obMap(a0)
-		move.w	#$440,obGfx(a0)
+		move.w	#$2444,obGfx(a0)
 		andi.w	#$7F,d0
 		move.b	d0,$33(a0)
 		bra.w	Drown_Countdown

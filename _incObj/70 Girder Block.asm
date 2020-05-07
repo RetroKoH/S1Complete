@@ -22,7 +22,7 @@ gird_delay:	equ $3A		; delay for movement
 Gird_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Gird,obMap(a0)
-		move.w	#$42F0,obGfx(a0)
+		move.w	#ArtNem_SBZGirder,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$60,obActWid(a0)

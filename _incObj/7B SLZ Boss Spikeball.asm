@@ -28,7 +28,7 @@ Obj7B_Index:	dc.w Obj7B_Main-Obj7B_Index
 
 Obj7B_Main:	; Routine 0
 		move.l	#Map_SSawBall,obMap(a0)
-		move.w	#$518,obGfx(a0)
+		move.w	#ArtNem_SLZWeapons,obGfx(a0)
 		move.b	#1,obFrame(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
@@ -324,11 +324,11 @@ Obj7B_MakeFrag:
 Obj7B_Loop:
 		jsr	(FindFreeObj).l
 		bne.s	loc_1909A
-		move.b	#id_BossSpikeball,(a1) ; load shrapnel object
+		move.b	#id_BossSpikeball,obID(a1) ; load shrapnel object
 		move.b	#$A,obRoutine(a1)
 		move.l	#Map_BSBall,obMap(a1)
 		move.w	#$180,obPriority(a1)
-		move.w	#$518,obGfx(a1)
+		move.w	#ArtNem_SLZWeapons,obGfx(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	(a2)+,obVelX(a1)

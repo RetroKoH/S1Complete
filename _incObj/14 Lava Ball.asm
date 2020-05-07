@@ -22,12 +22,7 @@ LBall_Main:	; Routine 0
 		move.b	#8,obHeight(a0)
 		move.b	#8,obWidth(a0)
 		move.l	#Map_Fire,obMap(a0)
-		move.w	#$345,obGfx(a0)
-		cmpi.b	#3,(v_zone).w	; check if level is SLZ
-		bne.s	@notSLZ
-		move.w	#$480,obGfx(a0)	; SLZ specific code
-
-	@notSLZ:
+		move.w	#ArtNem_Fireball,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#$8B,obColType(a0)
@@ -48,7 +43,7 @@ LBall_Main:	; Routine 0
 		move.b	#$10,obActWid(a0)
 		move.b	#2,obAnim(a0)	; use horizontal animation
 		move.w	obVelY(a0),obVelX(a0) ; set horizontal speed
-		move.w	#0,obVelY(a0)	; delete vertical speed
+		clr.w	obVelY(a0)	; delete vertical speed
 
 	@sound:
 		sfx	sfx_Fireball,0,0,0	; play lava ball sound
@@ -140,15 +135,13 @@ LBall_Type07:
 		moveq	#8,d3
 		bsr.w	ObjHitWallRight
 		tst.w	d1
-		bpl.s	locret_E4BC
+		bpl.s	LBall_locret
 		move.b	#8,obSubtype(a0)
 		move.b	#3,obAnim(a0)
-		move.w	#0,obVelX(a0)	; stop object when it touches a	wall
-
-locret_E4BC:
-		rts	
+		clr.w	obVelX(a0)	; stop object when it touches a	wall
 ; ===========================================================================
 
+LBall_locret:
 LBall_Type08:
 		rts	
 ; ===========================================================================

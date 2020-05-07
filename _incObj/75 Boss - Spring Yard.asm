@@ -14,10 +14,19 @@ Obj75_Index:	dc.w Obj75_Main-Obj75_Index
 		dc.w Obj75_FlameMain-Obj75_Index
 		dc.w Obj75_SpikeMain-Obj75_Index
 
-Obj75_ObjData:	dc.b 2,	0, 5		; routine number, animation, priority
-		dc.b 4,	1, 5
-		dc.b 6,	7, 5
-		dc.b 8,	0, 5
+Obj75_ObjData:
+		; Ship
+		dc.b 2,	0
+		dc.w $280
+		; Face
+		dc.b 4, 1
+		dc.w $280
+		; Flame
+		dc.b 6, 7
+		dc.w $280
+		; Spike
+		dc.b 8, 0
+		dc.w $280
 ; ===========================================================================
 
 Obj75_Main:	; Routine 0
@@ -45,15 +54,9 @@ Obj75_LoadBoss:
 		clr.b	ob2ndRout(a1)
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obAnim(a1)
-		move.b	(a2)+,obPriority(a1)
-
-		move.w  obPriority(a1),d0
-		lsr.w   #1,d0
-		andi.w  #$380,d0
-		move.w  d0,obPriority(a1)
-
+		move.w	(a2)+,obPriority(a1)
 		move.l	#Map_Eggman,obMap(a1)
-		move.w	#$400,obGfx(a1)
+		move.w	#ArtNem_Eggman,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.l	a0,$34(a1)
@@ -555,7 +558,7 @@ loc_195DA:
 
 Obj75_SpikeMain:; Routine 8
 		move.l	#Map_BossItems,obMap(a0)
-		move.w	#$246C,obGfx(a0)
+		move.w	#ArtNem_Weapons,obGfx(a0)
 		move.b	#5,obFrame(a0)
 		movea.l	$34(a0),a1
 		cmpi.b	#$A,ob2ndRout(a1)

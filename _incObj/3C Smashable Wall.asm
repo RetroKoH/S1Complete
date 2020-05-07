@@ -20,7 +20,11 @@ smash_speed:	equ $30		; Sonic's horizontal speed
 Smash_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Smash,obMap(a0)
-		move.w	#$450F,obGfx(a0)
+		move.w	#ArtNem_GHZBreakWall,obGfx(a0)
+		cmpi.b	#id_SLZ,(v_zone).w
+		bne.s	@notslz
+		move.w	#ArtNem_SLZBreakWall,obGfx(a0) ; SLZ
+	@notslz:
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$200,obPriority(a0)
@@ -33,7 +37,7 @@ Smash_Solid:	; Routine 2
 		move.w	#$20,d3
 		move.w	obX(a0),d4
 		bsr.w	SolidObject
-		btst	#5,obStatus(a0)	; is Sonic pushing against the wall?
+		btst	#staPush,obStatus(a0)	; is Sonic pushing against the wall?
 		bne.s	@chkroll	; if yes, branch
 
 @donothing:

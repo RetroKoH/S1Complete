@@ -6,11 +6,12 @@ GeyserMaker:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	GMake_Index(pc,d0.w),d1
-		jsr	GMake_Index(pc,d1.w)
+		jsr		GMake_Index(pc,d1.w)
         out_of_range    DeleteObject
         rts
 ; ===========================================================================
-GMake_Index:	dc.w GMake_Main-GMake_Index
+GMake_Index:
+		dc.w GMake_Main-GMake_Index
 		dc.w GMake_Wait-GMake_Index
 		dc.w GMake_ChkType-GMake_Index
 		dc.w GMake_MakeLava-GMake_Index
@@ -25,7 +26,7 @@ gmake_parent:	equ $3C		; address of parent object
 GMake_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Geyser,obMap(a0)
-		move.w	#$E3A8,obGfx(a0)
+		move.w	#ArtNem_MZLavaGeyser_2,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
 		move.b	#$38,obActWid(a0)
@@ -53,7 +54,7 @@ GMake_MakeLava:	; Routine 6
 		addq.b	#2,obRoutine(a0)
 		bsr.w	FindNextFreeObj
 		bne.s	@fail
-		move.b	#id_LavaGeyser,0(a1) ; load lavafall object
+		move.b	#id_LavaGeyser,obID(a1) ; load lavafall object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	obSubtype(a0),obSubtype(a1)
@@ -89,12 +90,11 @@ GMake_Display:	; Routine 8
 ; ===========================================================================
 
 GMake_Delete:	; Routine $A
-		move.b	#0,obAnim(a0)
+		clr.b	obAnim(a0)
 		move.b	#2,obRoutine(a0)
 		tst.b	obSubtype(a0)
 		beq.w	DeleteObject
 		rts	
-
 
 ; ---------------------------------------------------------------------------
 ; Object 4D - lava geyser / lavafall (MZ)
@@ -104,10 +104,11 @@ LavaGeyser:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Geyser_Index(pc,d0.w),d1
-		jsr	Geyser_Index(pc,d1.w)
+		jsr		Geyser_Index(pc,d1.w)
 		bra.w	DisplaySprite
 ; ===========================================================================
-Geyser_Index:	dc.w Geyser_Main-Geyser_Index
+Geyser_Index:
+		dc.w Geyser_Main-Geyser_Index
 		dc.w Geyser_Action-Geyser_Index
 		dc.w loc_EFFC-Geyser_Index
 		dc.w Geyser_Delete-Geyser_Index
@@ -138,9 +139,9 @@ Geyser_Main:	; Routine 0
 		bne.s	@fail
 
 @makelava:
-		move.b	#id_LavaGeyser,0(a1)
+		move.b	#id_LavaGeyser,obID(a1)
 		move.l	#Map_Geyser,obMap(a1)
-		move.w	#$63A8,obGfx(a1)
+		move.w	#ArtNem_MZLavaGeyser,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.w	obX(a0),obX(a1)
@@ -176,7 +177,7 @@ Geyser_Main:	; Routine 0
 		clr.w	obPriority(a1)
 		move.w	$30(a0),$30(a1)
 		move.l	$3C(a0),$3C(a1)
-		move.b	#0,obSubtype(a0)
+		clr.b	obSubtype(a0)
 
 	@sound:
 		sfx	sfx_Burning,0,0,0	; play flame sound
@@ -254,7 +255,7 @@ loc_F02E:
 		addq.b	#1,obAniFrame(a0)
 		cmpi.b	#2,obAniFrame(a0)
 		bcs.s	loc_F04C
-		move.b	#0,obAniFrame(a0)
+		clr.b	obAniFrame(a0)
 
 loc_F04C:
 		move.b	obAniFrame(a0),d0

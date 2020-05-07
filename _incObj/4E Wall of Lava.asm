@@ -6,9 +6,10 @@ LavaWall:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	LWall_Index(pc,d0.w),d1
-		jmp	LWall_Index(pc,d1.w)
+		jmp		LWall_Index(pc,d1.w)
 ; ===========================================================================
-LWall_Index:	dc.w LWall_Main-LWall_Index
+LWall_Index:
+		dc.w LWall_Main-LWall_Index
 		dc.w LWall_Solid-LWall_Index
 		dc.w LWall_Action-LWall_Index
 		dc.w LWall_Move-LWall_Index
@@ -29,15 +30,15 @@ LWall_Main:	; Routine 0
 		bne.s	@fail
 
 @make:
-		move.b	#id_LavaWall,0(a1)	; load object
+		move.b	#id_LavaWall,obID(a1)	; load object
 		move.l	#Map_LWall,obMap(a1)
-		move.w	#$63A8,obGfx(a1)
+		move.w	#ArtNem_MZLavaGeyser,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$50,obActWid(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	#$80,obPriority(a1)
-		move.b	#0,obAnim(a1)
+		clr.b	obAnim(a1)
 		move.b	#$94,obColType(a1)
 		move.l	a0,$3C(a1)
 

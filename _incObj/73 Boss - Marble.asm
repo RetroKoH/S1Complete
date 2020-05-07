@@ -14,10 +14,20 @@ Obj73_Index:	dc.w Obj73_Main-Obj73_Index
 		dc.w Obj73_FlameMain-Obj73_Index
 		dc.w Obj73_TubeMain-Obj73_Index
 
-Obj73_ObjData:	dc.b 2,	0, 4		; routine number, animation, priority
-		dc.b 4,	1, 4
-		dc.b 6,	7, 4
-		dc.b 8,	0, 3
+Obj73_ObjData:	; routine number, animation
+				; priority
+		; Ship
+		dc.b 2,	0
+		dc.w $200
+		; Face
+		dc.b 4, 1
+		dc.w $200
+		; Flame
+		dc.b 6, 7
+		dc.w $200
+		; Tube
+		dc.b 8, 0
+		dc.w $180
 ; ===========================================================================
 
 Obj73_Main:	; Routine 0
@@ -34,7 +44,7 @@ Obj73_Main:	; Routine 0
 Obj73_Loop:
 		jsr	(FindNextFreeObj).l
 		bne.s	Obj73_ShipMain
-		move.b	#id_BossMarble,0(a1)
+		move.b	#id_BossMarble,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
@@ -43,15 +53,9 @@ Obj73_LoadBoss:
 		clr.b	ob2ndRout(a1)
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obAnim(a1)
-		move.b	(a2)+,obPriority(a1)
-
-		move.w  obPriority(a1),d0
-		lsr.w   #1,d0
-		andi.w  #$380,d0
-		move.w  d0,obPriority(a1)
-
+		move.w	(a2)+,obPriority(a1)
 		move.l	#Map_Eggman,obMap(a1)
-		move.w	#$400,obGfx(a1)
+		move.w	#ArtNem_Eggman,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.l	a0,$34(a1)
@@ -181,7 +185,7 @@ Obj73_MakeLava:
 		bcc.s	loc_1845C
 		jsr	(FindFreeObj).l
 		bne.s	loc_1844A
-		move.b	#id_LavaBall,0(a1) ; load lava ball object
+		move.b	#id_LavaBall,obID(a1) ; load lava ball object
 		move.w	#$2E8,obY(a1)	; set Y	position
 		jsr	(RandomNumber).l
 		andi.l	#$FFFF,d0
@@ -242,7 +246,7 @@ Obj73_MakeLava2:
 		move.w	$30(a0),obX(a1)
 		move.w	$38(a0),obY(a1)
 		addi.w	#$18,obY(a1)
-		move.b	#id_BossFire,(a1)	; load lava ball object
+		move.b	#id_BossFire,obID(a1)	; load lava ball object
 		move.b	#1,obSubtype(a1)
 
 loc_184EA:
@@ -437,7 +441,7 @@ Obj73_TubeMain:	; Routine 8
 
 loc_18688:
 		move.l	#Map_BossItems,obMap(a0)
-		move.w	#$246C,obGfx(a0)
+		move.w	#ArtNem_Weapons,obGfx(a0)
 		move.b	#4,obFrame(a0)
 		bra.s	loc_1864A
 ; ===========================================================================

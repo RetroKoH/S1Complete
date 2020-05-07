@@ -6,11 +6,12 @@ Springs:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Spring_Index(pc,d0.w),d1
-		jsr	Spring_Index(pc,d1.w)
+		jsr		Spring_Index(pc,d1.w)
 		out_of_range	DeleteObject
 		bra.w	DisplaySprite
 ; ===========================================================================
-Spring_Index:	dc.w Spring_Main-Spring_Index
+Spring_Index:
+		dc.w Spring_Main-Spring_Index
 		dc.w Spring_Up-Spring_Index
 		dc.w Spring_AniUp-Spring_Index
 		dc.w Spring_ResetUp-Spring_Index
@@ -30,7 +31,7 @@ Spring_Powers:	dc.w -$1000		; power	of red spring
 Spring_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Spring,obMap(a0)
-		move.w	#$523,obGfx(a0)
+		move.w	#ArtNem_HSpring_Red,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$200,obPriority(a0)
@@ -41,7 +42,7 @@ Spring_Main:	; Routine 0
 		move.b	#8,obRoutine(a0) ; use "Spring_LR" routine
 		move.b	#1,obAnim(a0)
 		move.b	#3,obFrame(a0)
-		move.w	#$533,obGfx(a0)
+		move.w	#ArtNem_VSpring_Red,obGfx(a0)
 		move.b	#8,obActWid(a0)
 
 	Spring_NotLR:

@@ -20,7 +20,7 @@ vanp_timelen:	equ $32		; time between events (general)
 VanP_Main:	; Routine 0
 		addq.b	#6,obRoutine(a0)
 		move.l	#Map_VanP,obMap(a0)
-		move.w	#$44C3,obGfx(a0)
+		move.w	#ArtNem_SBZBlock,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$200,obPriority(a0)

@@ -16,7 +16,7 @@ Poi_Index:
 Poi_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Poi,obMap(a0)
-		move.w	#$2797,obGfx(a0)
+		move.w	#ArtNem_Points,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
 		move.b	#8,obActWid(a0)

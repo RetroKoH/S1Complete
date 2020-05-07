@@ -20,7 +20,7 @@ GBall_Main:	; Routine 0
 		move.w	#$4080,obAngle(a0)
 		move.w	#-$200,$3E(a0)
 		move.l	#Map_BossItems,obMap(a0)
-		move.w	#$46C,obGfx(a0)
+		move.w	#ArtNem_Weapons,obGfx(a0)
 		lea	obSubtype(a0),a2
 		move.b	#0,(a2)+
 		moveq	#5,d1
@@ -33,10 +33,10 @@ GBall_MakeLinks:
 		bne.s	GBall_MakeBall
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
-		move.b	#id_BossBall,0(a1) ; load chain link object
+		move.b	#id_BossBall,obID(a1) ; load chain link object
 		move.b	#6,obRoutine(a1)
 		move.l	#Map_Swing_GHZ,obMap(a1)
-		move.w	#$380,obGfx(a1)
+		move.w	#$37E,obGfx(a1)
 		move.b	#1,obFrame(a1)
 		addq.b	#1,obSubtype(a0)
 
@@ -55,7 +55,7 @@ loc_17B60:
 GBall_MakeBall:
 		move.b	#8,obRoutine(a1)
 		move.l	#Map_GBall,obMap(a1) ; load different mappings for final link
-		move.w	#$43AA,obGfx(a1) ; use different graphics
+		move.w	#ArtNem_GHZBall,obGfx(a1) ; use different graphics
 		move.b	#1,obFrame(a1)
 		move.w	#$280,obPriority(a1)
 		move.b	#$81,obColType(a1) ; make object hurt Sonic
@@ -127,8 +127,8 @@ loc_17C3C:
 		move.b	obStatus(a1),obStatus(a0)
 		tst.b	obStatus(a1)
 		bpl.s	locret_17C66
-		move.b	#id_ExplosionBomb,0(a0)
-		move.b	#0,obRoutine(a0)
+		move.b	#id_ExplosionBomb,obID(a0)
+		clr.b	obRoutine(a0)
 
 locret_17C66:
 		rts	
@@ -140,8 +140,8 @@ loc_17C68:	; Routine 6
 		movea.l	$34(a0),a1
 		tst.b	obStatus(a1)
 		bpl.s	GBall_Display3
-		move.b	#id_ExplosionBomb,0(a0)
-		move.b	#0,obRoutine(a0)
+		move.b	#id_ExplosionBomb,obID(a0)
+		clr.b	obRoutine(a0)
 
 GBall_Display3:
 		jmp	(DisplaySprite).l
@@ -162,8 +162,8 @@ GBall_Vanish:
 		bsr.w	BossDefeated
 		subq.b	#1,$3C(a0)
 		bpl.s	GBall_Display4
-		move.b	#id_ExplosionBomb,(a0)
-		move.b	#0,obRoutine(a0)
+		move.b	#id_ExplosionBomb,obID(a0)
+		clr.b	obRoutine(a0)
 
 GBall_Display4:
 		jmp	(DisplaySprite).l

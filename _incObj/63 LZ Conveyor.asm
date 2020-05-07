@@ -38,14 +38,14 @@ LCon_Main:	; Routine 0
 		bmi.w	loc_12460
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_LConv,obMap(a0)
-		move.w	#$43F6,obGfx(a0)
+		move.w	#ArtNem_LZWheel2,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$200,obPriority(a0)
 		cmpi.b	#$7F,obSubtype(a0)
 		bne.s	loc_123E2
 		addq.b	#4,obRoutine(a0)
-		move.w	#$3F6,obGfx(a0)
+		move.w	#ArtNem_LZWheel,obGfx(a0)
 		move.w	#$80,obPriority(a0)
 		bra.w	loc_124DE
 ; ===========================================================================

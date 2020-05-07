@@ -19,7 +19,7 @@ gfire_origX:	equ $2A
 GFire_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Fire,obMap(a0)
-		move.w	#$345,obGfx(a0)
+		move.w	#ArtNem_Fireball,obGfx(a0)
 		move.w	obX(a0),gfire_origX(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)

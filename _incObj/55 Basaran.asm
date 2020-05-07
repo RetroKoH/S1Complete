@@ -10,12 +10,14 @@ Basaran:
 ; ===========================================================================
 Bas_Index:	dc.w Bas_Main-Bas_Index
 		dc.w Bas_Action-Bas_Index
+
+drop_ypos:	= $36		; distance to drop to (Changes based on difficulty)
 ; ===========================================================================
 
 Bas_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bas,obMap(a0)
-		move.w	#$84B8,obGfx(a0)
+		move.w	#ArtNem_Basaran,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$C,obHeight(a0)
 		move.w	#$100,obPriority(a0)
@@ -76,12 +78,10 @@ Bas_Action:	; Routine 2
 		move.b	#2,obAnim(a0)
 		addq.b	#2,ob2ndRout(a0)
 
-	@dropmore:
-		rts	
-
 	@chkdel:
 		tst.b	obRender(a0)
 		bpl.w	DeleteObject
+	@dropmore:
 		rts	
 ; ===========================================================================
 

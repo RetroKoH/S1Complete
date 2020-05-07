@@ -18,7 +18,7 @@ fan_switch:	equ $32		; on/off switch
 Fan_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Fan,obMap(a0)
-		move.w	#$43A0,obGfx(a0)
+		move.w	#ArtNem_SLZFan,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$200,obPriority(a0)

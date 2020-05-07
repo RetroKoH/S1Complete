@@ -7,9 +7,10 @@ BuzzBomber:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Buzz_Index(pc,d0.w),d1
-		jmp	Buzz_Index(pc,d1.w)
+		jmp		Buzz_Index(pc,d1.w)
 ; ===========================================================================
-Buzz_Index:	dc.w Buzz_Main-Buzz_Index
+Buzz_Index:
+		dc.w Buzz_Main-Buzz_Index
 		dc.w Buzz_Action-Buzz_Index
 		dc.w Buzz_Delete-Buzz_Index
 
@@ -21,7 +22,7 @@ buzz_parent:	equ $3C
 Buzz_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Buzz,obMap(a0)
-		move.w	#$444,obGfx(a0)
+		move.w	#ArtNem_BuzzBomber,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#8,obColType(a0)

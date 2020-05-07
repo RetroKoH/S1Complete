@@ -33,7 +33,7 @@ FBlock_Main:	; Routine 0
 		move.w	#$4000,obGfx(a0)
 		cmpi.b	#id_LZ,(v_zone).w ; check if level is LZ
 		bne.s	@notLZ
-		move.w	#$43C4,obGfx(a0) ; LZ specific code
+		move.w	#ArtNem_LZDoor1,obGfx(a0) ; LZ specific code
 
 	@notLZ:
 		move.b	#4,obRender(a0)

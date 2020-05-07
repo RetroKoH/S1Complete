@@ -21,7 +21,7 @@ bom_parent:	equ $3C		; address of parent object
 Bom_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Bomb,obMap(a0)
-		move.w	#$400,obGfx(a0)
+		move.w	#ArtNem_Bomb,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#$C,obActWid(a0)

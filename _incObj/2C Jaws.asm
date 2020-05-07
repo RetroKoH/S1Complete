@@ -6,7 +6,7 @@ Jaws:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Jaws_Index(pc,d0.w),d1
-		jmp	Jaws_Index(pc,d1.w)
+		jmp		Jaws_Index(pc,d1.w)
 ; ===========================================================================
 Jaws_Index:	dc.w Jaws_Main-Jaws_Index
 		dc.w Jaws_Turn-Jaws_Index
@@ -18,7 +18,7 @@ jaws_timedelay:	equ $32
 Jaws_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Jaws,obMap(a0)
-		move.w	#$2486,obGfx(a0)
+		move.w	#ArtNem_Jaws,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$A,obColType(a0)
 		move.w	#$200,obPriority(a0)

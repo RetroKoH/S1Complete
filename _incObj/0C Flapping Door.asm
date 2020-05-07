@@ -18,7 +18,7 @@ flap_wait:	equ $30		; time until change
 Flap_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Flap,obMap(a0)
-		move.w	#$4328,obGfx(a0)
+		move.w	#ArtNem_LZFlapDoor,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$28,obActWid(a0)
 		moveq	#0,d0

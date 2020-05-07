@@ -1,27 +1,40 @@
 ; ---------------------------------------------------------------------------
 ; Sprite mappings - signpost
 ; ---------------------------------------------------------------------------
-Map_Sign_internal:
-		dc.w @eggman-Map_Sign_internal
-		dc.w @spin1-Map_Sign_internal
-		dc.w @spin2-Map_Sign_internal
-		dc.w @spin3-Map_Sign_internal
-		dc.w @sonic-Map_Sign_internal
-@eggman:	dc.b 3
-		dc.b $F0, $B, 0, 0, $E8
-		dc.b $F0, $B, 8, 0, 0
-		dc.b $10, 1, 0,	$38, $FC
-@spin1:		dc.b 2
-		dc.b $F0, $F, 0, $C, $F0
-		dc.b $10, 1, 0,	$38, $FC
-@spin2:		dc.b 2
-		dc.b $F0, 3, 0,	$1C, $FC
-		dc.b $10, 1, 8,	$38, $FC
-@spin3:		dc.b 2
-		dc.b $F0, $F, 8, $C, $F0
-		dc.b $10, 1, 8,	$38, $FC
-@sonic:		dc.b 3
-		dc.b $F0, $B, 0, $20, $E8
-		dc.b $F0, $B, 0, $2C, 0
-		dc.b $10, 1, 0,	$38, $FC
-		even
+Map_Sign:	mappingsTable
+	mappingsTableEntry.w	@eggman
+	mappingsTableEntry.w	@spin1
+	mappingsTableEntry.w	@spin2
+	mappingsTableEntry.w	@spin3
+	mappingsTableEntry.w	@player
+
+@eggman:	spriteHeader
+	spritePiece	-8, -$10, 1, 3, $E, 0, 0, 0, 0
+	spritePiece	0, -$10, 1, 3, $E, 1, 0, 0, 0
+	spritePiece	-$18, -$10, 3, 4, 0, 0, 0, 1, 0
+	spritePiece	0, -$10, 3, 4, 0, 1, 0, 1, 0
+	spritePiece	-4, $10, 1, 2, $C, 0, 0, 1, 0
+@eggman_End
+
+@spin1:	spriteHeader
+	spritePiece	-$10, -$10, 4, 4, 0, 0, 0, 1, 0
+	spritePiece	-4, $10, 1, 2, $10, 0, 0, 1, 0
+@spin1_End
+
+@spin2:	spriteHeader
+	spritePiece	-4, -$10, 1, 4, 0, 0, 0, 1, 0
+	spritePiece	-4, $10, 1, 2, 4, 1, 0, 1, 0
+@spin2_End
+
+@spin3:	spriteHeader
+	spritePiece	-$10, -$10, 4, 4, 0, 1, 0, 1, 0
+	spritePiece	-4, $10, 1, 2, $10, 1, 0, 1, 0
+@spin3_End
+
+@player:	spriteHeader
+	spritePiece	-$18, -$10, 3, 4, 0, 0, 0, 0, 0
+	spritePiece	0, -$10, 3, 4, $C, 0, 0, 0, 0
+	spritePiece	-4, $10, 1, 2, $18, 0, 0, 0, 0
+@player_End
+
+	even

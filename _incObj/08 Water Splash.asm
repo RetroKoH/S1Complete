@@ -19,7 +19,7 @@ Spla_Main:	; Routine 0
 		ori.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
 		move.b	#$10,obActWid(a0)
-		move.w	#$4259,obGfx(a0)
+		move.w	#ArtNem_Splash,obGfx(a0)
 		move.w	(v_player+obX).w,obX(a0) ; copy x-position from Sonic
 
 Spla_Display:	; Routine 2

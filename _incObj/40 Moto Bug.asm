@@ -6,7 +6,7 @@ MotoBug:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Moto_Index(pc,d0.w),d1
-		jmp	Moto_Index(pc,d1.w)
+		jmp		Moto_Index(pc,d1.w)
 ; ===========================================================================
 Moto_Index:	dc.w Moto_Main-Moto_Index
 		dc.w Moto_Action-Moto_Index
@@ -16,7 +16,7 @@ Moto_Index:	dc.w Moto_Main-Moto_Index
 
 Moto_Main:	; Routine 0
 		move.l	#Map_Moto,obMap(a0)
-		move.w	#$4F0,obGfx(a0)
+		move.w	#ArtNem_Motobug,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$14,obActWid(a0)
@@ -26,11 +26,11 @@ Moto_Main:	; Routine 0
 		move.b	#8,obWidth(a0)
 		move.b	#$C,obColType(a0)
 		bsr.w	ObjectFall
-		jsr	(ObjFloorDist).l
+		jsr		(ObjFloorDist).l
 		tst.w	d1
 		bpl.s	@notonfloor
 		add.w	d1,obY(a0)	; match	object's position with the floor
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0) ; goto Moto_Action next
 		bchg	#0,obStatus(a0)
 
@@ -47,8 +47,8 @@ Moto_Action:	; Routine 2
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
 		move.w	Moto_ActIndex(pc,d0.w),d1
-		jsr	Moto_ActIndex(pc,d1.w)
-		lea	(Ani_Moto).l,a1
+		jsr		Moto_ActIndex(pc,d1.w)
+		lea		(Ani_Moto).l,a1
 		bsr.w	AnimateSprite
 
 		include	"_incObj\sub RememberState.asm" ; Moto_Action terminates in this file
@@ -88,7 +88,7 @@ Moto_ActIndex:	dc.w @move-Moto_ActIndex
 		move.b	#$F,@smokedelay(a0)
 		bsr.w	FindFreeObj
 		bne.s	@nosmoke
-		move.b	#id_MotoBug,0(a1) ; load exhaust smoke object
+		move.b	#id_MotoBug,obID(a1) ; load exhaust smoke object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	obStatus(a0),obStatus(a1)
@@ -100,13 +100,13 @@ Moto_ActIndex:	dc.w @move-Moto_ActIndex
 @pause:
 		subq.b	#2,ob2ndRout(a0)
 		move.w	#59,@time(a0)	; set pause time to 1 second
-		move.w	#0,obVelX(a0)	; stop the object moving
-		move.b	#0,obAnim(a0)
+		clr.w	obVelX(a0)	; stop the object moving
+		clr.b	obAnim(a0)
 		rts	
 ; ===========================================================================
 
 Moto_Animate:	; Routine 4
-		lea	(Ani_Moto).l,a1
+		lea		(Ani_Moto).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
 ; ===========================================================================

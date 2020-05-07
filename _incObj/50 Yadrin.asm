@@ -49,7 +49,7 @@ yad_timedelay:	equ $30
 
 Yad_Main:	; Routine 0
 		move.l	#Map_Yad,obMap(a0)
-		move.w	#$247B,obGfx(a0)
+		move.w	#ArtNem_Yadrin,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$14,obActWid(a0)
@@ -61,7 +61,7 @@ Yad_Main:	; Routine 0
 		tst.w	d1
 		bpl.s	locret_F89E
 		add.w	d1,obY(a0)	; match	object's position with the floor
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 		bchg	#0,obStatus(a0)
 
@@ -112,6 +112,6 @@ Yad_FixToFloor:
 Yad_Pause:
 		subq.b	#2,ob2ndRout(a0)
 		move.w	#59,yad_timedelay(a0) ; set pause time to 1 second
-		move.w	#0,obVelX(a0)
-		move.b	#0,obAnim(a0)
+		clr.w	obVelX(a0)
+		clr.b	obAnim(a0)
 		rts	

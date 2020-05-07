@@ -351,7 +351,7 @@ Art_LevelArt:			equ 0
 
 ; Shared art between zones
 ArtNem_Splash_locVRAM:			equ $5560
-ArtNem_Splash:					equ $4000+(ArtNem_WaterSplash_locVRAM/$20) ; BZ/JZ/LZ
+ArtNem_Splash:					equ $4000+(ArtNem_Splash_locVRAM/$20) ; BZ/JZ/LZ
 
 ArtNem_WaterSurface_locVRAM:	equ $5BE0
 ArtNem_WaterSurface:			equ $C000+(ArtNem_WaterSurface_locVRAM/$20) ; BZ/JZ/LZ
@@ -605,3 +605,59 @@ ArtNem_SBZFlamepipe:			equ $A000+(ArtNem_SBZFlamepipe_locVRAM/$20)
 
 ArtNem_SBZSlideFloor_locVRAM:	equ $98A0
 ArtNem_SBZSlideFloor:			equ $4000+(ArtNem_SBZSlideFloor_locVRAM/$20)
+
+; Global art
+ArtNem_HSpring_locVRAM:			equ $A040
+ArtNem_HSpring_Red:				equ (ArtNem_HSpring_locVRAM/$20)
+ArtNem_HSpring_Yellow:			equ $2000+(ArtNem_HSpring_Red)
+
+ArtNem_VSpring_locVRAM:			equ $A240
+ArtNem_VSpring_Red:				equ (ArtNem_VSpring_locVRAM/$20)
+ArtNem_VSpring_Yellow:			equ $2000+(ArtNem_VSpring_Red)
+
+ArtNem_Lamppost_locVRAM:		equ $A400
+ArtNem_Lamppost:				equ $2000+(ArtNem_Lamppost_locVRAM/$20)
+
+ArtNem_Points_locVRAM:			equ $A540
+ArtNem_Points:					equ $2000+(ArtNem_Points_locVRAM/$20)
+
+ArtNem_Ring_locVRAM:			equ $A660
+ArtNem_Ring:					equ $2000+(ArtNem_Ring_locVRAM/$20)
+
+ArtNem_Spikes_locVRAM:			equ $A8E0
+ArtNem_Spikes:					equ $2000+(ArtNem_Spikes_locVRAM/$20)
+
+ArtUnc_PlayerBonus_locVRAM:		equ $A9E0
+ArtUnc_PlayerBonus:				equ (ArtUnc_PlayerBonus_locVRAM/$20)
+
+ArtNem_GameOver_locVRAM:		equ $AA00
+
+ArtNem_Animal1_locVRAM:			equ $AF80
+ArtNem_Animal1:					equ $2000+(ArtNem_Animal1_locVRAM/$20)
+
+ArtNem_Animal2_locVRAM:			equ $B1C0
+ArtNem_Animal2:					equ $2000+(ArtNem_Animal2_locVRAM/$20)
+
+ArtNem_Explosions_locVRAM:		equ $B400
+ArtNem_Explosions:				equ (ArtNem_Explosions_locVRAM/$20)
+
+ArtNem_Monitors_locVRAM:		equ $D000
+ArtNem_Monitors:				equ (ArtNem_Monitors_locVRAM/$20)
+ArtNem_Signpost:				equ (ArtNem_Monitors)
+
+ArtNem_HUD_locVRAM:				equ $D940
+
+; BOSSES
+ArtNem_Eggman_locVRAM:			equ $7D20	; Eggman main patterns
+ArtNem_Eggman:					equ (ArtNem_Eggman_locVRAM/$20)
+
+ArtNem_Weapons_locVRAM:			equ $8AA0	; Eggman's weapons
+ArtNem_Weapons:					equ $2000+(ArtNem_Weapons_locVRAM/$20)
+
+ArtNem_Prison_locVRAM:			equ $90C0	; prison capsule
+ArtNem_Prison:					equ (ArtNem_Prison_locVRAM/$20)
+
+ArtNem_SLZWeapons_locVRAM:		equ $9FA0	; bomb enemy (gets overwritten by spikeballs, shrapnel is used for SLZ boss)
+ArtNem_SLZWeapons:				equ (ArtNem_SLZWeapons_locVRAM/$20)
+
+ArtNem_Exhaust_locVRAM: 		equ $A260	; exhaust flame

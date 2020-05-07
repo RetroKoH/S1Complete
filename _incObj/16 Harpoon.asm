@@ -18,7 +18,7 @@ harp_time:	equ $30		; time between stabbing/retracting
 Harp_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Harp,obMap(a0)
-		move.w	#$3CC,obGfx(a0)
+		move.w	#ArtNem_LZHarpoon,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	obSubtype(a0),obAnim(a0) ; get type (vert/horiz)

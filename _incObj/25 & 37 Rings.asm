@@ -6,7 +6,7 @@ Rings:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Ring_Index(pc,d0.w),d1
-		jmp	Ring_Index(pc,d1.w)
+		jmp		Ring_Index(pc,d1.w)
 ; ===========================================================================
 Ring_Index:
 ptr_Ring_Main:		dc.w Ring_Main-Ring_Index
@@ -87,7 +87,7 @@ loc_9BBA:
 		move.w	obX(a0),$32(a1)
 		move.w	d3,obY(a1)	; set y-axis position based on d3
 		move.l	#Map_Ring,obMap(a1)
-		move.w	#$27B2,obGfx(a1)
+		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	#$100,obPriority(a1)
 		move.b	#$47,obColType(a1)
@@ -198,14 +198,14 @@ RLoss_Count:	; Routine 0
 		bne.w	@resetcounter
 
 @makerings:
-		move.b	#id_RingLoss,0(a1) ; load bouncing ring object
+		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
 		addq.b	#2,obRoutine(a1)
 		move.b	#8,obHeight(a1)
 		move.b	#8,obWidth(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.l	#Map_Ring,obMap(a1)
-		move.w	#$27B2,obGfx(a1)
+		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	#$180,obPriority(a1)
 		move.b	#$47,obColType(a1)

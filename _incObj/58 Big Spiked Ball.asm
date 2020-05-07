@@ -20,7 +20,7 @@ bball_speed:	equ $3E		; speed
 BBall_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_BBall,obMap(a0)
-		move.w	#$396,obGfx(a0)
+		move.w	#ArtNem_SYZSpike,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$18,obActWid(a0)

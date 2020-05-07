@@ -44,14 +44,14 @@ SStom_Main:	; Routine 0
 
 	@load:
 		move.b	(a2)+,obRoutine(a1)
-		move.b	#id_SideStomp,0(a1)
+		move.b	#id_SideStomp,obID(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	(a2)+,d0
 		ext.w	d0
 		add.w	obX(a0),d0
 		move.w	d0,obX(a1)
 		move.l	#Map_SStom,obMap(a1)
-		move.w	#$300,obGfx(a1)
+		move.w	#ArtNem_MZMetal,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	obX(a1),$30(a1)
 		move.w	obX(a0),$3A(a1)
