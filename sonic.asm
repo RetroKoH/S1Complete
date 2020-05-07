@@ -5384,7 +5384,11 @@ Map_Missile:	include	"_maps\Buzz Bomber Missile.asm"
 
 		include	"_anim\Rings.asm"
 
-Map_Ring:	include	"_maps\Rings.asm"
+		include	"_maps\Rings.asm" ; THESE normal mappings are for debug rings, lost rings, and SS rings
+
+Map_RingBIN:
+		incbin	"_maps\Rings.bin" ; THESE special mappings are for the S2 Rings Manager
+		even
 
 		include	"_maps\Giant Ring.asm"
 		include "_maps\Giant Ring - Dynamic Gfx Script.asm"

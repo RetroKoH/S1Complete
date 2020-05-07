@@ -107,7 +107,7 @@ loc_9C0E:
 		bne.w	DeleteObject
 
 Ring_Animate:	; Routine 2
-		move.b	(v_ani1_frame).w,obFrame(a0) ; set frame
+		move.b	(v_ani2_frame).w,obFrame(a0) ; set frame
 		out_of_range.s	Ring_Delete,$32(a0)
 		bra.w	DisplaySprite
 ; ===========================================================================
