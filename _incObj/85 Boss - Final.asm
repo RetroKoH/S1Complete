@@ -444,6 +444,7 @@ loc_1A248:
 		tst.b	obRender(a0)
 		bmi.s	loc_1A260
 		move.b	#$18,(v_gamemode).w
+		addq.l	#4,sp
 		bra.w	Obj85_Delete
 ; ===========================================================================
 

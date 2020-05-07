@@ -98,13 +98,12 @@ LWall_Solid:	; Routine 2
 		bsr.w	SpeedToPos
 
 	@rangechk:
-		bsr.w	DisplaySprite
 		tst.b	lwall_flag(a0)	; is wall already moving?
 		bne.s	@moving		; if yes, branch
 		out_of_range.s	@chkgone
 
 	@moving:
-		rts	
+		bra.w	DisplaySprite	
 ; ===========================================================================
 
 @chkgone:

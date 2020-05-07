@@ -76,9 +76,8 @@ loc_BDDE:
 		bchg	#1,obFrame(a0)
 
 But_Display:
-		bsr.w	DisplaySprite
 		out_of_range	But_Delete
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 But_Delete:

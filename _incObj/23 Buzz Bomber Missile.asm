@@ -37,7 +37,9 @@ Msl_Main:	; Routine 0
 ; ===========================================================================
 
 Msl_Animate:	; Routine 2
-		bsr.s	Msl_ChkCancel
+		movea.l msl_parent(a0),a1
+		cmpi.b  #id_ExplosionItem,0(a1) ; has Buzz Bomber been destroyed?
+		beq.s   Msl_Delete  ; if yes, branch
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
@@ -66,12 +68,11 @@ Msl_FromBuzz:	; Routine 4
 		bsr.w	SpeedToPos
 		lea	(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	DisplaySprite
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0	; has object moved below the level boundary?
 		bcs.s	Msl_Delete	; if yes, branch
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 	@explode:

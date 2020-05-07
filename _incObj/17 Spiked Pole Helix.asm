@@ -78,7 +78,6 @@ Hel_Build:
 
 Hel_Action:	; Routine 2, 4
 		bsr.w	Hel_RotateSpikes
-		bsr.w	DisplaySprite
 		bra.w	Hel_ChkDel
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -101,7 +100,7 @@ locret_7DA6:
 
 Hel_ChkDel:
 		out_of_range	Hel_DelAll
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Hel_DelAll:

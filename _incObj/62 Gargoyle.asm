@@ -57,7 +57,7 @@ Gar_FireBall:	; Routine 4
 		move.l	#Map_Gar,obMap(a0)
 		move.w	#$2E9,obGfx(a0)
 		ori.b	#4,obRender(a0)
-		move.b	#4,obPriority(a0)
+		move.w	#$200,obPriority(a0)
 		move.b	#$98,obColType(a0)
 		move.b	#8,obActWid(a0)
 		move.b	#2,obFrame(a0)

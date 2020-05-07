@@ -106,10 +106,10 @@ Obj11_BendData2:incbin	"misc\ghzbend2.bin"
 
 Bri_ChkDel:
 		out_of_range	@deletebridge
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
-@deletebridge:
+	@deletebridge:
 		moveq	#0,d2
 		lea	obSubtype(a0),a2 ; load bridge length
 		move.b	(a2)+,d2	; move bridge length to	d2
@@ -129,16 +129,13 @@ Bri_ChkDel:
 	@skipdel:
 		dbf	d2,@loop ; repeat d2 times (bridge length)
 
-@delparent:
-		bsr.w	DeleteObject
-		rts	
+	@delparent:
+		bra.w	DeleteObject	
 ; ===========================================================================
 
 Bri_Delete:	; Routine 6, 8
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject	
 ; ===========================================================================
 
 Bri_Display:	; Routine $A
-		bsr.w	DisplaySprite
-		rts	
+		bra.w	DisplaySprite	

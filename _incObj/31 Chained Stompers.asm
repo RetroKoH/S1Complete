@@ -129,7 +129,6 @@ loc_B798:	; Routine 2
 		movea.l	a2,a0
 
 CStom_Display:
-		bsr.w	DisplaySprite
 		bra.w	CStom_ChkDel
 ; ===========================================================================
 
@@ -150,11 +149,10 @@ loc_B7FE:	; Routine 4
 		move.w	d0,obY(a0)
 
 CStom_Display2:	; Routine 6
-		bsr.w	DisplaySprite
-
+;...
 CStom_ChkDel:
 		out_of_range	DeleteObject
-		rts	
+		bra.w	DisplaySprite	
 ; ===========================================================================
 
 CStom_Types:

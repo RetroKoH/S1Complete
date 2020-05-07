@@ -324,7 +324,9 @@ loc_18BC6:
 
 loc_18BE0:
 		tst.b	obRender(a0)
-		bpl.w	Obj7A_Delete
+		bmi.w   loc_18BE8
+		addq.l  #4,sp
+		bra.w   Obj7A_Delete
 
 loc_18BE8:
 		bsr.w	BossMove

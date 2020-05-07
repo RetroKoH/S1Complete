@@ -359,5 +359,8 @@ Obj7B_MoveFrag:	; Routine $A
 		lsr.w	#2,d0
 		move.b	d0,obFrame(a0)
 		tst.b	1(a0)
-		bpl.w	Obj7A_Delete
+        bmi.s   @locret
+        addq.l  #4,sp
+        bra.w   Obj7A_Delete
+@locret:
 		rts	

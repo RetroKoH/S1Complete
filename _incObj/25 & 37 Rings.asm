@@ -108,9 +108,8 @@ loc_9C0E:
 
 Ring_Animate:	; Routine 2
 		move.b	(v_ani1_frame).w,obFrame(a0) ; set frame
-		bsr.w	DisplaySprite
 		out_of_range.s	Ring_Delete,$32(a0)
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Ring_Collect:	; Routine 4

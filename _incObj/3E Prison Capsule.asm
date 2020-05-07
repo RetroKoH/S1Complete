@@ -191,16 +191,17 @@ Pri_EndAct:	; Routine $E
 		moveq	#$3E,d0
 		moveq	#id_Animals,d1
 		moveq	#$40,d2
-		lea	(v_objspace+$40).w,a1 ; load object RAM
+		lea		(v_objspace+$40).w,a1 ; load object RAM
 
 	@findanimal:
 		cmp.b	(a1),d1		; is object $28	(animal) loaded?
 		beq.s	@found		; if yes, branch
 		adda.w	d2,a1		; next object RAM
-		dbf	d0,@findanimal	; repeat $3E times
+		dbf		d0,@findanimal	; repeat $3E times
 
-		jsr	(GotThroughAct).l
-		jmp	(DeleteObject).l
+		jsr		(GotThroughAct).l
+		addq.l	#4,sp
+		jmp		(DeleteObject).l
 
 	@found:
 		rts	

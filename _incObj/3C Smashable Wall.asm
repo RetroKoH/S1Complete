@@ -6,10 +6,11 @@ SmashWall:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Smash_Index(pc,d0.w),d1
-		jsr	Smash_Index(pc,d1.w)
+		jsr		Smash_Index(pc,d1.w)
 		bra.w	RememberState
 ; ===========================================================================
-Smash_Index:	dc.w Smash_Main-Smash_Index
+Smash_Index:
+		dc.w Smash_Main-Smash_Index
 		dc.w Smash_Solid-Smash_Index
 		dc.w Smash_FragMove-Smash_Index
 
@@ -67,9 +68,9 @@ Smash_Solid:	; Routine 2
 		bsr.s	SmashObject
 
 Smash_FragMove:	; Routine 4
+		addq.l	#4,sp
 		bsr.w	SpeedToPos
 		addi.w	#$70,obVelY(a0)	; make fragment	fall faster
-		bsr.w	DisplaySprite
 		tst.b	obRender(a0)
 		bpl.w	DeleteObject
-		rts	
+		bra.w	DisplaySprite

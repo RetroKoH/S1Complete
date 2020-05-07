@@ -1,7 +1,6 @@
 
 Bri_Platform:	; Routine 4
 		bsr.s	Bri_WalkOff
-		bsr.w	DisplaySprite
 		bra.w	Bri_ChkDel
 
 ; ---------------------------------------------------------------------------
@@ -28,7 +27,7 @@ Bri_WalkOff:
 
 loc_75B6:
 		bsr.w	Bri_Bend
-		bsr.w	Bri_MoveSonic
+		bra.w	Bri_MoveSonic
 
 locret_75BE:
 		rts	

@@ -6,22 +6,22 @@ Signpost:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Sign_Index(pc,d0.w),d1
-		jsr	Sign_Index(pc,d1.w)
-		lea	(Ani_Sign).l,a1
+		jsr		Sign_Index(pc,d1.w)
+		lea		(Ani_Sign).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	DisplaySprite
 		out_of_range	DeleteObject
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
-Sign_Index:	dc.w Sign_Main-Sign_Index
+Sign_Index:
+		dc.w Sign_Main-Sign_Index
 		dc.w Sign_Touch-Sign_Index
 		dc.w Sign_Spin-Sign_Index
 		dc.w Sign_SonicRun-Sign_Index
 		dc.w Sign_Exit-Sign_Index
 
-spintime:	equ $30		; time for signpost to spin
+spintime:		equ $30		; time for signpost to spin
 sparkletime:	equ $32		; time between sparkles
-sparkle_id:	equ $34		; counter to keep track of sparkles
+sparkle_id:		equ $34		; counter to keep track of sparkles
 ; ===========================================================================
 
 Sign_Main:	; Routine 0

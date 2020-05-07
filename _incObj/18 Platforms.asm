@@ -64,7 +64,6 @@ Plat_Solid:	; Routine 2
 Plat_Action:	; Routine 8
 		bsr.w	Plat_Move
 		bsr.w	Plat_Nudge
-		bsr.w	DisplaySprite
 		bra.w	Plat_ChkDel
 ; ===========================================================================
 
@@ -82,10 +81,7 @@ Plat_Action2:	; Routine 4
 		bsr.w	Plat_Nudge
 		move.w	(sp)+,d2
 		bsr.w	MvSonicOnPtfm2
-		bsr.w	DisplaySprite
 		bra.w	Plat_ChkDel
-
-		rts
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	move platform slightly when you	stand on it
@@ -292,7 +288,7 @@ Plat_Move:
 
 Plat_ChkDel:
 		out_of_range.s	Plat_Delete,$32(a0)
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Plat_Delete:	; Routine 6

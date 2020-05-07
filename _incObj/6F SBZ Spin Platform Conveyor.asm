@@ -95,10 +95,11 @@ loc_16378:
 loc_16380:
 		move.b	d0,$2F(a0)
 		andi.w	#$7F,d0
-		lea	(v_obj63).w,a2
+		lea		(v_obj63).w,a2
 		bset	#0,(a2,d0.w)
 		beq.s	loc_1639A
-		jmp	(DeleteObject).l
+		addq.l	#4,sp
+		jmp		(DeleteObject).l
 ; ===========================================================================
 
 loc_1639A:

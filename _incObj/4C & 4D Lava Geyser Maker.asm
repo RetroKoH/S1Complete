@@ -7,7 +7,8 @@ GeyserMaker:
 		move.b	obRoutine(a0),d0
 		move.w	GMake_Index(pc,d0.w),d1
 		jsr	GMake_Index(pc,d1.w)
-		bra.w	Geyser_ChkDel
+        out_of_range    DeleteObject
+        rts
 ; ===========================================================================
 GMake_Index:	dc.w GMake_Main-GMake_Index
 		dc.w GMake_Wait-GMake_Index
@@ -191,8 +192,11 @@ Geyser_Action:	; Routine 2
 		bsr.w	AnimateSprite
 
 Geyser_ChkDel:
-		out_of_range	DeleteObject
-		rts	
+        out_of_range    @delete
+        rts
+@delete:
+        addq.l  #4,sp
+        bra.w   DeleteObject
 ; ===========================================================================
 Geyser_Types:	dc.w Geyser_Type00-Geyser_Types
 		dc.w Geyser_Type01-Geyser_Types
@@ -260,4 +264,5 @@ loc_F04C:
 ; ===========================================================================
 
 Geyser_Delete:	; Routine 6
+		addq.l  #4,sp
 		bra.w	DeleteObject

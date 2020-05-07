@@ -62,7 +62,7 @@ SBall_Main:	; Routine 0
 		bcs.s	@fail
 
 @makechain:
-		bsr.w	FindFreeObj
+		bsr.w	FindNextFreeObj ; Changed from FindFreeObj in order to prevent DisplaySprite bug
 		bne.s	@fail
 		addq.b	#1,sball_childs(a0) ; increment child object counter
 		move.w	a1,d5		; get child object RAM address

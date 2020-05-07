@@ -6,7 +6,7 @@ SmashBlock:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Smab_Index(pc,d0.w),d1
-		jsr	Smab_Index(pc,d1.w)
+		jsr		Smab_Index(pc,d1.w)
 		bra.w	RememberState
 ; ===========================================================================
 Smab_Index:	dc.w Smab_Main-Smab_Index
@@ -86,12 +86,12 @@ sonicAniFrame:	equ $32		; Sonic's current animation number
 		move.b	d2,obFrame(a1)
 
 Smab_Points:	; Routine 4
+		addq.l	#4,sp
 		bsr.w	SpeedToPos
 		addi.w	#$38,obVelY(a0)
-		bsr.w	DisplaySprite
 		tst.b	obRender(a0)
 		bpl.w	DeleteObject
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 Smab_Speeds:	dc.w -$200, -$200	; x-speed, y-speed
 		dc.w -$100, -$100

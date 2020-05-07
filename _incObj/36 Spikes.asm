@@ -100,9 +100,8 @@ loc_CF20:
 		movea.l	(sp)+,a0
 
 Spik_Display:
-		bsr.w	DisplaySprite
 		out_of_range	DeleteObject,spik_origX(a0)
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Spik_Type0x:

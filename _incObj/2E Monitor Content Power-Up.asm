@@ -6,10 +6,10 @@ PowerUp:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Pow_Index(pc,d0.w),d1
-		jsr	Pow_Index(pc,d1.w)
-		bra.w	DisplaySprite
+		jmp		Pow_Index(pc,d1.w)
 ; ===========================================================================
-Pow_Index:	dc.w Pow_Main-Pow_Index
+Pow_Index:
+		dc.w Pow_Main-Pow_Index
 		dc.w Pow_Move-Pow_Index
 		dc.w Pow_Delete-Pow_Index
 ; ===========================================================================
@@ -36,7 +36,7 @@ Pow_Move:	; Routine 2
 		bpl.w	Pow_Checks	; if not, branch
 		bsr.w	SpeedToPos
 		addi.w	#$18,obVelY(a0)	; reduce object	speed
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Pow_Checks:
@@ -139,4 +139,4 @@ Pow_ChkEnd:
 Pow_Delete:	; Routine 4
 		subq.w	#1,obTimeFrame(a0)
 		bmi.w	DeleteObject	; delete after half a second
-		rts	
+		bra.w	DisplaySprite

@@ -80,7 +80,6 @@ SStom_Solid:	; Routine 2
 		move.w	#$20,d3
 		move.w	(sp)+,d4
 		bsr.w	SolidObject
-		bsr.w	DisplaySprite
 		bra.w	SStom_ChkDel
 ; ===========================================================================
 
@@ -105,7 +104,7 @@ SStom_Display:	; Routine 6
 
 SStom_ChkDel:
 		out_of_range	DeleteObject,$3A(a0)
-		rts	
+		bra.w	DisplaySprite
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 

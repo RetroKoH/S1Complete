@@ -40,7 +40,7 @@ Crab_Main:	; Routine 0
 		bpl.s	@floornotfound
 		add.w	d1,obY(a0)
 		move.b	d3,obAngle(a0)
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 
 	@floornotfound:
@@ -207,12 +207,8 @@ Crab_BallMove:	; Routine 8
 		lea	(Ani_Crab).l,a1
 		bsr.w	AnimateSprite
 		bsr.w	ObjectFall
-		bsr.w	DisplaySprite
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
-		cmp.w	obY(a0),d0	; has object moved below the level boundary?
-		bcs.s	@delete		; if yes, branch
-		rts	
-
-	@delete:
-		bra.w	DeleteObject
+		cmp.w	obY(a0),d0		; has object moved below the level boundary?
+		bcs.w	DeleteObject	; if yes, branch
+		bra.w	DisplaySprite	

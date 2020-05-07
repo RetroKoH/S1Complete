@@ -78,7 +78,6 @@ Bri_Action:	; Routine 2
 		bsr.w	Bri_Bend
 
 	@display:
-		bsr.w	DisplaySprite
 		bra.w	Bri_ChkDel
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||

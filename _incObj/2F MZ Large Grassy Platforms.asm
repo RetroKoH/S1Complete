@@ -82,7 +82,6 @@ loc_AF8E:
 		bsr.w	SolidObject2F
 
 LGrass_Display:
-		bsr.w	DisplaySprite
 		bra.w	LGrass_ChkDel
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -232,7 +231,7 @@ LGrass_ChkDel:
 
 loc_B0C6:
 		out_of_range	DeleteObject,lgrass_origX(a0)
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 LGrass_DelFlames:

@@ -7,7 +7,7 @@ MagicSwitch:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Swi_Index(pc,d0.w),d1
-		jmp	Swi_Index(pc,d1.w)
+		jmp		Swi_Index(pc,d1.w)
 ; ===========================================================================
 Swi_Index:	dc.w Swi_Main-Swi_Index
 		dc.w Swi_Action-Swi_Index
@@ -36,9 +36,8 @@ Swi_Action:	; Routine 2
 		move.w	d0,(f_switch).w	; set switch 0 as "pressed"
 
 Swi_ChkDel:
-		bsr.w	DisplaySprite
 		out_of_range	Swi_Delete
-		rts	
+		bra.w	DisplaySprite
 ; ===========================================================================
 
 Swi_Delete:	; Routine 4
