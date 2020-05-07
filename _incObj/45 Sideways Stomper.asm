@@ -14,11 +14,12 @@ SStom_Index:	dc.w SStom_Main-SStom_Index
 		dc.w SStom_Display-SStom_Index
 		dc.w SStom_Pole-SStom_Index
 
-		;	routine		frame
-		;		 xpos
-SStom_Var:	dc.b	2,  	 4,	0	; main block
+		;	routine		  frame
+		;		    xpos
+SStom_Var:
+		dc.b	2,     4,	0	; main block
 		dc.b	4,	-$1C,	1	; spikes
-		dc.b	8,	 $34,	3	; pole
+		dc.b	8,	 $54,	3	; pole
 		dc.b	6,	 $28,	2	; wall bracket
 
 ;word_B9BE:	; Note that this indicates three subtypes
@@ -110,21 +111,6 @@ SStom_ChkDel:
 
 
 SStom_Move:
-		moveq	#0,d0
-		move.b	obSubtype(a0),d0
-		add.w	d0,d0
-		move.w	off_BAD6(pc,d0.w),d1
-		jmp	off_BAD6(pc,d1.w)
-; End of function SStom_Move
-
-; ===========================================================================
-		; This indicates only two subtypes... that do the same thing
-		; Compare to SStom_Len. This breaks subtype 02
-off_BAD6:	dc.w loc_BADA-off_BAD6
-		dc.w loc_BADA-off_BAD6
-; ===========================================================================
-
-loc_BADA:
 		tst.w	$36(a0)
 		beq.s	loc_BB08
 		tst.w	$38(a0)
