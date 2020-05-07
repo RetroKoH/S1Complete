@@ -517,9 +517,13 @@ Obj09_Chk1Up:
 		move.l	a1,4(a2)
 
 Obj09_Get1Up:
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm
 		addq.b	#1,(v_lives).w	; add 1 to number of lives
 		addq.b	#1,(f_lifecount).w ; update the lives counter
-		music	bgm_ExtraLife,0,0,0	; play extra life music
+
+	@playbgm:
+		music	bgm_ExtraLife,1,0,0	; play extra life music
 		moveq	#0,d4
 		rts	
 ; ===========================================================================

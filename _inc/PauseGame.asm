@@ -55,16 +55,18 @@ Pause_DoNothing:
 ; ===========================================================================
 
 Pause_Reset: ; Iso Kilo; Concept by luluco
-        cmp.b	#1,(v_lives).w			; Check if you only have 1 life
-        beq.s	@ret					; If so branch (This way you don't get 0 lives and then underflow)
-        addq.b	#1,(f_lifecount).w		; update lives counter
-        subq.b	#1,(v_lives).w			; subtract 1 from number of lives
-        move.b	#0,(v_lastlamp).w		; clear lamppost counter
-        move.b	#1,(f_restart).w		; Set the level reset flag
-        move.b	#$80,(f_pausemusic).w 	; Unpause music
-        clr.w	(f_pause).w
+		cmp.b	#1,(v_lives).w			; Check if you only have 1 life
+		beq.s	@ret					; If so branch (This way you don't get 0 lives and then underflow)
+		cmp.b	#id_Sonic_Death,(v_player+obRoutine).w
+		bge.s	@ret
+		addq.b	#1,(f_lifecount).w		; update lives counter
+		subq.b	#1,(v_lives).w			; subtract 1 from number of lives
+		move.b	#0,(v_lastlamp).w		; clear lamppost counter
+		move.b	#1,(f_restart).w		; Set the level reset flag
+		move.b	#$80,(f_pausemusic).w 	; Unpause music
+		clr.w	(f_pause).w
 	@ret:
-        rts 
+		rts 
 
 Pause_SlowMo:
 		move.w	#1,(f_pause).w

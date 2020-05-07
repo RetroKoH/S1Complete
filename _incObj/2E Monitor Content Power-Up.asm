@@ -55,8 +55,11 @@ Pow_ChkSonic:
 		bne.s	Pow_ChkShoes
 
 	ExtraLife:
-		addq.b	#1,(v_lives).w	; add 1 to the number of lives you have
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm
+		addq.b	#1,(v_lives).w	; add 1 to number of lives
 		addq.b	#1,(f_lifecount).w ; update the lives counter
+	@playbgm:
 		music	bgm_ExtraLife,1,0,0	; play extra life music
 ; ===========================================================================
 

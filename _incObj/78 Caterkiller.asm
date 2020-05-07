@@ -16,7 +16,7 @@ Cat_Index:	dc.w Cat_Main-Cat_Index
 		dc.w Cat_Delete-Cat_Index
 		dc.w loc_16CC0-Cat_Index
 
-catIntertia: equ $1E
+catIntertia: equ $14
 cat_parent:	equ $3C		; address of parent object
 ; ===========================================================================
 

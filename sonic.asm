@@ -7988,8 +7988,11 @@ AddPoints:
 		blo.s   @noextralife ; if not, branch
 
 		addi.l  #5000,(v_scorelife).w ; increase requirement by 50000
-		addq.b  #1,(v_lives).w ; give extra life
-		addq.b  #1,(f_lifecount).w
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm
+		addq.b	#1,(v_lives).w	; add 1 to number of lives
+		addq.b	#1,(f_lifecount).w ; update the lives counter
+	@playbgm:
 		music	bgm_ExtraLife,1,0,0
 
 @locret_1C6B6:

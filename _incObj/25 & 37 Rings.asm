@@ -149,8 +149,11 @@ CollectRing:
 		bne.s	@playsnd
 
 	@got100:
-		addq.b	#1,(v_lives).w	; add 1 to the number of lives you have
+		cmpi.b	#$63,(v_lives).w	; are lives at max?
+		beq.s	@playbgm
+		addq.b	#1,(v_lives).w	; add 1 to number of lives
 		addq.b	#1,(f_lifecount).w ; update the lives counter
+	@playbgm:
 		move.w	#bgm_ExtraLife,d0 ; play extra life music
 
 	@playsnd:
