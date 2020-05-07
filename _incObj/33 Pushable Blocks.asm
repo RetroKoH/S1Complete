@@ -40,7 +40,7 @@ PushB_Main:	; Routine 0
 		move.b	(a2)+,obFrame(a0)
 		tst.b	obSubtype(a0)
 		beq.s	@chkgone
-		move.w	#$C2B8,obGfx(a0)
+		move.w	#ArtNem_MZBlock_Long,obGfx(a0)
 
 	@chkgone:
 		lea	(v_objstate).w,a2
