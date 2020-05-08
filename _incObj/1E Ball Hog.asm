@@ -18,7 +18,7 @@ Hog_Main:	; Routine 0
 		move.b	#$13,obHeight(a0)
 		move.b	#8,obWidth(a0)
 		move.l	#Map_Hog,obMap(a0)
-		move.w	#$2302,obGfx(a0)
+		move.w	#ArtNem_Ballhog,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#5,obColType(a0)
@@ -28,7 +28,7 @@ Hog_Main:	; Routine 0
 		tst.w	d1
 		bpl.s	@floornotfound
 		add.w	d1,obY(a0)
-		move.w	#0,obVelY(a0)
+		clr.w	obVelY(a0)
 		addq.b	#2,obRoutine(a0)
 
 	@floornotfound:
@@ -56,7 +56,7 @@ Hog_Action:	; Routine 2
 		move.b	#1,hog_launchflag(a0)
 		bsr.w	FindFreeObj
 		bne.s	@fail
-		move.b	#id_Cannonball,0(a1) ; load cannonball object ($20)
+		move.b	#id_Cannonball,obID(a1) ; load cannonball object ($20)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	#-$100,obVelX(a1) ; cannonball bounces to the left

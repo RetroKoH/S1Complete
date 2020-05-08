@@ -224,7 +224,7 @@ v_lani4_frame:	equ $FFFFF7B8	; level graphics animation 4 - current frame
 v_lani4_time:	equ $FFFFF7B9	; level graphics animation 4 - time until next frame
 v_lani5_frame:	equ $FFFFF7BA	; level graphics animation 5 - current frame
 v_lani5_time:	equ $FFFFF7BB	; level graphics animation 5 - time until next frame
-v_gfxbigring:	equ $FFFFF7BE	; settings for giant ring graphics loading (2 bytes)
+				; equ $FFFFF7BE	; (2 bytes free )
 f_conveyrev:	equ $FFFFF7C0	; flag set to reverse conveyor belts in LZ/SBZ
 v_obj63:		equ $FFFFF7C1	; object 63 (LZ/SBZ platforms) variables (6 bytes)
 f_wtunnelmode:	equ $FFFFF7C7	; LZ water tunnel mode

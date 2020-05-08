@@ -18,7 +18,7 @@ Cbal_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.b	#7,obHeight(a0)
 		move.l	#Map_Hog,obMap(a0)
-		move.w	#$2302,obGfx(a0)
+		move.w	#ArtNem_Ballhog,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#$87,obColType(a0)
@@ -58,8 +58,7 @@ Cbal_ChkExplode:
 		bpl.s	Cbal_Animate	; if time is > 0, branch
 
 	Cbal_Explode:
-		move.b	#id_MissileDissolve,0(a0)
-		move.b	#id_ExplosionBomb,0(a0)	; change object	to an explosion	($3F)
+		move.b	#id_ExplosionBomb,obID(a0)	; change object	to an explosion	($3F)
 		move.b	#0,obRoutine(a0) ; reset routine counter
 		bra.w	ExplosionBomb	; jump to explosion code
 ; ===========================================================================

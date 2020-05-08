@@ -6,7 +6,7 @@ SpinConvey:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	SpinC_Index(pc,d0.w),d1
-		jsr	SpinC_Index(pc,d1.w)
+		jsr		SpinC_Index(pc,d1.w)
 		out_of_range.s	loc_1629A,$30(a0)
 
 SpinC_Display:
@@ -38,7 +38,7 @@ SpinC_Main:	; Routine 0
 		bmi.w	loc_16380
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Spin,obMap(a0)
-		move.w	#$4DF,obGfx(a0)
+		move.w	#ArtNem_SBZSpinPlatfm,obGfx(a0)
 		move.b	#$10,obActWid(a0)
 		ori.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)

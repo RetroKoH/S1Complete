@@ -18,7 +18,7 @@ disc_origY:	equ $30		; original y-axis position
 Disc_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Disc,obMap(a0)
-		move.w	#$C344,obGfx(a0)
+		move.w	#ArtNem_SBZWheel1,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#8,obActWid(a0)
@@ -87,11 +87,11 @@ loc_155B8:
 		move.b	#1,$3A(a0)
 		btst	#2,obStatus(a1)
 		bne.s	loc_155D0
-		clr.b	obAnim(a1)
+		move.b	#aniID_Walk,obAnim(a1)
 
 loc_155D0:
 		bclr	#5,obStatus(a1)
-		move.b	#1,obNextAni(a1)
+		move.b	#aniID_Run,obNextAni(a1)
 		move.b	#1,$38(a1)
 
 loc_155E2:
