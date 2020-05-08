@@ -125,7 +125,14 @@ Spring_BounceLR:
 	Spring_Flipped:
 		move.w	#$F,$3E(a1)
 		move.w	obVelX(a1),obInertia(a1)
-		bchg	#0,obStatus(a1)
+
+		tst.w	x_vel(a1)		; which way is Sonic facing
+		bmi.s	Face_Left		; if Sonic is running left, branch
+		bclr	#0,status(a1)
+		bra.s	Face_Cont
+	Face_Left:
+		bset	#0,obStatus(a1) ;instead of bchg, we set or clear it as necessary
+	Face_Cont: ; End of fix
 		btst	#2,obStatus(a1)
 		bne.s	loc_DC56
 		move.b	#aniID_Walk,obAnim(a1)	; use walking animation
