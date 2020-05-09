@@ -169,9 +169,10 @@ RingLoss:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	RLoss_Index(pc,d0.w),d1
-		jmp	RLoss_Index(pc,d1.w)
+		jmp		RLoss_Index(pc,d1.w)
 ; ===========================================================================
-RLoss_Index:	dc.w RLoss_Count-RLoss_Index
+RLoss_Index:
+		dc.w RLoss_Count-RLoss_Index
 		dc.w RLoss_Bounce-RLoss_Index
 		dc.w RLoss_Collect-RLoss_Index
 		dc.w RLoss_Sparkle-RLoss_Index
@@ -181,23 +182,25 @@ RLoss_Index:	dc.w RLoss_Count-RLoss_Index
 RLoss_Count:	; Routine 0
 		movea.l	a0,a1
 		moveq	#0,d5
-		move.w	(v_rings).w,d5	; check number of rings you have
+		move.w	(v_rings).w,d5		; check number of rings you have
+		lea		SpillRingData,a3	; load the address of the array in a3
 		moveq	#32,d0
+ 		lea     (v_player).w,a2			; a2=character
+		btst    #staWater,status(a2)	; is Sonic underwater?
+		beq.s   @abovewater				; if not, branch
+		lea		SpillRingData_Water,a3	; load the address of the array in a3
+
+	@abovewater:
 		cmp.w	d0,d5		; do you have 32 or more?
 		bcs.s	@belowmax	; if not, branch
 		move.w	d0,d5		; if yes, set d5 to 32
 
 	@belowmax:
-		subq.w	#1,d5
-		move.w	#$288,d4
-		bra.s	@makerings
-; ===========================================================================
+		subq.w	#1,d5		; decrease the counter the first time, as we are creating the first ring now.
+		; Calculate? Nope. We arent doing that anymore.
+		; Loop through Object RAM? Screw that noise!
 
-	@loop:
-		bsr.w	FindFreeObj
-		bne.w	@resetcounter
-
-@makerings:
+; Create the first instance, then loop create the others afterward.
 		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
 		addq.b	#2,obRoutine(a1)
 		move.b	#8,obHeight(a1)
@@ -207,34 +210,42 @@ RLoss_Count:	; Routine 0
 		move.l	#Map_Ring,obMap(a1)
 		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
-		move.w	#$180,obPriority(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
-		tst.w	d4
-		bmi.s	@loc_9D62
-		move.w	d4,d0
-		bsr.w	CalcSine
-		move.w	d4,d2
-		lsr.w	#8,d2
-		asl.w	d2,d0
-		asl.w	d2,d1
-		move.w	d0,d2
-		move.w	d1,d3
-		addi.b	#$10,d4
-		bcc.s	@loc_9D62
-		subi.w	#$80,d4
-		bcc.s	@loc_9D62
-		move.w	#$288,d4
+		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
+		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
+		subq	#1,d5				; decrement for the first ring created
+		bmi.s	@resetcounter		; if only one ring is needed, branch and skip EVERYTHING below altogether
+		; Here we begin what's replacing SingleObjLoad, in order to avoid resetting its d0 every time an object is created.
+		lea		(v_lvlobjspace).w,a1
+		move.w	#$5F,d0
 
-	@loc_9D62:
-		move.w	d2,obVelX(a1)
-		move.w	d3,obVelY(a1)
-		neg.w	d2
-		neg.w	d4
-		dbf	d5,@loop	; repeat for number of rings (max 31)
+	@loop:
+		;bsr.w	FindFreeObj - REMOVE THIS. It's the routine that causes such slowdown
+		tst.b	(a1)
+		beq.s	@makerings	; Let's correct the branches. Here we can also skip the bne that was originally after bsr.w FindFreeObj because we already know there's a free object slot in memory.
+		lea		$40(a1),a1
+		dbf		d0,@loop	; Branch correction again.
+		bne.s	@resetcounter	; We're moving this line here.
+
+	@makerings:
+		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
+		addq.b	#2,obRoutine(a1)
+		move.b	#8,obHeight(a1)
+		move.b	#8,obWidth(a1)
+		move.w	obX(a0),obX(a1)
+		move.w	obY(a0),obY(a1)
+		move.l	#Map_Ring,obMap(a1)
+		move.w	#ArtNem_Ring,obGfx(a1)
+		move.b	#4,obRender(a1)
+		move.b	#$47,obColType(a1)
+		move.b	#8,obActWid(a1)
+		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
+		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
+		dbf		d5,@loop			; repeat for number of rings (max 31)
 
 	@resetcounter:
-		move.w	#0,(v_rings).w	; reset number of rings to zero
+		clr.w	(v_rings).w	; reset number of rings to zero
 		move.b	#$80,(f_ringcount).w ; update ring counter
 		move.b	#0,(v_lifecount).w
 		moveq   #-1,d0					; Move #-1 to d0
@@ -246,6 +257,15 @@ RLoss_Bounce:	; Routine 2
 		move.b	(v_ani3_frame).w,obFrame(a0)
 		bsr.w	SpeedToPos
 		addi.w	#$18,obVelY(a0)
+
+		tst.b   (f_water).w             ; Does the level have water?
+		beq.s   @skipbounceslow         ; If not, branch and skip underwater checks
+		move.w  (v_waterpos1).w,d6      ; Move water level to d6
+		cmp.w   obVelY(a0),d6           ; Is the ring object underneath the water level?
+		bgt.s   @skipbounceslow         ; If not, branch and skip underwater commands
+		subi.w  #$E,obVelY(a0)          ; Reduce gravity by $E ($18-$E=$A), giving the underwater effect
+
+	@skipbounceslow:
 		bmi.s	@chkdel
 		move.b	(v_vbla_byte).w,d0
 		add.b	d7,d0
@@ -264,30 +284,88 @@ RLoss_Bounce:	; Routine 2
 		subq.b	#1,obDelayAni(a0)		; Decrement timer
 		beq.w	DeleteObject			; if 0, delete
 		cmpi.w	#$FF00,(v_limittop2).w	; is vertical wrapping enabled?
-		beq.w	DisplaySprite			; if so, branch, to avoid deletion of Scattered Rings
+		beq.s	@chkflash				; if so, branch, to avoid deletion of Scattered Rings
+;loc_121B8:
 		move.w	(v_limitbtm2).w,d0
 		addi.w	#$E0,d0
 		cmp.w	obY(a0),d0				; has object moved below level boundary?
 		bcs.s	RLoss_Delete			; if yes, branch
+
+	@chkflash:
 		move.b	obDelayAni(a0),d0
-		btst	#1,d0
-		beq.w	DisplaySprite
+		btst	#0,d0
+		beq.s	RLoss_DisplaySprite
 		cmpi.b	#80,d0 					; within the last 80 frames of life, rings flash
-		bhi.w	DisplaySprite
+		bhi.s	RLoss_DisplaySprite
 		rts
+; ===========================================================================
+
+RLoss_DisplaySprite:
+		lea	(v_spritequeue+$180).w,a1	; immediately jump to position in queue
+		cmpi.w	#$7E,(a1)			; is this part of the queue full?
+		bcc.s	@full				; if yes, branch
+		addq.w	#2,(a1)				; increment sprite count
+		adda.w	(a1),a1				; jump to empty position
+		move.w	a0,(a1)				; insert RAM address for object
+
+	@full:
+		rts	
 ; ===========================================================================
 
 RLoss_Collect:	; Routine 4
 		addq.b	#2,obRoutine(a0)
 		clr.b	obColType(a0)
-		move.w	#$80,obPriority(a0)
 		bsr.w	CollectRing
 
 RLoss_Sparkle:	; Routine 6
 		lea		(Ani_Ring).l,a1
 		bsr.w	AnimateSprite
-		bra.w	DisplaySprite
+		;bra.w	RLoss_DisplaySparkle
+; ===========================================================================
+
+RLoss_DisplaySparkle:
+		lea	(v_spritequeue+$80).w,a1	; immediately jump to position in queue
+		cmpi.w	#$7E,(a1)			; is this part of the queue full?
+		bcc.s	@full				; if yes, branch
+		addq.w	#2,(a1)				; increment sprite count
+		adda.w	(a1),a1				; jump to empty position
+		move.w	a0,(a1)				; insert RAM address for object
+
+	@full:
+		rts	
 ; ===========================================================================
 
 RLoss_Delete:	; Routine 8
 		bra.w	DeleteObject
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Ring Spawn Array
+; ---------------------------------------------------------------------------
+
+SpillRingData:  dc.w    $FF3C,$FC14, $00C4,$FC14, $FDC8,$FCB0, $0238,$FCB0 ; 4
+                dc.w    $FCB0,$FDC8, $0350,$FDC8, $FC14,$FF3C, $03EC,$FF3C ; 8
+                dc.w    $FC14,$00C4, $03EC,$00C4, $FCB0,$0238, $0350,$0238 ; 12
+                dc.w    $FDC8,$0350, $0238,$0350, $FF3C,$03EC, $00C4,$03EC ; 16
+                dc.w    $FF9E,$FE0A, $0062,$FE0A, $FEE4,$FE58, $011C,$FE58 ; 20
+                dc.w    $FE58,$FEE4, $01A8,$FEE4, $FE0A,$FF9E, $01F6,$FF9E ; 24
+                dc.w    $FE0A,$0062, $01F6,$0062, $FE58,$011C, $01A8,$011C ; 28
+                dc.w    $FEE4,$01A8, $011C,$01A8, $FF9E,$0156, $0062,$0156 ; 32
+                even
+; ===========================================================================
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Ring Spawn Array - Underwater
+; ---------------------------------------------------------------------------
+
+SpillRingData_Water:
+				dc.w    $FF9C,$FE08, $0064,$FE08, $FEE4,$FE58, $011C,$FE58 ; 4
+                dc.w    $FE58,$FEE4, $01A8,$FEE4, $FE08,$FF9C, $01F8,$FF9C ; 8
+                dc.w    $FE08,$0060, $01F8,$0060, $FE58,$011C, $01A8,$011C ; 12
+                dc.w    $FEE4,$01A8, $011C,$01A8, $FF9C,$01F4, $0064,$01F4 ; 16
+                dc.w    $FFCE,$FF04, $0032,$FF04, $FF72,$FF2C, $008E,$FF2C ; 20
+                dc.w    $FF2C,$FF72, $00D4,$FF72, $FF04,$FFCE, $00FC,$FFCE ; 24
+                dc.w    $FF04,$0030, $00FC,$0030, $FF2C,$008E, $00D4,$008E ; 28
+                dc.w    $FF72,$00D4, $008E,$00D4, $FFCE,$00FA, $0032,$00FA ; 32
+                even
+; ===========================================================================

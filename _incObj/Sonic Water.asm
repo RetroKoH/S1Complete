@@ -17,6 +17,10 @@ Sonic_Water:
 		move.w	(v_waterpos1).w,d0
 		cmp.w	obY(a0),d0	; is Sonic above the water?
 		bge.s	@abovewater	; if yes, branch
+
+		tst.w	obVelY(a0)	; check if player is moving upward (i.e. from jumping)
+		bmi.s	@exit		; if yes, skip routine
+
 		bset	#6,obStatus(a0)
 		bne.s	@exit
 		bsr.w	ResumeMusic
@@ -24,12 +28,12 @@ Sonic_Water:
 		move.b	#$81,(v_objspace+$340+obSubtype).w
 		lea     (v_sonspeedmax).w,a2  ; Load Sonic_top_speed into a2
 		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
-		asr	obVelX(a0)
-		asr	obVelY(a0)
-		asr	obVelY(a0)	; slow Sonic
+		asr		obVelX(a0)
+		asr		obVelY(a0)
+		asr		obVelY(a0)	; slow Sonic
 		beq.s	@exit		; branch if Sonic stops moving
 		move.b	#id_Splash,(v_objspace+$300).w ; load splash object
-		sfx	sfx_Splash,1,0,0	 ; play splash sound
+		sfx		sfx_Splash,1,0,0	 ; play splash sound
 ; ===========================================================================
 
 @abovewater:
