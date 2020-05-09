@@ -4783,17 +4783,17 @@ DrawChunks:
  
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 LoadLevelArt:
-        move.w  d0,-(sp)        ; store level ID to stack
-        lsl.w   #2,d0           ; shift 2 bits left
-        move.l  LLA_ArtList(pc,d0.w),a0 ; get correct entry from art file list
+        move.w  d0,-(sp)        			; store level ID to stack
+        lsl.w   #2,d0           			; shift 2 bits left
+        move.l  LLA_ArtList(pc,d0.w),a0 	; get correct entry from art file list
  
-        move.l  #$40000000,d4       ; set "VRAM Write to $0000"
-        bsr.w   LoadCompArt     ; load comper compressed art
-        move.w  (sp)+,d0        ; get old level ID from stack again
-        rts          		    ; return to subroutine
+        move.l  #$40000000,d4       		; set "VRAM Write to $0000"
+        bsr.w   LoadCompArt     			; load comper compressed art
+        move.w  (sp)+,d0        			; get old level ID from stack again
+        rts          		    			; return to subroutine
  
         ; list of art patterns used in levels
-LLA_ArtList:    dc.l LvlArt_GHZ, LvlArt_LZ, LvlArt_MZ, LvlArt_SLZ, LvlArt_SYZ, LvlArt_SBZ, LvlArt_GHZ
+LLA_ArtList:    dc.l LvlArt_GHZ, LvlArt_LZ, LvlArt_MZ, LvlArt_SLZ, LvlArt_SYZ, LvlArt_SBZ, LvlArt_GHZ, LvlArt_SBZ3
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to load basic level data
@@ -4805,10 +4805,15 @@ LLA_ArtList:    dc.l LvlArt_GHZ, LvlArt_LZ, LvlArt_MZ, LvlArt_SLZ, LvlArt_SYZ, L
 LevelDataLoad:
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
-		bsr.s   LoadLevelArt        ; load level tiles
+		cmpi.w	#(id_LZ<<8)+3,(v_zone).w	; is level SBZ3 (LZ4) ?
+		bne.s	@notSB3Art					; if not, branch
+		moveq	#$7,d0						; use SB3 art
+
+	@notSB3Art:
+		bsr.s   LoadLevelArt		; load level tiles
 		lsl.w	#4,d0
-		lea	(LevelHeaders).l,a2
-		lea	(a2,d0.w),a2
+		lea		(LevelHeaders).l,a2
+		lea		(a2,d0.w),a2
 		move.l	a2,-(sp)
 		addq.l	#4,a2
 
@@ -8428,6 +8433,13 @@ LvlArt_SBZ:	incbin	"lvlart\SBZ.bin"	; SBZ primary patterns
 Blk16_SBZ:	incbin	"map16\SBZ.bin"
 		even
 Blk128_SBZ:	incbin	"map128\SBZ.bin"
+		even
+; Exclusive Act 3 Art
+LvlArt_SBZ3:	incbin	"lvlart\SBZ3.bin"	; SBZ Act 3 primary patterns
+		even
+Blk16_SBZ3:	incbin	"map16\SBZ3.bin"
+		even
+Blk128_SBZ3:	incbin	"map128\SBZ3.bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - bosses and ending sequence
