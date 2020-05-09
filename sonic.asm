@@ -5112,10 +5112,10 @@ Map_GBall:	include	"_maps\GHZ Ball.asm"
 ; ===========================================================================
 
 Ledge_Fragment:
-		move.b	#0,ledge_collapse_flag(a0)
+		clr.b	ledge_collapse_flag(a0)
 
 loc_847A:
-		lea	(CFlo_Data1).l,a4
+		lea		(CFlo_Data1).l,a4
 		moveq	#$18,d1
 		addq.b	#2,obFrame(a0)
 
@@ -5127,20 +5127,12 @@ loc_8486:
 		adda.w	(a3,d0.w),a3
 		addq.w	#1,a3
 		bset	#5,obRender(a0)
-		move.b	0(a0),d4
+		move.b	obID(a0),d4
 		move.b	obRender(a0),d5
 		movea.l	a0,a1
-		bra.s	loc_84B2
-; ===========================================================================
-
-loc_84AA:
-		bsr.w	FindFreeObj
-		bne.s	loc_84F2
-		addq.w	#5,a3
-
-loc_84B2:
+; SpirituInsanum Fix. Similar to what was applied to Lost Rings
 		move.b	#6,obRoutine(a1)
-		move.b	d4,0(a1)
+		move.b	d4,obID(a1)
 		move.l	a3,obMap(a1)
 		move.b	d5,obRender(a1)
 		move.w	obX(a0),obX(a1)
@@ -5149,8 +5141,39 @@ loc_84B2:
 		move.w	obPriority(a0),obPriority(a1)
 		move.b	obActWid(a0),obActWid(a1)
 		move.b	(a4)+,ledge_timedelay(a1)
-		cmpa.l	a0,a1
-		bhs.s	loc_84EE
+		; Now since we created one object already, we have to decrease the counter
+		subq.w	#1,d1
+		; Here we begin what's replacing SingleObjLoad, in order to avoid resetting its d0 every time an object is created.
+		lea		(v_lvlobjspace).w,a1
+		move.w	#$5F,d0
+; ===========================================================================
+
+loc_84AA:
+		;bsr.w	FindFreeObj - REMOVE THIS. It's the routine that causes such slowdown
+		; We'll just copy/paste the content of loc_DA94 and correct the branches.
+	@loop:
+		tst.b	(a1)
+		beq.s	@cont		; Let's correct the branches. Here we can also skip the bne that was originally after bsr.w FindFreeObj because we already know there's a free object slot in memory.
+		lea		$40(a1),a1
+		dbf		d0,@loop	; Branch correction again.
+		bne.s	loc_84F2	; We're moving this line here.
+	@cont:
+	; And that's it, copy/paste complete.
+		addq.w	#5,a3
+
+loc_84B2:
+		move.b	#6,obRoutine(a1)
+		move.b	d4,obID(a1)
+		move.l	a3,obMap(a1)
+		move.b	d5,obRender(a1)
+		move.w	obX(a0),obX(a1)
+		move.w	obY(a0),obY(a1)
+		move.w	obGfx(a0),obGfx(a1)
+		move.w	obPriority(a0),obPriority(a1)
+		move.b	obActWid(a0),obActWid(a1)
+		move.b	(a4)+,ledge_timedelay(a1)
+		;cmpa.l	a0,a1                     ; Finally, this isn't necessary anymore, its only purpose was to skip DisplaySprite2 on the first object
+		;bhs.s	loc_84EE
 		bsr.w	DisplaySprite1
 
 loc_84EE:
@@ -5158,7 +5181,7 @@ loc_84EE:
 
 loc_84F2:
 		bsr.w	DisplaySprite
-		sfx	sfx_Collapse,1,0,0	; play collapsing sound
+		sfx		sfx_Collapse,1,0,0	; play collapsing sound
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Disintegration data for collapsing ledges (MZ, SLZ, SBZ)
