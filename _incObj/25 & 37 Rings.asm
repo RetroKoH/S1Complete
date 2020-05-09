@@ -203,8 +203,9 @@ RLoss_Count:	; Routine 0
 ; Create the first instance, then loop create the others afterward.
 		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
 		addq.b	#2,obRoutine(a1)
-		move.b	#8,obHeight(a1)
-		move.b	#8,obWidth(a1)
+		move.w	#808,obHeight(a1) ; Height and Width
+;		move.b	#8,obHeight(a1)
+;		move.b	#8,obWidth(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.l	#Map_Ring,obMap(a1)
@@ -212,8 +213,9 @@ RLoss_Count:	; Routine 0
 		move.b	#4,obRender(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
-		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
-		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
+		move.l	(a3)+,obVelX(a1)	; move the data contained in the array to the speed data. Increment a3
+;		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
+;		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
 		subq	#1,d5				; decrement for the first ring created
 		bmi.s	@resetcounter		; if only one ring is needed, branch and skip EVERYTHING below altogether
 		; Here we begin what's replacing SingleObjLoad, in order to avoid resetting its d0 every time an object is created.
@@ -231,8 +233,9 @@ RLoss_Count:	; Routine 0
 	@makerings:
 		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
 		addq.b	#2,obRoutine(a1)
-		move.b	#8,obHeight(a1)
-		move.b	#8,obWidth(a1)
+		move.w	#808,obHeight(a1) ; Height and Width
+;		move.b	#8,obHeight(a1)
+;		move.b	#8,obWidth(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.l	#Map_Ring,obMap(a1)
@@ -240,14 +243,15 @@ RLoss_Count:	; Routine 0
 		move.b	#4,obRender(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
-		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
-		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
+		move.l	(a3)+,obVelX(a1)	; move the data contained in the array to the speed data. Increment a3
+;		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
+;		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
 		dbf		d5,@loop			; repeat for number of rings (max 31)
 
 	@resetcounter:
 		clr.w	(v_rings).w	; reset number of rings to zero
 		move.b	#$80,(f_ringcount).w ; update ring counter
-		move.b	#0,(v_lifecount).w
+		clr.b	(v_lifecount).w
 		moveq   #-1,d0					; Move #-1 to d0
 		move.b  d0,obDelayAni(a0)		; Move d0 to new timer
 		move.b  d0,(v_ani3_time).w		; Move d0 to old timer (for animated purposes)
