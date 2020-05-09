@@ -51,11 +51,11 @@ Sign_Touch:	; Routine 2
 		move.w	(v_player+obX).w,d0
 		sub.w	obX(a0),d0
 		bcs.s	@notouch
-		cmpi.w	#$20,d0		; is Sonic within $20 pixels of	the signpost?
-		bcc.s	@notouch	; if not, branch
-		music	sfx_Signpost,0,0,0	; play signpost sound
-		clr.b	(f_timecount).w	; stop time counter
-		move.w	(v_limitright2).w,(v_limitleft2).w ; lock screen position
+		cmpi.w	#$20,d0								; is Sonic within $20 pixels of	the signpost?
+		bcc.s	@notouch							; if not, branch
+		music	sfx_Signpost,0,0,0					; play signpost sound
+		clr.b	(f_timecount).w						; stop time counter
+		move.w	(v_limitright2).w,(v_limitleft2).w	; lock screen position
 		addq.b	#2,obRoutine(a0)
 
 	@notouch:
@@ -112,10 +112,9 @@ Sign_SparkPos:	dc.b -$18,-$10		; x-position, y-position
 ; ===========================================================================
 
 Sign_SonicRun:	; Routine 6
+		sfx		bgm_Fade,0,0,0 ; fade music out at the end of the level
 		tst.w	(v_debuguse).w	; is debug mode	on?
 		bne.w	locret_ECEE	; if yes, branch
-		btst	#1,(v_player+obStatus).w
-		bne.s	loc_EC70
 		move.b	#1,(f_lockctrl).w ; lock controls
 		move.w	#btnR<<8,(v_jpadhold2).w ; make Sonic run to the right
 
@@ -131,7 +130,6 @@ Sign_SonicRun:	; Routine 6
 	loc_EC86:
 		addq.b	#2,obRoutine(a0)
 
-
 ; ---------------------------------------------------------------------------
 ; Subroutine to	set up bonuses at the end of an	act
 ; ---------------------------------------------------------------------------
@@ -144,11 +142,10 @@ GotThroughAct:
 		bne.s	locret_ECEE
 		move.w	(v_limitright2).w,(v_limitleft2).w
 		clr.b	(v_invinc).w	; disable invincibility
-		clr.b	(f_timecount).w	; stop time counter
 		move.b	#id_GotThroughCard,(v_objspace+$5C0).w
 
 		move.l  a0,-(sp)            ; save object address to stack
-		move.l  #$70000002,($C00004)        ; set mode "VRAM Write to $B000"
+		move.l  #$70000002,($C00004)  ; set mode "VRAM Write to $B000"
 		lea Art_TitleCard,a0        ; load title card patterns
 		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0; the title card art lenght, in tiles
 		jsr LoadUncArt          ; load uncompressed art
@@ -173,7 +170,7 @@ GotThroughAct:
 		move.w	(v_rings).w,d0	; load number of rings
 		mulu.w	#10,d0		; multiply by 10
 		move.w	d0,(v_ringbonus).w ; set ring bonus
-		sfx	bgm_GotThrough,0,0,0	; play "Sonic got through" music
+		sfx		bgm_GotThrough,0,0,0	; play "Sonic got through" music
 
 locret_ECEE:
 		rts	
