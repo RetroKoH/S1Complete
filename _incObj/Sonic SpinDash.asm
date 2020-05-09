@@ -37,7 +37,7 @@ loc_1AC8E:
 		addq.w	#5,obY(a0)
 		bclr	#staSpinDash,obStatus2(a0)
 		moveq	#0,d0
-		move.b	(obRevSpeed)(a0),d0
+		move.b	obRevSpeed(a0),d0
 		add.w	d0,d0
 		move.w	#1,obVelX(a0)	; force X speed to nonzero for camera lag's benefit
 		move.w	SpinDashSpeeds(pc,d0.w),obInertia(a0)
@@ -65,7 +65,7 @@ loc_1AC8E:
 		muls.w	obInertia(a0),d1
 		asr.l	#8,d1
 		move.w	d1,obVelX(a0)
-		muls.w	inertia(a0),d0
+		muls.w	obInertia(a0),d0
 		asr.l	#8,d0
 		move.w	d0,obVelY(a0)
 		bra.w	SpinDash_ResetScr
