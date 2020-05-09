@@ -11,9 +11,7 @@ Sonic_SpinDash:
 		move.b	#1,(v_objspace+$1C0+obAnim).w
 		move.b	#0,(v_objspace+$1C0+obTimeFrame).w
 	
-
-;		move.w	#$80,(obRevSpeed)(a0) ; Spin Dash Cancel
-		move.w	#0,(obRevSpeed)(a0) ; No Spindash cancel
+		move.w	#$80,obRevSpeed(a0) ; Spin Dash Cancel
 	
 		move.w	#sfx_SpinDash,d0
 		jsr		(PlaySound_Special).l
@@ -61,9 +59,19 @@ loc_1AC8E:
 		bclr	#7,obStatus(a0)
 		move.w	#sfx_Teleport,d0
 		jsr		(PlaySound_Special).l
-		bra.w	loc_1AD78
+; added to fix spindash bug
+		move.b	obAngle(a0),d0
+		jsr		(CalcSine).l
+		muls.w	obInertia(a0),d1
+		asr.l	#8,d1
+		move.w	d1,obVelX(a0)
+		muls.w	inertia(a0),d0
+		asr.l	#8,d0
+		move.w	d0,obVelY(a0)
+		bra.w	SpinDash_ResetScr
 ; ---------------------------------------------------------------------------
-SpinDashSpeeds:	dc.w  $800		; 0
+SpinDashSpeeds:
+		dc.w  $800		; 0
 		dc.w  $880		; 1
 		dc.w  $900		; 2
 		dc.w  $980		; 3
@@ -75,39 +83,37 @@ SpinDashSpeeds:	dc.w  $800		; 0
 ; ---------------------------------------------------------------------------
  
 loc_1AD30:				; If still charging the dash...
-		tst.w	(obRevSpeed)(a0)
+		tst.w	obRevSpeed(a0)
 		beq.s	loc_1AD48
 		
-		move.w	(obRevSpeed)(a0),d0
+		move.w	obRevSpeed(a0),d0
 		lsr.w	#5,d0
-		sub.w	d0,(obRevSpeed)(a0)
+		sub.w	d0,obRevSpeed(a0)
 		
-; Mercury Spin Dash Cancel
-;		cmpi.w	#$1F,(obRevSpeed)(a0)
-;		bne.s	@skip
-;		move.w	#0,(obRevSpeed)(a0)	; clear SpinDash Counter
-;		bclr	#staSpinDash,obStatus2(a0)	; cancel SpinDash
-;		bra.s	loc_1AD78	; branch
+; Spin Dash Cancel
+		cmpi.w	#$1F,obRevSpeed(a0)
+		bne.s	@skip
+		clr.w	obRevSpeed(a0)				; clear SpinDash Counter
+		bclr	#staSpinDash,obStatus2(a0)	; cancel SpinDash
+		bra.s	SpinDash_ResetScr			; branch
 		
-;	@skip:
-;end Spin Dash Cancel		
-		
+	@skip:
 		bcc.s	loc_1AD48
-		move.w	#0,(obRevSpeed)(a0)
+		clr.w	obRevSpeed(a0)
  
 loc_1AD48:
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
-		beq.w	loc_1AD78
-		addi.w	#$200,(obRevSpeed)(a0)
-		cmpi.w	#$800,(obRevSpeed)(a0)
+		beq.w	SpinDash_ResetScr
+		addi.w	#$200,obRevSpeed(a0)
+		cmpi.w	#$800,obRevSpeed(a0)
 		bcs.s	@sound
-		move.w	#$800,(obRevSpeed)(a0)
+		move.w	#$800,obRevSpeed(a0)
 	@sound:
 		move.w	#sfx_SpinDash,d0
 		jsr	(PlaySound_Special).l
  
-loc_1AD78:
+SpinDash_ResetScr:
 		addq.l	#4,sp			; increase stack ptr
 		cmpi.w	#$60,(v_lookshift).w
 		beq.s	loc_1AD8C
