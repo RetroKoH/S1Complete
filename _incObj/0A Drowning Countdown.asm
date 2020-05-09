@@ -247,25 +247,18 @@ Drown_Countdown:; Routine $A
 		clr.w	obVelY(a0)
 		clr.w	obVelX(a0)
 		clr.w	obInertia(a0)
+		move.b	#id_Sonic_Drown,obRoutine(a0)
 		move.b	#1,(f_nobgscroll).w
+		move.b  #0,(f_timecount).w      ; Stop the timer immediately
 		movea.l	(sp)+,a0
 		rts	
 ; ===========================================================================
 
 	@delaycountdown:
 		subq.b	#1,drownDeathDelay(a0)					; decrement death delay
-		bne.s	@loc_13F94								; if time remains, branch
+		bne.s	@nochange								; if time remains, branch
 		move.b	#id_Sonic_Death,(v_player+obRoutine).w	; Sonic is now dead (Time stops, level restarts)
 		rts	
-; ===========================================================================
-
-	@loc_13F94:
-		move.l	a0,-(sp)
-		lea		(v_player).w,a0
-		jsr		(SpeedToPos).l
-		addi.w	#$10,obVelY(a0)
-		movea.l	(sp)+,a0
-		bra.s	@nochange
 ; ===========================================================================
 
 @gotomakenum:

@@ -2660,10 +2660,10 @@ Level_TtlCardLoop:
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
 
 Level_ChkDebug:
-;		tst.b	(f_debugcheat).w ; has debug cheat been entered?
-;		beq.s	Level_ChkWater	; if not, branch
-;		btst	#bitA,(v_jpadhold1).w ; is A button held?
-;		beq.s	Level_ChkWater	; if not, branch
+		tst.b	(f_debugcheat).w ; has debug cheat been entered?
+		beq.s	Level_ChkWater	; if not, branch
+		btst	#bitA,(v_jpadhold1).w ; is A button held?
+		beq.s	Level_ChkWater	; if not, branch
 		move.b	#1,(f_debugmode).w ; enable debug mode
 
 Level_ChkWater:
@@ -5753,8 +5753,7 @@ ExecuteObjects:
 		lea	(v_objspace).w,a0 ; set address for object RAM
 		moveq	#$7F,d7
 		moveq	#0,d0
-		cmpi.b	#6,(v_player+obRoutine).w
-		bhs.s	loc_D362
+;Objects do not freeze when dying
 
 loc_D348:
 		move.b	(a0),d0		; load object number from RAM
@@ -5762,16 +5761,18 @@ loc_D348:
 		add.w	d0,d0
 		add.w	d0,d0
 		movea.l	Obj_Index-4(pc,d0.w),a1
-		jsr	(a1)		; run the object's code
+		jsr		(a1)		; run the object's code
 		moveq	#0,d0
 
 loc_D358:
-		lea	$40(a0),a0	; next object
-		dbf	d7,loc_D348
+		lea		$40(a0),a0	; next object
+		dbf		d7,loc_D348
 		rts	
 ; ===========================================================================
-
+; Freezes objects
 loc_D362:
+		cmpi.b  #$A,(v_player+obRoutine).w      ; Has Sonic drowned?
+		beq.s   loc_D348                        ; If so, run objects a little longer
 		moveq	#$1F,d7
 		bsr.s	loc_D348
 		moveq	#$5F,d7
@@ -6481,12 +6482,14 @@ ptr_Sonic_Control:	dc.w Sonic_Control-Sonic_Index
 ptr_Sonic_Hurt:		dc.w Sonic_Hurt-Sonic_Index
 ptr_Sonic_Death:	dc.w Sonic_Death-Sonic_Index
 ptr_Sonic_Reset:	dc.w Sonic_ResetLevel-Sonic_Index
+ptr_Sonic_Drown:	dc.w Sonic_Drowned-Sonic_Index
 
 id_Sonic_Init:		equ ptr_Sonic_Init-Sonic_Index		; 0
 id_Sonic_Control:	equ ptr_Sonic_Control-Sonic_Index	; 2
 id_Sonic_Hurt:		equ ptr_Sonic_Hurt-Sonic_Index		; 4
 id_Sonic_Death:		equ ptr_Sonic_Death-Sonic_Index		; 6
 id_Sonic_Reset:		equ ptr_Sonic_Reset-Sonic_Index		; 8
+id_Sonic_Drown:		equ ptr_Sonic_Drown-Sonic_Index		; $A
 ; ===========================================================================
 
 Sonic_Init:	; Routine 0
@@ -6653,6 +6656,7 @@ loc_12EA6:
 		include	"_incObj\Sonic ResetOnFloor.asm"
 		include	"_incObj\Sonic (part 2).asm"
 		include	"_incObj\Sonic Loops.asm"
+		include	"_incObj\Sonic Drowned.asm"
 		include	"_incObj\Sonic Animate.asm"
 		include	"_anim\Sonic.asm"
 		include	"_incObj\Sonic LoadGfx.asm"

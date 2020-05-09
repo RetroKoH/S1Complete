@@ -29,8 +29,8 @@ Over_Main:
 	Over_1stWord:
 		move.w	#$F0,obScreenY(a0)
 		move.l	#Map_Over,obMap(a0)
-		move.w	#$855E,obGfx(a0)
-		move.b	#0,obRender(a0)
+		move.w	#$A550,obGfx(a0)
+		clr.b	obRender(a0)
 		clr.w	obPriority(a0)
 
 Over_Move:	; Routine 2
