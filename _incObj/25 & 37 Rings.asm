@@ -186,7 +186,7 @@ RLoss_Count:	; Routine 0
 		lea		SpillRingData,a3	; load the address of the array in a3
 		moveq	#32,d0
  		lea     (v_player).w,a2			; a2=character
-		btst    #staWater,status(a2)	; is Sonic underwater?
+		btst    #staWater,obStatus(a2)	; is Sonic underwater?
 		beq.s   @abovewater				; if not, branch
 		lea		SpillRingData_Water,a3	; load the address of the array in a3
 

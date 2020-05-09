@@ -83,7 +83,7 @@ Drown_ChkWater:	; Routine 4
 		cmpi.b	#$D,obAnim(a0)
 		beq.s	Drown_Display
 		blo.s	Drown_Display
-		move.b	#$D,anim(a0)
+		move.b	#$D,obAnim(a0)
 		bra.s	Drown_Display
 ; ===========================================================================
 

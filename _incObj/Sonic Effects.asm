@@ -56,11 +56,11 @@ Fx_MdNull:
 		rts
 ; ===========================================================================
 Fx_ResetDisplayMode:
-		clr.b	anim(a0)
+		clr.b	obAnim(a0)
 		rts
 
 Effects_Delete:	; Routine 4
-		jmp	DeleteObject	; delete when animation	is complete
+		jmp		DeleteObject	; delete when animation	is complete
 ; ===========================================================================
 
 Effects_LoadGfx:

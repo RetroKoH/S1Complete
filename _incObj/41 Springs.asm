@@ -126,9 +126,9 @@ Spring_BounceLR:
 		move.w	#$F,$3E(a1)
 		move.w	obVelX(a1),obInertia(a1)
 
-		tst.w	x_vel(a1)		; which way is Sonic facing
+		tst.w	obVelX(a1)		; which way is Sonic facing
 		bmi.s	Face_Left		; if Sonic is running left, branch
-		bclr	#0,status(a1)
+		bclr	#0,obStatus(a1)
 		bra.s	Face_Cont
 	Face_Left:
 		bset	#0,obStatus(a1) ;instead of bchg, we set or clear it as necessary

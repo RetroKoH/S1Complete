@@ -14,7 +14,7 @@ Signpost:
 		; If the sign is nearly onscreen, the art loads.
 		move.w	(v_player+obX).w,d0		; Get the Character's X position.
 		addi.w	#$E0,d0					; add 224 to it.
-		sub.w	x_pos(a0),d0			; Subtract the signpost's x postion.
+		sub.w	obX(a0),d0			; Subtract the signpost's x postion.
 		tst.w	d0						; Check if d0 is 0 or great (Sonic is less than
 		blt.s	@skip					; If d0 is lower than 0, branch.
 
@@ -190,7 +190,7 @@ Sign_Exit:	; Routine 8
 
 Signpost_LoadGfx:
 		moveq	#0,d0
-		move.b	mapping_frame(a0),d0	; load frame number
+		move.b	obFrame(a0),d0	; load frame number
 ;		cmpi.b	#4,d0
 ;		bne.s	@notchar
 ;		add.b	(v_player+character_id).w,d0	; Add Character ID to d0

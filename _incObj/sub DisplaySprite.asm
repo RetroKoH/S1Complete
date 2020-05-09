@@ -29,7 +29,7 @@ DisplaySprite:
 
 DisplaySprite1:
 		lea	(v_spritequeue).w,a2
-		adda.w	priority(a1),a2
+		adda.w	obPriority(a1),a2
 		cmpi.w	#$7E,(a2)
 		bcc.s	DSpr1_Full
 		addq.w	#2,(a2)
@@ -40,3 +40,19 @@ DisplaySprite1:
 		rts	
 
 ; End of function DisplaySprite1
+
+
+; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+
+
+DisplaySprite3:
+		lea (v_spritequeue).w,a1
+		adda.w d0,a1
+		cmpi.w #$7E,(a1)
+		bhs.s return_16542
+		addq.w #2,(a1)
+		adda.w (a1),a1
+		move.w a0,(a1)
+
+	return_16542:
+		rts
