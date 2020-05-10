@@ -154,9 +154,7 @@ obSubtype:		equ $28	; object subtype
 obSolid:		equ ob2ndRout ; solid status flag
 
 ; Object variables used by Sonic
-flashtime:	equ $30	; time between flashes after getting hit
-invtime:	equ $32	; time left for invincibility
-shoetime:	equ $34	; time left for speed shoes
+obJumpFlag:	equ $2E ; Flag for Double Jump
 obInvuln:	equ $30	; Invulnerable (blinking) timer ; $31 reserved as well
 obInvinc:	equ $32	; Invincibility timer ; $33 reserved as well
 obShoes:	equ $34	; Speed Shoes timer ; $35 reserved as well
@@ -211,9 +209,22 @@ staPush:	equ 5
 staWater:	equ 6
 staSSJump:	equ 7
 
-; Secondary Status
+; Ability Status
 staSpinDash:	equ 0
 staDash:		equ 1
+
+; v_status_secondary
+stsShield:		equ 0
+stsInvinc:		equ 1
+stsShoes:		equ 2
+stsGoggles:		equ 3
+stsSuper:		equ 4
+stsFlame:		equ 5
+stsBubble:		equ 6
+stsLightning:	equ 7
+
+stsRmvShield:	equ $1E
+stsChkShield:	equ $3E
 
 ; NEW GLOBAL Animation IDs - To make easier the usage of animations across all 6 characters
 aniID_Null:			equ 0		; Null animation
@@ -341,13 +352,13 @@ spec__Last:	equ ((ptr_specend-SpecSoundIndex-4)/4)+spec__First
 
 sfx_SpinDash:	equ $D1
 
-flg__First:	equ $E0
-bgm_Fade:	equ ((ptr_flgE0-Sound_ExIndex)/4)+flg__First
-sfx_Sega:	equ ((ptr_flgE1-Sound_ExIndex)/4)+flg__First
+flg__First:		equ $E0
+bgm_Fade:		equ ((ptr_flgE0-Sound_ExIndex)/4)+flg__First
+sfx_Sega:		equ ((ptr_flgE1-Sound_ExIndex)/4)+flg__First
 bgm_Speedup:	equ ((ptr_flgE2-Sound_ExIndex)/4)+flg__First
 bgm_Slowdown:	equ ((ptr_flgE3-Sound_ExIndex)/4)+flg__First
-bgm_Stop:	equ ((ptr_flgE4-Sound_ExIndex)/4)+flg__First
-flg__Last:	equ ((ptr_flgend-Sound_ExIndex-4)/4)+flg__First
+bgm_Stop:		equ ((ptr_flgE4-Sound_ExIndex)/4)+flg__First
+flg__Last:		equ ((ptr_flgend-Sound_ExIndex-4)/4)+flg__First
 
 ; ---------------------------------------------------------------------------
 ; NEW VRAM and tile art base addresses, to make VRAM shifting less of a headache.

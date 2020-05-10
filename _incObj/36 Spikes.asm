@@ -79,10 +79,12 @@ Spik_Upright:
 		bpl.s	Spik_Display
 
 Spik_Hurt:
-		tst.b	(v_invinc).w			; is Sonic invincible?
-		bne.s	Spik_Display			; if yes, branch
-		tst.w	(v_player+flashtime).w	; +++ is Sonic invulnerable?
-		bne.s	Spik_Display			; +++ if yes, branch
+		btst	#stsSuper,(v_status_secondary).w	; is Sonic Super?
+		bne.s	Spik_Display						; if yes, branch
+		btst	#stsInvinc,(v_status_secondary).w	; is Sonic invincible?
+		bne.s	Spik_Display						; if yes, branch
+		tst.w	(v_player+obInvuln).w				; +++ is Sonic invulnerable?
+		bne.s	Spik_Display						; +++ if yes, branch
 		move.l	a0,-(sp)
 		movea.l	a0,a2
 		lea		(v_player).w,a0
@@ -94,7 +96,7 @@ Spik_Hurt:
 		asl.l	#8,d0
 		sub.l	d0,d3
 		move.l	d3,obY(a0)
-		jsr	(HurtSonic).l
+		jsr		(HurtSonic).l
 
 loc_CF20:
 		movea.l	(sp)+,a0

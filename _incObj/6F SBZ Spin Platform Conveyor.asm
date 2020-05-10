@@ -143,7 +143,7 @@ loc_163D8:	; Routine 2
 		move.w	d2,d3
 		addq.w	#1,d3
 		move.w	(sp)+,d4
-		bra.w	SolidObject
+		jmp		SolidObject ; was bra.w
 ; ===========================================================================
 
 loc_16404:

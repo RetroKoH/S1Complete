@@ -43,8 +43,7 @@ Flash_Collect:
 		move.b	#6,obRoutine(a1) ; delete parent object
 		move.b	#aniID_Null,(v_player+obAnim).w ; make Sonic invisible
 		move.b	#1,(f_bigring).w ; stop	Sonic getting bonuses
-		clr.b	(v_invinc).w	; remove invincibility
-		clr.b	(v_shield).w	; remove shield
+		clr.b   (v_status_secondary).w ; remove powerups and the like
 
 locret_9F76:
 		rts	

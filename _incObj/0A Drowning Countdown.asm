@@ -189,8 +189,12 @@ Drown_WobbleData:
 Drown_Countdown:; Routine $A
 		tst.b	drownDeathDelay(a0)						; has Sonic already drowned?
 		bne.w	@delaycountdown							; if yes, branch
+;		cmpi.b	#ch_Metal,(v_player+obCharID).w			; Metal Sonic doesn't drown
+;		beq.w	@nocountdown
 		cmpi.b	#id_Sonic_Death,(v_player+obRoutine).w	; is Sonic dead?
 		bcc.w	@nocountdown							; if yes, branch
+		btst	#stsBubble,(v_status_secondary).w		; does the player have the Bubble Shield? - REV C EDIT
+		bne.w   @nocountdown							; if yes, branch 
 		btst	#staWater,(v_player+obStatus).w			; is Sonic underwater?
 		beq.w	@nocountdown							; if not, branch
 

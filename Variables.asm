@@ -19,11 +19,28 @@ VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slo
 ; $FFFFC900-CAFF - UNUSED
 
 v_tracksonic:	equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
-
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)
-v_objspace:	equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)
-v_player:	equ v_objspace	; object variable space for Sonic ($40 bytes)
-v_lvlobjspace:	equ $FFFFD800	; level object variable space ($1800 bytes)
+
+v_objspace:			equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)
+v_player:			equ v_objspace	; object variable space for Sonic ($40 bytes)
+v_player2:			= v_objspace+$40	; object variable space reserved for player 2			- 1 object
+v_titlespace:		= v_objspace+$80	; object variable space reserved for the title card, credits, and other text ($100 bytes) - 4 objects for the title card
+v_shieldspace:		= v_objspace+$180	; object variable space reserved for the shield			- 1 object
+v_signspace:		= v_objspace+$1C0	; object variable space reserved for the signpost		- 1 object
+v_invincspace:		= v_objspace+$200	; object variable space reserved for the invincibility stars	- 4 objects
+v_splashspace:		= v_objspace+$300	; object variable space reserved for splash			- 1 object
+v_bubblespace:		= v_objspace+$340	; object variable space reserved for breathing bubble spawner	- 1 object
+v_tailsspace:		= v_objspace+$380	; object variable space reserved for Tails' tails		- 1 object
+v_emeraldspace:		= v_objspace+$3C0	; object variable space reserved for Ending Chaos Emeralds	- 7 objects
+; These objects share space with the ending emeralds, as they are never used during the ending.
+v_bonusentryspace:	= v_emeraldspace	; object variable space reserved for the bonus entry effect. (Shared with Ending Emerald #1)
+v_sparkspace:		= v_emeraldspace+$40 ; object variable space reserved for lightning shield and Metal Sonic sparks (Shared with Ending Emeralds 2-5)
+
+v_gogglespace:		= v_objspace+$540	; object variable space reserved for Goggles (Shared with Ending Emerald #7)
+v_effectspace:		= v_objspace+$580	; object variable space reserved for dust effects		- 1 object
+v_resultspace:		= v_objspace+$5C0	; object variable space reserved for results screen		- 7 objects
+v_waterspace:		= v_objspace+$780	; object variable space reserved for the water surface		- 2 objects
+v_lvlobjspace:		equ v_objspace+$800	; level object variable space ($1800 bytes)
 
 v_snddriver_ram:	equ $FFFFF000 ; start of RAM for the sound driver data ($5C0 bytes)
 
@@ -268,29 +285,30 @@ v_debugyspeed:	equ $FFFFFE0B	; debug mode - vertical speed
 v_vbla_count:	equ $FFFFFE0C	; vertical interrupt counter (adds 1 every VBlank) (4 bytes)
 v_vbla_word:	equ v_vbla_count+2 ; low word for vertical interrupt counter (2 bytes)
 v_vbla_byte:	equ v_vbla_word+1	; low byte for vertical interrupt counter
-v_zone:		equ $FFFFFE10	; current zone number
-v_act:		equ $FFFFFE11	; current act number
+v_zone:			equ $FFFFFE10	; current zone number
+v_act:			equ $FFFFFE11	; current act number
 v_lives:		equ $FFFFFE12	; number of lives
-v_air:		equ $FFFFFE14	; air remaining while underwater (2 bytes)
-v_airbyte:	equ v_air+1	; low byte for air
+v_air:			equ $FFFFFE14	; air remaining while underwater (2 bytes)
+v_airbyte:		equ v_air+1	; low byte for air
 v_lastspecial:	equ $FFFFFE16	; last special stage number
 v_continues:	equ $FFFFFE18	; number of continues
-f_timeover:	equ $FFFFFE1A	; time over flag
+f_timeover:		equ $FFFFFE1A	; time over flag
 v_lifecount:	equ $FFFFFE1B	; lives counter value (for actual number, see "v_lives")
 f_lifecount:	equ $FFFFFE1C	; lives counter update flag
 f_ringcount:	equ $FFFFFE1D	; ring counter update flag
 f_timecount:	equ $FFFFFE1E	; time counter update flag
 f_scorecount:	equ $FFFFFE1F	; score counter update flag
 v_rings:		equ $FFFFFE20	; rings (2 bytes)
-v_ringbyte:	equ v_rings+1	; low byte for rings
-v_time:		equ $FFFFFE22	; time (4 bytes)
-v_timemin:	equ $FFFFFE23	; time - minutes
-v_timesec:	equ $FFFFFE24	; time - seconds
-v_timecent:	equ $FFFFFE25	; time - centiseconds
+v_ringbyte:		equ v_rings+1	; low byte for rings
+v_time:			equ $FFFFFE22	; time (4 bytes)
+v_timemin:		equ $FFFFFE23	; time - minutes
+v_timesec:		equ $FFFFFE24	; time - seconds
+v_timecent:		equ $FFFFFE25	; time - centiseconds
 v_score:		equ $FFFFFE26	; score (4 bytes)
-v_shield:	equ $FFFFFE2C	; shield status (00 = no; 01 = yes)
-v_invinc:	equ $FFFFFE2D	; invinciblity status (00 = no; 01 = yes)
-v_shoes:		equ $FFFFFE2E	; speed shoes status (00 = no; 01 = yes)
+
+v_status_secondary:	equ $FFFFFE2A	; Secondary status bitfield. {Lightning-Bubble-Flame-Super Goggle-Shoes-Inv-Shield}
+v_coolcount:		equ $FFFFFE2B	; Cool Bonus hit counter. Starts at 10 and decrements to 0.
+
 v_lastlamp:	equ $FFFFFE30	; number of the last lamppost you hit
 v_lamp_xpos:	equ v_lastlamp+2	; x-axis for Sonic to respawn at lamppost (2 bytes)
 v_lamp_ypos:	equ v_lastlamp+4	; y-axis for Sonic to respawn at lamppost (2 bytes)

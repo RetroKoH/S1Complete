@@ -23,7 +23,7 @@ PathSwapper:
 		bclr	#7,2(a2,d0.w)
 
 	@delete:
-		bra.w	DeleteObject
+		jmp		DeleteObject ; was bra.w
 ; ===========================================================================
 ; off_1FCF0:
 PSwapper_Index:

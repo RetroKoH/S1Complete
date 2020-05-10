@@ -55,7 +55,7 @@ Gird_Action:	; Routine 2
 		move.b	gird_height(a0),d2
 		move.w	d2,d3
 		addq.w	#1,d3
-		bsr.w	SolidObject
+		jsr		SolidObject ; was bsr.w
 
 	@chkdel:
 		out_of_range.s	@delete,gird_origX(a0)

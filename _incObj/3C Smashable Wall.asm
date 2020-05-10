@@ -37,16 +37,24 @@ Smash_Solid:	; Routine 2
 		move.w	#$20,d3
 		move.w	obX(a0),d4
 		bsr.w	SolidObject
+		beq.s	@donothing
+
+;		cmpi.b	#ch_Knuckles,obCharID(a1)	; is the current character Knuckles
+;		beq.s	@continue					; if yes, continue
+;		tst.b	obCharID(a1)				; is the player Sonic?
+;		bne.s	@chkPush					; if not, skip and check if player is rolling on the ground
+		btst	#stsFlame,(v_status_secondary).w	; does Sonic have the Flame Shield
+		beq.s	@chkPush							; if not, skip and check if player is rolling on the ground
+		tst.b	obJumpFlag(a1)			; is Sonic using his ability?
+		bne.s	@continue				; if yes, branch. ABILITY TIME
+
+	@chkPush:
 		btst	#staPush,obStatus(a0)	; is Sonic pushing against the wall?
-		bne.s	@chkroll	; if yes, branch
+		beq.s	@donothing				; if no, branch
 
-@donothing:
-		rts	
-; ===========================================================================
-
-@chkroll:
-		cmpi.b	#aniID_Roll,obAnim(a1) ; is Sonic rolling?
-		bne.s	@donothing	; if not, branch
+	@chkroll:
+		cmpi.b	#aniID_Roll,obAnim(a1)	; is Sonic rolling?
+		bne.s	@donothing				; if not, branch
 		move.w	smash_speed(a0),d0
 		bpl.s	@chkspeed
 		neg.w	d0
@@ -54,22 +62,29 @@ Smash_Solid:	; Routine 2
 	@chkspeed:
 		cmpi.w	#$480,d0	; is Sonic's speed $480 or higher?
 		bcs.s	@donothing	; if not, branch
+
+	@continue:
+		bclr	#staPush,obStatus(a0)
 		move.w	smash_speed(a0),obVelX(a1)
 		addq.w	#4,obX(a1)
-		lea	(Smash_FragSpd1).l,a4 ;	use fragments that move	right
+		lea		(Smash_FragSpd1).l,a4 ;	use fragments that move	right
 		move.w	obX(a0),d0
 		cmp.w	obX(a1),d0	; is Sonic to the right	of the block?
 		bcs.s	@smash		; if yes, branch
 		subq.w	#8,obX(a1)
-		lea	(Smash_FragSpd2).l,a4 ;	use fragments that move	left
+		lea		(Smash_FragSpd2).l,a4 ;	use fragments that move	left
 
 	@smash:
 		move.w	obVelX(a1),obInertia(a1)
-		bclr	#5,obStatus(a0)
-		bclr	#5,obStatus(a1)
+;		bclr	#staPush,obStatus(a0)
+		bclr	#staPush,obStatus(a1)
 		moveq	#7,d1		; load 8 fragments
 		move.w	#$70,d2
 		bsr.s	SmashObject
+
+	@donothing:
+		rts	
+; ===========================================================================
 
 Smash_FragMove:	; Routine 4
 		addq.l	#4,sp

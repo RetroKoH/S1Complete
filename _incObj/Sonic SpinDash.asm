@@ -8,8 +8,8 @@ Sonic_SpinDash:
 		beq.w	locret_1AC8C
 		move.b	#aniID_SpinDash,obAnim(a0)
 		
-		move.b	#1,(v_objspace+$1C0+obAnim).w
-		move.b	#0,(v_objspace+$1C0+obTimeFrame).w
+		move.b	#1,(v_effectspace+obAnim).w
+		move.b	#0,(v_effectspace+obTimeFrame).w
 	
 		move.w	#$80,obRevSpeed(a0) ; Spin Dash Cancel
 	
@@ -125,6 +125,4 @@ loc_1AD88:
  
 loc_1AD8C:
 		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
-		rts
-		
+		bra.w	Sonic_AnglePos

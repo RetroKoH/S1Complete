@@ -12,7 +12,7 @@
 
 ApplySpeedSettings:
 		moveq   #0,d0                           ; Quickly clear d0
-		tst.b   shoetime(a0)             ; Does character have speedshoes?
+		btst	#stsShoes,(v_status_secondary).w            ; Does character have speedshoes?
 		beq.s   @noshoes                        ; If not, branch
 		addq.b  #8,d0
 
@@ -22,15 +22,15 @@ ApplySpeedSettings:
 		addi.b  #$10,d0
 
 	@nowater:
-;		tst.b   (f_supersonic).w                ; Is character Super?
-;		beq.s   @nosuper                        ; If not, branch
-;		addi.b  #$20,d0
+		btst	#stsSuper,(v_status_secondary).w ; Is character Super?
+		beq.s   @nosuper                         ; If not, branch
+		addi.b  #$20,d0
 
-;	@nosuper:
+	@nosuper:
 		lea	SpeedSettings(pc,d0.w),a1       ; Load correct speed settings into a1
 ;		cmpi.b	#4,character_id(a0)
 ;		bne.s	@notamy
-;		lea		AmySpeedSettings(pc,d0.w),a1
+;		lea	AmySpeedSettings(pc,d0.w),a1
 ;	@notamy:
 		addq.l  #2,a1                           ; Increment a1 by 2 quickly
 		move.l  (a1)+,(a2)+                     ; Set character's new top speed and acceleration

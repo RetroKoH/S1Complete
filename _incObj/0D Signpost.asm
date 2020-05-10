@@ -54,6 +54,7 @@ Sign_Touch:	; Routine 2
 		cmpi.w	#$20,d0								; is Sonic within $20 pixels of	the signpost?
 		bcc.s	@notouch							; if not, branch
 		music	sfx_Signpost,0,0,0					; play signpost sound
+		move.w	#1,(v_player+obShoes).w				; disable speed shoes - REV C EDIT
 		clr.b	(f_timecount).w						; stop time counter
 		move.w	(v_limitright2).w,(v_limitleft2).w	; lock screen position
 		addq.b	#2,obRoutine(a0)
@@ -141,7 +142,7 @@ GotThroughAct:
 		tst.b	(v_objspace+$5C0).w
 		bne.s	locret_ECEE
 		move.w	(v_limitright2).w,(v_limitleft2).w
-		clr.b	(v_invinc).w	; disable invincibility
+		bclr	#stsInvinc,(v_status_secondary).w 	; disable invincibility
 		move.b	#id_GotThroughCard,(v_objspace+$5C0).w
 
 		move.l  a0,-(sp)            ; save object address to stack

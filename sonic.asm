@@ -2658,6 +2658,8 @@ Level_TtlCardLoop:
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
+		move.b	#id_ShieldItem,(v_shieldspace).w		; Create the instashield object
+		move.b	#$D,(v_shieldspace+obAnim).w
 
 Level_ChkDebug:
 		tst.b	(f_debugcheat).w ; has debug cheat been entered?
@@ -2689,10 +2691,13 @@ Level_LoadObj:
 		move.b	d0,(v_lifecount).w ; clear lives counter
 
 	Level_SkipClr:
-		move.b	d0,(f_timeover).w
-		move.b	d0,(v_shield).w	; clear shield
-		move.b	d0,(v_invinc).w	; clear invincibility
-		move.b	d0,(v_shoes).w	; clear speed shoes
+		; Endri Time Over mod
+		tst.b   (f_timeover).w    ; test the time over flag
+		bmi.s   @skiptimeclear    ; if negative, branch
+		move.b  d0,(f_timeover).w ; clear time over flag
+	@skiptimeclear: ; end of mod
+;		move.l  (v_startscore).w,(v_score).w
+		move.b	d0,(v_status_secondary).w
 		move.b	d0,($FFFFFE2F).w
 		move.w	d0,(v_debuguse).w
 		move.w	d0,(f_restart).w
@@ -3667,9 +3672,7 @@ End_LoadData:
 		move.w	d0,(v_rings).w
 		move.l	d0,(v_time).w
 		move.b	d0,(v_lifecount).w
-		move.b	d0,(v_shield).w
-		move.b	d0,(v_invinc).w
-		move.b	d0,(v_shoes).w
+		move.b	d0,(v_status_secondary).w 
 		move.b	d0,($FFFFFE2F).w
 		move.w	d0,(v_debuguse).w
 		move.w	d0,(f_restart).w
@@ -6646,8 +6649,7 @@ Sonic_Init:	; Routine 0
 		move.b	#4,obRender(a0)
 		lea     (v_sonspeedmax).w,a2	; Load Sonic_top_speed into a2
 		bsr.w   ApplySpeedSettings		; Fetch Speed settings
-		move.b	#id_Effects,(v_objspace+$1C0).w
-;		move.b	#id_19,(v_objspace+$200).w
+		move.b	#id_Effects,(v_effectspace).w
 
 Sonic_Control:	; Routine 2
 		tst.w	(f_debugmode).w	; is debug cheat enabled?
@@ -6823,20 +6825,24 @@ ResumeMusic:
 		move.w	#bgm_SBZ,d0	; play SBZ music
 
 	@notsbz:
-		tst.b	(v_invinc).w ; is Sonic invincible?
+		btst	#stsSuper,(v_status_secondary).w		; is player in Super Form?
+		bne.s	@invinc				; if yes, branch
+		btst	#stsInvinc,(v_status_secondary).w ; is Sonic invincible?
 		beq.s	@notinvinc ; if not, branch
+
+	@invinc:
 		move.w	#bgm_Invincible,d0
 	@notinvinc:
 		tst.b	(f_lockscreen).w ; is Sonic at a boss?
 		beq.s	@playselected ; if not, branch
 		move.w	#bgm_Boss,d0
-	@playselected:
 
+	@playselected:
 		jsr	(PlaySound).l
 
 	@over12:
 		move.w	#30,(v_air).w	; reset air to 30 seconds
-		clr.b	(v_objspace+$340+$32).w
+		clr.b	(v_objspace+$340+$32).w ; which object was this?
 		rts	
 ; End of function ResumeMusic
 
@@ -6845,12 +6851,24 @@ ResumeMusic:
 		include	"_anim\Drowning Countdown.asm"
 Map_Drown:	include	"_maps\Drowning Countdown.asm"
 
+		include	"_anim\Shield and Invincibility.asm"
+		include	"_maps\Shield and Invincibility.asm"
+		include "_maps\Shield - Dynamic Gfx Script.asm" ; AND INVINCIBILITY
+		include "_maps\Shield - Flame.asm"
+		include "_maps\Shield - Flame - Dynamic Gfx Script.asm"
+		include "_maps\Shield - Bubble.asm"
+		include "_maps\Shield - Bubble - Dynamic Gfx Script.asm"
+		include "_maps\Shield - Lightning.asm"
+		include "_maps\Shield - Lightning - Dynamic Gfx Script.asm"
+		include "_maps\Shield - Insta.asm"
+		include "_maps\Shield - Insta - Dynamic Gfx Script.asm"
+
+
 		include	"_incObj\38 Shield and Invincibility.asm"
 		include	"_incObj\4A Special Stage Entry (Unused).asm"
 		include	"_incObj\03 Collision Switcher.asm"
 		include	"_incObj\08 Water Splash.asm"
-		include	"_anim\Shield and Invincibility.asm"
-Map_Shield:	include	"_maps\Shield and Invincibility.asm"
+
 		include	"_anim\Special Stage Entry (Unused).asm"
 Map_Vanish:	include	"_maps\Special Stage Entry (Unused).asm"
 		include	"_anim\Water Splash.asm"
@@ -8232,8 +8250,16 @@ Eni_JapNames:	incbin	"tilemaps\Hidden Japanese Credits.bin" ; Japanese credits (
 Nem_JapNames:	incbin	"artnem\Hidden Japanese Credits.bin"
 		even
 
-Map_Sonic:	include	"_maps\Sonic.asm"
-SonicDynPLC:	include	"_maps\Sonic - Dynamic Gfx Script.asm"
+
+
+
+
+; ---------------------------------------------------------------------------
+; Sprite Mappings
+; ---------------------------------------------------------------------------
+
+				include	"_maps\Sonic.asm"
+				include	"_maps\Sonic - Dynamic Gfx Script.asm"
 
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics
@@ -8241,6 +8267,20 @@ SonicDynPLC:	include	"_maps\Sonic - Dynamic Gfx Script.asm"
 Art_Sonic:		incbin	"artunc\Sonic.bin"	; Sonic
 		even
 Art_Effects:	incbin	"artunc\Dust Effects.bin"	; Spindash/Skid Dust
+		even
+Art_Insta:		incbin	"artunc\Shield - Insta.bin"	; Spindash and Skidding dust (REV C EDIT)
+		even
+Art_Shield:		incbin	"artunc\Shield - Blue.bin"
+		even
+Art_Shield_F:	incbin	"artunc\Shield - Flame.bin"
+		even
+Art_Shield_B:	incbin	"artunc\Shield - Bubble.bin"
+		even
+Art_Shield_L:	incbin	"artunc\Shield - Lightning.bin"
+		even
+Art_Shield_L2:	incbin	"artunc\Shield - Lightning - Sparks.bin"
+		even
+Art_Stars:		incbin	"artunc\Invincibility Stars.bin"
 		even
 Art_SignPost:	incbin	"artunc\Signpost.bin"	; end of level signpost
 		even
@@ -8251,14 +8291,6 @@ Art_BigRing:	incbin	"artunc\Giant Ring.bin"
 		include "_maps\Effects - Dynamic Gfx Script.asm"
 		include "_anim\Effects.asm"
 
-; ---------------------------------------------------------------------------
-; Compressed graphics - various
-; ---------------------------------------------------------------------------
-
-Nem_Shield:	incbin	"artnem\Shield.bin"
-		even
-Nem_Stars:	incbin	"artnem\Invincibility Stars.bin"
-		even
 
 		include	"_maps\SS Walls.asm"
 
