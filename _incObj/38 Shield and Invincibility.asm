@@ -23,6 +23,8 @@ obArt:		equ $38
 obDPLC:		equ $3C
 ; ===========================================================================
 
+
+
 Shi_Init:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Shield,obMap(a0)

@@ -18,7 +18,7 @@ VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slo
 
 ; $FFFFC900-CAFF - UNUSED
 
-v_tracksonic:	equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
+v_tracksonic:			equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 
 v_objspace:			equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)
@@ -211,8 +211,6 @@ v_ssangle:			equ $FFFFF780	; Special Stage angle (2 bytes)
 v_ssrotate:			equ $FFFFF782	; Special Stage rotation speed (2 bytes)
 v_ssangleprev:		equ $FFFFF784	; USED WITH DYN SS WALLS (2 bytes)
 
-f_level_started: = $FFFFF786 ; from Sonic 2
-
 v_btnpushtime1:	equ $FFFFF790	; button push duration - in level (2 bytes)
 v_btnpushtime2:	equ $FFFFF792	; button push duration - in demo (2 bytes)
 v_palchgspeed:	equ $FFFFF794	; palette fade/transition speed (0 is fastest) (2 bytes)
@@ -361,8 +359,12 @@ v_bg3_scroll_flags_dup:	equ $FFFFFF36
 v_levseldelay:	equ $FFFFFF80	; level select - time until change when up/down is held (2 bytes)
 v_levselitem:	equ $FFFFFF82	; level select - item selected (2 bytes)
 v_levselsound:	equ $FFFFFF84	; level select - sound selected (2 bytes)
+
+f_level_started: 	equ $FFFFFF98	; Level started. Rings and HUD can be drawn
+v_hudscrollpos:		equ $FFFFFF99	; Scrolling x-position for the HUD.
+
 v_scorecopy:	equ $FFFFFFC0	; score, duplicate (4 bytes)
-v_scorelife:	equ $FFFFFFC0	; points required for an extra life (4 bytes) (JP1 only)
+v_scorelife:	equ $FFFFFFC0	; points required for an extra life (4 bytes)
 v_colladdr1:	equ $FFFFFFD0	; (4 bytes)
 v_colladdr2:	equ $FFFFFFD4	; (4 bytes)
 v_top_solid_bit:	equ $FFFFFFD8

@@ -1902,15 +1902,15 @@ GM_Title:
 		bsr.w	SoundDriverLoad
 		lea		(vdp_control_port).l,a6
 		move.w	#$8004,(a6)	; 8-colour mode
-		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
-		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
-		move.w	#$9001,(a6)	; 64-cell hscroll size
-		move.w	#$9200,(a6)	; window vertical position
+		move.w	#$8200+(vram_fg>>10),(a6)	; set foreground nametable address
+		move.w	#$8400+(vram_bg>>13),(a6)	; set background nametable address
+		move.w	#$9001,(a6)					; 64-cell hscroll size
+		move.w	#$9200,(a6)					; window vertical position
 		move.w	#$8B03,(a6)
-		move.w	#$8720,(a6)	; set background colour (palette line 2, entry 0)
+		move.w	#$8720,(a6)					; set background colour (palette line 2, entry 0)
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
-		clr.b	(f_level_started).w	; LEVEL START FLAG
+		clr.w	(f_level_started).w			; Clear Level Start Flag, and HUD Scroll
 
 		lea		(v_objspace).w,a1
 		moveq	#0,d0
@@ -2527,6 +2527,8 @@ loc_37FC:
 		bsr.w	AddPLC		; load standard	patterns
 
 Level_ClrRam:
+		clr.w	(f_level_started).w	; clear HUD and ring drawing flag, and HUD scrolling.
+
 		lea		(v_objspace).w,a1
 		moveq	#0,d0
 		move.w	#$7FF,d1
@@ -2671,7 +2673,6 @@ Level_ChkDebug:
 Level_ChkWater:
 		clr.w	(v_jpadhold2).w
 		clr.w	(v_jpadhold1).w
-		clr.b	(f_level_started).w ; LEVEL START FLAG
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadObj	; if not, branch
 		move.b	#id_WaterSurface,(v_objspace+$780).w ; load water surface object
@@ -2773,7 +2774,7 @@ Level_ClrCardArt:
 Level_StartGame:
 		tst.w	(f_demo).w
 		bmi.s	@demo
-		bset	#0,(f_level_started).w ; LEVEL START FLAG
+		move.b	#1,(f_level_started).w ; LEVEL START FLAG
 	@demo:
 		bclr	#7,(v_gamemode).w ; subtract $80 from mode to end pre-level stuff
 
@@ -2800,6 +2801,11 @@ Level_MainLoop:
 		bsr.w	DeformLayers
 
 	Level_SkipScroll:
+		cmpi.b	#$90,(v_hudscrollpos).w
+		beq.s	Level_SkipHUDScroll
+		add.b	#4,(v_hudscrollpos).w
+
+Level_SkipHUDScroll:
 		jsr	(BuildSprites).l
 		jsr	(ObjPosLoad).l
 		bsr.w	PaletteCycle
@@ -3044,17 +3050,18 @@ GM_Special:
 		clr.w	(f_restart).w
 		moveq	#palid_Special,d0
 		bsr.w	PalLoad1	; load special stage palette
-		jsr	(SS_Load).l		; load SS layout data
-		move.l	#0,(v_screenposx).w
-		move.l	#0,(v_screenposy).w
+		jsr		(SS_Load).l		; load SS layout data
+		clr.w	(f_level_started).w	; clear the flag for drawing HUD and rings.
+		clr.l	(v_screenposx).w
+		clr.l	(v_screenposy).w
 		move.b	#id_SonicSpecial,(v_player).w ; load special stage Sonic object
 		move.b	#$FF,(v_ssangleprev).w	; fill previous angle with obviously false value to force an update
 		bsr.w	PalCycle_SS
 		clr.w	(v_ssangle).w	; set stage angle to "upright"
 		move.w	#$40,(v_ssrotate).w ; set stage rotation speed
 		music	bgm_SS,0,1,0	; play special stage BG	music
-		move.w	#0,(v_btnpushtime1).w
-		lea	(DemoDataPtr).l,a1
+		clr.w	(v_btnpushtime1).w
+		lea		(DemoDataPtr).l,a1
 		moveq	#6,d0
 		lsl.w	#2,d0
 		movea.l	(a1,d0.w),a1
@@ -3493,7 +3500,7 @@ GM_Continue:
 		move.w	#$8004,(a6)	; 8 colour mode
 		move.w	#$8700,(a6)	; background colour
 		bsr.w	ClearScreen
-		clr.b	(f_level_started).w	; LEVEL START FLAG
+		clr.w	(f_level_started).w	; LEVEL START FLAG and HUD SCROLL
 
 		lea	(v_objspace).w,a1
 		moveq	#0,d0
@@ -3652,22 +3659,22 @@ End_LoadData:
 		move.l	#Col_GHZ_1,(v_colladdr1).w ; MJ: Set first collision for ending
 		move.l	#Col_GHZ_2,(v_colladdr2).w ; MJ: Set second collision for ending
 		enable_ints
-		lea	(Kos_EndFlowers).l,a0 ;	load extra flower patterns
-		lea	($FFFF9400).w,a1 ; RAM address to buffer the patterns
+		lea		(Kos_EndFlowers).l,a0 ;	load extra flower patterns
+		lea		($FFFF9400).w,a1 ; RAM address to buffer the patterns
 		bsr.w	KosDec
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1	; load Sonic's palette
 		music	bgm_Ending,0,1,0	; play ending sequence music
 
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
-		bset	#0,(v_player+obStatus).w ; make Sonic face left
+		bset	#staFacing,(v_player+obStatus).w ; make Sonic face left
 		move.b	#1,(f_lockctrl).w ; lock controls
 		move.w	#(btnL<<8),(v_jpadhold2).w ; move Sonic to the left
 		move.w	#$F800,(v_player+obInertia).w ; set Sonic's speed
-		bset	#0,(f_level_started).w
-		jsr	(ObjPosLoad).l
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
+		move.w	#$190,(f_level_started).w ; Allow the HUD and hardset HUD's position
+		jsr		(ObjPosLoad).l
+		jsr		(ExecuteObjects).l
+		jsr		(BuildSprites).l
 		moveq	#0,d0
 		move.w	d0,(v_rings).w
 		move.l	d0,(v_time).w
@@ -3824,7 +3831,7 @@ Map_ESth:	include	"_maps\Ending Sequence STH.asm"
 GM_Credits:
 		bsr.w	ClearPLC
 		bsr.w	PaletteFadeOut
-		lea	(vdp_control_port).l,a6
+		lea		(vdp_control_port).l,a6
 		move.w	#$8004,(a6)		; 8-colour mode
 		move.w	#$8200+(vram_fg>>10),(a6) ; set foreground nametable address
 		move.w	#$8400+(vram_bg>>13),(a6) ; set background nametable address
@@ -3834,31 +3841,31 @@ GM_Credits:
 		move.w	#$8720,(a6)		; set background colour (line 3; colour 0)
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
-		clr.b	(f_level_started).w
+		clr.w	(f_level_started).w ; HUD Drawing and Scrolling
 
-		lea	(v_objspace).w,a1
+		lea		(v_objspace).w,a1
 		moveq	#0,d0
 		move.w	#$7FF,d1
 	Cred_ClrObjRam:
 		move.l	d0,(a1)+
-		dbf	d1,Cred_ClrObjRam ; clear object RAM
+		dbf		d1,Cred_ClrObjRam ; clear object RAM
 
 		locVRAM	$B400
-		lea	(Nem_CreditText).l,a0 ;	load credits alphabet patterns
+		lea		(Nem_CreditText).l,a0 ;	load credits alphabet patterns
 		bsr.w	NemDec
 
-		lea	(v_pal_dry_dup).w,a1
+		lea		(v_pal_dry_dup).w,a1
 		moveq	#0,d0
 		move.w	#$1F,d1
 	Cred_ClrPal:
 		move.l	d0,(a1)+
-		dbf	d1,Cred_ClrPal ; fill palette with black
+		dbf		d1,Cred_ClrPal ; fill palette with black
 
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1	; load Sonic's palette
 		move.b	#id_CreditsText,(v_objspace+$80).w ; load credits object
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
+		jsr		(ExecuteObjects).l
+		jsr		(BuildSprites).l
 		bsr.w	EndingDemoLoad
 		moveq	#0,d0
 		move.b	(v_zone).w,d0

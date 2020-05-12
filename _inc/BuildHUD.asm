@@ -29,7 +29,8 @@ BuildHUD:
 		bne.s	@skip						; if not, branch
 		addq.w	#2,d1						; set mapping frame for double blink
 	@goahead:
-		move.w	#128+16,d3					; set X pos
+		moveq	#0,d3
+		move.b	(v_hudscrollpos).w,d3		; set X pos. Will scroll to $90.
 		move.w	#128+136,d2					; set Y pos
 		lea	(Map_HUD).l,a1
 		movea.w	#$6CA,a3					; set art tile and flags
@@ -47,4 +48,3 @@ BuildHUD:
 	@end:
 		rts
 ; End of function BuildHUD
-
