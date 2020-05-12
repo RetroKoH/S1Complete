@@ -55,7 +55,7 @@ loc_13602:
 loc_1361E:
 		add.w	d1,obY(a0)
 		move.b	d3,obAngle(a0)
-		bsr.w	Sonic_ResetOnFloor
+		;bsr.w	Sonic_ResetOnFloor ; Fix Bubble Shield Bounce
 		move.b	#aniID_Walk,obAnim(a0)
 		move.b	d3,d0
 		addi.b	#$20,d0
@@ -72,7 +72,7 @@ loc_1361E:
 loc_1364E:
 		move.w	#0,obVelY(a0)
 		move.w	obVelX(a0),obInertia(a0)
-		rts	
+		bra.w	Sonic_ResetOnFloor
 ; ===========================================================================
 
 loc_1365C:
@@ -82,6 +82,7 @@ loc_1365C:
 		move.w	#$FC0,obVelY(a0)
 
 loc_13670:
+		bsr.w	Sonic_ResetOnFloor
 		move.w	obVelY(a0),obInertia(a0)
 		tst.b	d3
 		bpl.s	locret_1367E
@@ -122,10 +123,11 @@ loc_136B4:
 		bpl.s	locret_136E0
 		add.w	d1,obY(a0)
 		move.b	d3,obAngle(a0)
-		bsr.w	Sonic_ResetOnFloor
+		;bsr.w	Sonic_ResetOnFloor
 		move.b	#aniID_Walk,obAnim(a0)
 		move.w	#0,obVelY(a0)
 		move.w	obVelX(a0),obInertia(a0)
+		bra.w	Sonic_ResetOnFloor
 
 locret_136E0:
 		rts	
@@ -201,10 +203,11 @@ loc_13772:
 		bpl.s	locret_1379E
 		add.w	d1,obY(a0)
 		move.b	d3,obAngle(a0)
-		bsr.w	Sonic_ResetOnFloor
+		;bsr.w	Sonic_ResetOnFloor
 		move.b	#aniID_Walk,obAnim(a0)
 		move.w	#0,obVelY(a0)
 		move.w	obVelX(a0),obInertia(a0)
+		bra.w	Sonic_ResetOnFloor
 
 locret_1379E:
 		rts	

@@ -21,7 +21,7 @@ Sonic_Water:
 		tst.w	obVelY(a0)	; check if player is moving upward (i.e. from jumping)
 		bmi.s	@exit		; if yes, skip routine
 
-		bset	#6,obStatus(a0)
+		bset	#staWater,obStatus(a0)
 		bne.s	@exit
 		bsr.w	ResumeMusic
 		move.b	#id_DrownCount,(v_objspace+$340).w ; load bubbles object from Sonic's mouth

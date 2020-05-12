@@ -20,7 +20,7 @@ Mon_Main:	; Routine 0
 		move.b	#$E,obHeight(a0)
 		move.b	#$E,obWidth(a0)
 		move.l	#Map_Monitor,obMap(a0)
-		move.w	#$680,obGfx(a0)
+		move.w	#ArtNem_Monitors,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#$F,obActWid(a0)
@@ -31,7 +31,7 @@ Mon_Main:	; Routine 0
 		btst	#0,2(a2,d0.w)	; has monitor been broken?
 		beq.s	@notbroken	; if not, branch
 		move.b	#8,obRoutine(a0) ; run "Mon_Display" routine
-		move.b	#$B,obFrame(a0)	; use broken monitor frame
+		move.b	#$10,obFrame(a0)	; use broken monitor frame
 		rts	
 ; ===========================================================================
 
@@ -108,24 +108,24 @@ loc_A230:
 
 loc_A236:
 		sub.w	d0,obX(a1)
-		move.w	#0,obInertia(a1)
-		move.w	#0,obVelX(a1)
+		clr.w	obInertia(a1)
+		clr.w	obVelX(a1)
 
 loc_A246:
-		btst	#1,obStatus(a1)
+		btst	#staAir,obStatus(a1)
 		bne.s	loc_A26A
-		bset	#5,obStatus(a1)
-		bset	#5,obStatus(a0)
+		bset	#staPush,obStatus(a1)
+		bset	#staPush,obStatus(a0)
 		bra.s	Mon_Animate
 ; ===========================================================================
 
 loc_A25C:
-		btst	#5,obStatus(a0)
+		btst	#staPush,obStatus(a0)
 		beq.s	Mon_Animate
 
 loc_A26A:
-		bclr	#5,obStatus(a0)
-		bclr	#5,obStatus(a1)
+		bclr	#staPush,obStatus(a0)
+		bclr	#staPush,obStatus(a1)
 
 Mon_Animate:	; Routine 6
 		lea	(Ani_Monitor).l,a1
@@ -138,10 +138,10 @@ Mon_Display:	; Routine 8
 
 Mon_BreakOpen:	; Routine 4
 		addq.b	#2,obRoutine(a0)
-		move.b	#0,obColType(a0)
+		clr.b	obColType(a0)
 		bsr.w	FindFreeObj
 		bne.s	Mon_Explode
-		move.b	#id_PowerUp,0(a1) ; load monitor contents object
+		move.b	#id_PowerUp,obID(a1) ; load monitor contents object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.b	obAnim(a0),obAnim(a1)
@@ -149,7 +149,7 @@ Mon_BreakOpen:	; Routine 4
 Mon_Explode:
 		bsr.w	FindFreeObj
 		bne.s	@fail
-		move.b	#id_ExplosionItem,0(a1) ; load explosion object
+		move.b	#id_ExplosionItem,obID(a1) ; load explosion object
 		addq.b	#2,obRoutine(a1) ; don't create an animal
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
@@ -159,5 +159,5 @@ Mon_Explode:
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		bset	#0,2(a2,d0.w)
-		move.b	#9,obAnim(a0)	; set monitor type to broken
+		move.b	#$E,obAnim(a0)	; set monitor type to broken
 		bra.w	DisplaySprite

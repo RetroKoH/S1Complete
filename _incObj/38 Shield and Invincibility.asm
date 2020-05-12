@@ -26,12 +26,14 @@ obDPLC:		equ $3C
 Shi_Init:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Shield,obMap(a0)
+		move.l	#Art_Shield,obArt(a0)
+		move.l	#ShieldDynPLC,obDPLC(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$2550,obGfx(a0)
-		tst.b	obAnim(a0)					; is object a shield?
-		beq.s	@shield						; if yes, branch
+		tst.b	obAnim(a0)					; is object a blue shield?
+		beq.s	@blueshield					; if yes, branch
 		cmpi.b	#5,obAnim(a0)     			; is object a flame shield?
 		bne.s	@noflame        			; if not, branch
 		move.l	#Map_FlameShield,obMap(a0)
@@ -39,7 +41,7 @@ Shi_Init:	; Routine 0
 		move.l	#DPLC_FlameShield,obDPLC(a0)
 		move.b	#5,obGfx(a0)				; quickly set to first palette line
 		addq.b	#4,obRoutine(a0)
-	@shield:
+	@blueshield:
 		rts
 
 	@noflame:
@@ -225,18 +227,27 @@ Shi_Lightning:	; Routine 8
 ;		beq.s	@remove
 		btst	#stsShield,(v_status_secondary).w	; does Sonic have shield?
 		beq.s	@delete								; if not, branch
-		btst	#staWater,(v_player+obStatus).w	; is Sonic underwater?
-		bne.s	@checkflash						; if yes, branch, and destroy the shield
+		btst	#staWater,(v_player+obStatus).w		; is Sonic underwater?
+		bne.s	@checkflash							; if yes, branch, and destroy the shield
 		move.w	(v_player+obX).w,obX(a0)
 		move.w	(v_player+obY).w,obY(a0)
 		move.b	(v_player+obStatus).w,obStatus(a0)
 		andi.b	#1,obStatus(a0)
+
+	@chkspark:
+		cmpi.b	#aniID_LightningShield,obAnim(a0)
+		beq.s	@animate
+		bsr.w	Lightning_CreateSpark
+		move.b	#aniID_LightningShield,obAnim(a0)
+
+	@animate:
 		lea		(Ani_Shield).l,a1
 		jsr		AnimateSprite
 		move.w	#$80,obPriority(a0)
 		cmpi.b	#$F,obFrame(a0)
 		bcs.s	@display
 		move.w	#$200,obPriority(a0)
+
 	@display:
 		bsr.w	Shield_LoadGfx
 		jmp		DisplaySprite
@@ -273,33 +284,36 @@ Lightning_FlashWater:
 ; ===========================================================================
 
 Lightning_CreateSpark:
-;		moveq	#$C,d2
+		lea		(v_sparkspace).w,a1
+		lea		(SparkVelocities).l,a2
+		moveq	#3,d1
 
-;Metal_Create_Spark: ; Metal Sonic's double jump sparks use this too
-;		lea	(v_sparkspace).w,a1
-;		lea	(SparkVelocities).l,a2
-;		moveq	#3,d1
+	@loop:
+		move.b	#id_ShieldItem,obID(a1)	; Make new Spark Object
+		move.b	#$E,obRoutine(a1)
+		move.w	obX(a0),obX(a1)
+		move.w	obY(a0),obY(a1)
+		move.l	obMap(a0),obMap(a1)
+		move.w	obGfx(a0),obGfx(a1)
+		move.b	#4,obRender(a1)
+		move.w	#$80,obPriority(a1)
+		move.b	#8,obActWid(a1)
+		move.b	#aniID_LightningSpark,obAnim(a1)
+		move.w	(a2)+,obVelX(a1)
+		move.w	(a2)+,obVelY(a1)
+		lea		$40(a1),a1
+		dbf		d1,@loop
 
-;	@loop:
-;		move.b	#id_ShieldItem,(a1)
-;		move.b	#$E,routine(a1)
-;		move.w	x_pos(a0),x_pos(a1)
-;		move.w	y_pos(a0),y_pos(a1)
-;		move.l	mappings(a0),mappings(a1)
-;		move.w	art_tile(a0),art_tile(a1)
-;		move.b	#4,render_flags(a1)
-;		move.w	#$80,priority(a1)
-;		move.b	#8,width_pixels(a1)
-;		move.b	d2,anim(a1)
-;		move.w	(a2)+,x_vel(a1)
-;		move.w	(a2)+,y_vel(a1)
-;		lea	$40(a1),a1
-;		dbf	d1,@loop
-
-;	@end:
+	@end:
 		rts
 ; End of function Lightning_CreateSpark
 ; ===========================================================================
+; ---------------------------------------------------------------------------
+SparkVelocities:dc.w  $FE00, $FE00
+		dc.w   $200, $FE00
+		dc.w  $FE00,  $200
+		dc.w   $200,  $200
+; ---------------------------------------------------------------------------
 
 Shi_Insta:	; Routine $C
 		btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
@@ -331,16 +345,16 @@ Shi_Insta:	; Routine $C
 ; ===========================================================================
 
 Shi_LightningSpark: ; Routine $E
-		jsr	SpeedToPos
+		jsr		SpeedToPos
 		addi.w	#$18,obVelY(a0)
-		lea	(Ani_Shield).l,a1
-		jsr	AnimateSprite
-		cmpi.b	#$E,obRoutine(a0)
+		lea		(Ani_Shield).l,a1
+		jsr		AnimateSprite
+		cmpi.b	#$E,obRoutine(a0) 		; Changes at the end of the animation
 		bne.s	@delete
-		jmp	DisplaySprite
+		jmp		DisplaySprite
 
 	@delete:
-		jmp	DeleteObject
+		jmp		DeleteObject
 ; ===========================================================================
 
 Shi_LightningDestroy: ; Routine $10

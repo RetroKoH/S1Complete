@@ -101,15 +101,14 @@ Shield_L_B:	spriteHeader
 Shield_L_B_End
 
 Shield_L_C:	spriteHeader
-	spritePiece	-4, -4, 1, 1, $1F, 0, 0, 0, 0
+	spritePiece	-4, -4, 1, 1, $15, 0, 0, 0, 0
 Shield_L_C_End
 
 Shield_L_D:	spriteHeader
-	spritePiece	-8, -8, 2, 2, $20, 0, 0, 0, 0
+	spritePiece	-8, -8, 2, 2, $16, 0, 0, 0, 0
 Shield_L_D_End
 
 Shield_L_E:	spriteHeader
 Shield_L_E_End
 
 	even
-

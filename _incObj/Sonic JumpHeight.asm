@@ -56,7 +56,7 @@ Sonic_ShieldCheckFire:
 		bne.w	Sonic_ShieldDoNothing				; if yes, branch
 		btst	#stsFlame,(v_status_secondary).w	; does Sonic have a Fire Shield?
 		beq.s	Sonic_ShieldCheckLightning			; if not, branch
-		addq.b	#1,(v_shieldspace+obAnim).w			; Set animation
+		addq.b	#1,(v_shieldspace+obAnim).w			; Set animation to aniID_FlameDash
 		move.b	#1,obJumpFlag(a0)					; Set double jump flag
 		move.w	#$800,d0							; Set horizontal speed to 8
 		btst	#staFacing,obStatus(a0)				; is Sonic facing left?
@@ -74,7 +74,7 @@ Sonic_ShieldCheckFire:
 Sonic_ShieldCheckLightning:
 		btst	#stsLightning,(v_status_secondary).w	; does Sonic have a Lightning Shield?
 		beq.s	Sonic_ShieldCheckBubble		; if not, branch
-		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation
+		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation to aniID_LightningSpark
 		move.b	#1,obJumpFlag(a0)
 		move.w	#-$580,obVelY(a0)			; y speed set to -5.5, to spring him further upward
 		clr.b	obJumping(a0)
@@ -85,11 +85,11 @@ Sonic_ShieldCheckLightning:
 Sonic_ShieldCheckBubble:
 		btst	#stsBubble,(v_status_secondary).w	; does Sonic have a Bubble Shield
 		beq.s	Sonic_ShieldCheckSuper		; if not, branch
-		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation
+		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation to aniID_BubbleBounce
 		move.b	#1,obJumpFlag(a0)
 		clr.w	obVelX(a0)
 		clr.w	obInertia(a0)
-		move.w	#$800,obVelY(a0)				; send Sonic straight down, to bounce himself up
+		move.w	#$800,obVelY(a0)			; send Sonic straight down, to bounce himself up
 		;move.w	#$44,d0
 		;jmp	(Play_Sound_2).l
 		rts

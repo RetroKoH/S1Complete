@@ -99,7 +99,7 @@ Pow_Shoes:
 		bne.s	@nomusic							; if yes, branch
 		tst.b	(f_lockscreen).w		; is boss mode on?
 		bne.s	@nomusic				; if yes, branch
-		cmpi.b	#$C,(v_air).w			; is drowning countdown active?
+		cmpi.w	#$C,(v_air).w			; is drowning countdown active?
 		bls.s	@nomusic				; if yes, branch
 		music	bgm_Speedup,1,0,0		; speed	up the music
 
@@ -131,7 +131,7 @@ Pow_Invinc:
 		move.b	#4,(v_invincspace+$C0+obAnim).w
 		tst.b	(f_lockscreen).w					; is boss mode on?
 		bne.s	@nomusic							; if yes, branch
-		cmpi.b	#$C,(v_air).w			; is drowning countdown active?
+		cmpi.w	#$C,(v_air).w			; is drowning countdown active?
 		bls.s	@nomusic				; if yes, branch
 		music	bgm_Invincible,1,0,0	; play invincibility music
 
