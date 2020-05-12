@@ -40,15 +40,16 @@ locret_134D2:
 ; Shield Moves, and Drop Dash
 
 Sonic_DoubleJumpMoves:
-		tst.b	obJumpFlag(a0)			; is Sonic currently performing a double jump?
-		bne.w	Sonic_ShieldDoNothing	; if yes, branch
+		tst.b	obJumpFlag(a0)						; is Sonic currently performing a double jump?
+		bne.w	Sonic_ChkDropDash					; if yes, branch (Instead of doing nothing, we will check for DropDash)
 		move.b	(v_jpadpress2).w,d0
-		andi.b	#btnABC,d0				; are buttons A, B, or C being pressed?
-		beq.w	Sonic_ShieldDoNothing	; if not, branch
-		bclr	#4,obStatus(a0)
+		andi.b	#btnABC,d0							; are buttons A, B, or C being pressed?
+		beq.w	Sonic_ShieldDoNothing				; if not, branch
+		bclr	#4,obStatus(a0)						; clear Roll Jump flag
 		btst	#stsSuper,(v_status_secondary).w	; is Sonic currently in his Super form?
 		beq.s	Sonic_ShieldCheckFire				; if not, branch
-		move.b	#1,obJumpFlag(a0)					; if yes, set Sonic's double jump flag
+	; super sonic
+		move.b	#1,obJumpFlag(a0)					; if yes, just set Sonic's double jump flag
 		rts
 
 Sonic_ShieldCheckFire:
@@ -73,10 +74,10 @@ Sonic_ShieldCheckFire:
 
 Sonic_ShieldCheckLightning:
 		btst	#stsLightning,(v_status_secondary).w	; does Sonic have a Lightning Shield?
-		beq.s	Sonic_ShieldCheckBubble		; if not, branch
-		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation to aniID_LightningSpark
+		beq.s	Sonic_ShieldCheckBubble					; if not, branch
+		addq.b	#1,(v_shieldspace+obAnim).w				; Set animation to aniID_LightningSpark
 		move.b	#1,obJumpFlag(a0)
-		move.w	#-$580,obVelY(a0)			; y speed set to -5.5, to spring him further upward
+		move.w	#-$580,obVelY(a0)						; y speed set to -5.5, to spring him further upward
 		clr.b	obJumping(a0)
 		;move.w	#$45,d0
 		;jmp	(Play_Sound_2).l
@@ -84,12 +85,12 @@ Sonic_ShieldCheckLightning:
 
 Sonic_ShieldCheckBubble:
 		btst	#stsBubble,(v_status_secondary).w	; does Sonic have a Bubble Shield
-		beq.s	Sonic_ShieldCheckSuper		; if not, branch
-		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation to aniID_BubbleBounce
+		beq.s	Sonic_ShieldCheckSuper				; if not, branch
+		addq.b	#1,(v_shieldspace+obAnim).w			; Set animation to aniID_BubbleBounce
 		move.b	#1,obJumpFlag(a0)
 		clr.w	obVelX(a0)
 		clr.w	obInertia(a0)
-		move.w	#$800,obVelY(a0)			; send Sonic straight down, to bounce himself up
+		move.w	#$800,obVelY(a0)					; send Sonic straight down, to bounce himself up
 		;move.w	#$44,d0
 		;jmp	(Play_Sound_2).l
 		rts
@@ -99,11 +100,12 @@ Sonic_ShieldCheckSuper:
 
 Sonic_ShieldInsta:
 		btst	#stsShield,(v_status_secondary).w	; does Sonic have a blue shield?
-		bne.s	Sonic_ShieldDoNothing		; if yes, branch
-		addq.b	#1,(v_shieldspace+obAnim).w	; Set animation
+		bne.s	Sonic_ShieldDoNothing				; if yes, branch
+		addq.b	#1,(v_shieldspace+obAnim).w			; Set animation
 		move.b	#1,obJumpFlag(a0)
 		;move.w	#$42,d0
 		;jmp	(Play_Sound_2).l
 
+Sonic_ChkDropDash:
 Sonic_ShieldDoNothing:
 		rts

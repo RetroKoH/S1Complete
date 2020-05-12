@@ -224,7 +224,7 @@ stsBubble:		equ 6
 stsLightning:	equ 7
 
 stsRmvShield:	equ $1E
-stsChkShield:	equ $3E
+stsChkShield:	equ $E3
 
 ; NEW GLOBAL Animation IDs - To make easier the usage of animations across all 6 characters
 aniID_Null:			equ 0		; Null animation

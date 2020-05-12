@@ -8,16 +8,14 @@
 ReactToItem:
 		nop
 ;		jsr	Touch_Rings
-
-		; INSTASHIELD ADDITION
 ;		tst.b	character_id(a0)			; is the player character Sonic?
 ;		bne.s	@noInstaShield				; if not, branch
 		move.b	(v_status_secondary).w,d0	; does the player have a Shield or Invincibility?
 		andi.b	#stsChkShield,d0
 		bne.s	@noInstaShield				; if yes, branch
+; By this point, we're focussing purely on the Insta-Shield
 		cmpi.b	#1,obJumpFlag(a0)			; is the insta-shield active?
 		bne.s	@noInstaShield				; if not, branch
-
 		move.b	(v_status_secondary).w,d0
 		move.w	d0,-(sp)
 		bset	#stsInvinc,(v_status_secondary).w		; Set invincibility
@@ -39,7 +37,6 @@ ReactToItem:
 		; INSTASHIELD ADDITION - REV C EDIT
 
 	@noInstaShield:
-
 		move.w	obX(a0),d2	; load Sonic's x-axis position
 		move.w	obY(a0),d3	; load Sonic's y-axis position
 		subq.w	#8,d2

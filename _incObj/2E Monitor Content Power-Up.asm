@@ -9,12 +9,12 @@ PowerUp:
 		jmp		Pow_Index(pc,d1.w)
 ; ===========================================================================
 Pow_Index:
-		dc.w Pow_Main-Pow_Index
+		dc.w Pow_Init-Pow_Index
 		dc.w Pow_Move-Pow_Index
 		dc.w Pow_Delete-Pow_Index
 ; ===========================================================================
 
-Pow_Main:	; Routine 0
+Pow_Init:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.w	#$680,obGfx(a0)
 		move.b	#$24,obRender(a0)
@@ -46,7 +46,9 @@ Pow_Checks:
 		move.b	obAnim(a0),d0
 		add.w	d0,d0
 		move.w	Pow_Types(pc,d0.w),d0
-		jmp	Pow_Types(pc,d0.w)
+		jsr		Pow_Types(pc,d0.w)
+		bra.w	DisplaySprite
+
 ; Lookup table replaces the old system
 ; ===========================================================================
 
@@ -94,7 +96,7 @@ Pow_Shoes:
 		lea     (v_player).w,a0					; Load Sonic to a0
 		lea		(v_sonspeedmax).w,a2			; Load Sonic_top_speed into a2
 		jsr		ApplySpeedSettings				; Fetch Speed settings
-		movem.l (sp)+,a0-a2				; Move a0, a1 and a2 from stack
+		movem.l (sp)+,a0-a2						; Move a0, a1 and a2 from stack
 		btst  	#stsSuper,(v_status_secondary).w	; Is Sonic in his Super form?
 		bne.s	@nomusic							; if yes, branch
 		tst.b	(f_lockscreen).w		; is boss mode on?
@@ -173,7 +175,7 @@ Pow_SlowShoes: ; Used to slow down the player
 
 Pow_FShield:
 		andi.b	#stsRmvShield,(v_status_secondary).w	; remove shield status
-		bset	#stsShield,(v_status_secondary).w		; give Sonic a blue shield
+		bset	#stsShield,(v_status_secondary).w		; give Sonic a shield
 		bset	#stsFlame,(v_status_secondary).w ; give Sonic a flame shield
 		move.b	#id_ShieldItem,(v_shieldspace).w ; load shield object ($38)
 		clr.b	(v_shieldspace+obRoutine).w
@@ -183,7 +185,7 @@ Pow_FShield:
 
 Pow_BShield:
 		andi.b	#stsRmvShield,(v_status_secondary).w	; remove shield status
-		bset	#stsShield,(v_status_secondary).w		; give Sonic a blue shield
+		bset	#stsShield,(v_status_secondary).w		; give Sonic a shield
 		bset	#stsBubble,(v_status_secondary).w ; give Sonic a bubble shield
 		move.b	#id_ShieldItem,(v_shieldspace).w ; load shield object ($38)
 		clr.b	(v_shieldspace+obRoutine).w
@@ -193,7 +195,7 @@ Pow_BShield:
 
 Pow_LShield:
 		andi.b	#stsRmvShield,(v_status_secondary).w	; remove shield status
-		bset	#stsShield,(v_status_secondary).w		; give Sonic a blue shield
+		bset	#stsShield,(v_status_secondary).w		; give Sonic a shield
 		bset	#stsLightning,(v_status_secondary).w ; give Sonic a lightning shield
 		move.b	#id_ShieldItem,(v_shieldspace).w ; load shield object ($38)
 		clr.b	(v_shieldspace+obRoutine).w
