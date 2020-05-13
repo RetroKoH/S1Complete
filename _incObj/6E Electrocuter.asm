@@ -21,6 +21,7 @@ Elec_Main:	; Routine 0
 		move.w	#ArtNem_SBZElectric,obGfx(a0)
 		ori.b	#4,obRender(a0)
 		move.b	#$28,obActWid(a0)
+		bset	#stsLightning,obShieldProp(a0) ; Negated by Electric Shield
 		moveq	#0,d0
 		move.b	obSubtype(a0),d0 ; read object type
 		lsl.w	#4,d0		; multiply by $10

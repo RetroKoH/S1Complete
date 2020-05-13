@@ -8,14 +8,18 @@ Monitor:
 		move.w	Mon_Index(pc,d0.w),d1
 		jmp	Mon_Index(pc,d1.w)
 ; ===========================================================================
-Mon_Index:	dc.w Mon_Main-Mon_Index
+Mon_Index:
+		dc.w Mon_Main-Mon_Index
 		dc.w Mon_Solid-Mon_Index
 		dc.w Mon_BreakOpen-Mon_Index
 		dc.w Mon_Animate-Mon_Index
 		dc.w Mon_Display-Mon_Index
+		dc.w Mon_Delete-Mon_Index ; Only to be used with f_optmonitor
 ; ===========================================================================
 
 Mon_Main:	; Routine 0
+		cmpi.b	#$FF,obSubtype(a0)
+		beq.s	@todelete
 		addq.b	#2,obRoutine(a0)
 		move.b	#$E,obHeight(a0)
 		move.b	#$E,obWidth(a0)
@@ -32,12 +36,17 @@ Mon_Main:	; Routine 0
 		beq.s	@notbroken	; if not, branch
 		move.b	#8,obRoutine(a0) ; run "Mon_Display" routine
 		move.b	#$10,obFrame(a0)	; use broken monitor frame
-		rts	
+		rts
+	@todelete:
+		move.b	#$A,obRoutine(a0)
+		rts
 ; ===========================================================================
 
 	@notbroken:
 		move.b	#$46,obColType(a0)
-		move.b	obSubtype(a0),obAnim(a0)
+		move.b	obSubtype(a0),d0
+		andi.b	#$1F,d0						; top bit of subtype for f_optmonitor
+		move.b	d0,obAnim(a0)
 
 Mon_Solid:	; Routine 2
 		move.b	ob2ndRout(a0),d0 ; is monitor set to fall?
@@ -134,6 +143,9 @@ Mon_Animate:	; Routine 6
 Mon_Display:	; Routine 8
 		out_of_range	DeleteObject
 		bra.w	DisplaySprite
+
+Mon_Delete:		; Routine $A
+		bra.w	DeleteObject
 ; ===========================================================================
 
 Mon_BreakOpen:	; Routine 4

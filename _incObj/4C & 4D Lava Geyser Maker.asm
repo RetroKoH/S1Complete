@@ -18,7 +18,7 @@ GMake_Index:
 		dc.w GMake_Display-GMake_Index
 		dc.w GMake_Delete-GMake_Index
 
-gmake_time:	equ $34		; time delay (2 bytes)
+gmake_time:		equ $34		; time delay (2 bytes)
 gmake_timer:	equ $32		; current time remaining (2 bytes)
 gmake_parent:	equ $3C		; address of parent object
 ; ===========================================================================
@@ -163,6 +163,7 @@ Geyser_Main:	; Routine 0
 		move.w	$30(a0),$30(a1)
 		addi.w	#$60,$30(a1)
 		move.b	#$93,obColType(a1)
+		bset	#stsFlame,obShieldProp(a0) ; Negated by Flame Shield
 		move.b	#$80,obHeight(a1)
 		bset	#4,obRender(a1)
 		addq.b	#4,obRoutine(a1)

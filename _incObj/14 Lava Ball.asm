@@ -26,6 +26,7 @@ LBall_Main:	; Routine 0
 		move.b	#4,obRender(a0)
 		move.w	#$180,obPriority(a0)
 		move.b	#$8B,obColType(a0)
+		bset	#stsFlame,obShieldProp(a0) ; Negated by Flame Shield
 		move.w	obY(a0),$30(a0)
 		tst.b	$29(a0)
 		beq.s	@speed

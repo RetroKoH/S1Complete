@@ -37,22 +37,23 @@ Buzz_Action:	; Routine 2
 		bsr.w	AnimateSprite
 		bra.w	RememberState
 ; ===========================================================================
-@index:		dc.w @move-@index
+@index:	
+		dc.w @move-@index
 		dc.w @chknearsonic-@index
 ; ===========================================================================
 
 @move:
-		subq.w	#1,buzz_timedelay(a0) ; subtract 1 from time delay
-		bpl.s	@noflip		; if time remains, branch
-		btst	#1,buzz_buzzstatus(a0) ; is Buzz Bomber near Sonic?
-		bne.s	@fire		; if yes, branch
+		subq.w	#1,buzz_timedelay(a0)	; subtract 1 from time delay
+		bpl.s	@noflip					; if time remains, branch
+		btst	#1,buzz_buzzstatus(a0)	; is Buzz Bomber near Sonic?
+		bne.s	@fire					; if yes, branch
 		addq.b	#2,ob2ndRout(a0)
-		move.w	#127,buzz_timedelay(a0) ; set time delay to just over 2 seconds
-		move.w	#$400,obVelX(a0) ; move Buzz Bomber to the right
-		move.b	#1,obAnim(a0)	; use "flying" animation
-		btst	#0,obStatus(a0)	; is Buzz Bomber facing	left?
-		bne.s	@noflip		; if not, branch
-		neg.w	obVelX(a0)	; move Buzz Bomber to the left
+		move.w	#127,buzz_timedelay(a0)	; set time delay to just over 2 seconds
+		move.w	#$400,obVelX(a0)		; move Buzz Bomber to the right
+		move.b	#1,obAnim(a0)			; use "flying" animation
+		btst	#0,obStatus(a0)			; is Buzz Bomber facing	left?
+		bne.s	@noflip					; if not, branch
+		neg.w	obVelX(a0)				; move Buzz Bomber to the left
 
 	@noflip:
 		rts	
@@ -61,7 +62,7 @@ Buzz_Action:	; Routine 2
 	@fire:
 		bsr.w	FindFreeObj
 		bne.s	@fail
-		move.b	#id_Missile,0(a1) ; load missile object
+		move.b	#id_Missile,obID(a1) ; load missile object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		addi.w	#$1C,obY(a1)
@@ -108,19 +109,18 @@ Buzz_Action:	; Routine 2
 ; ===========================================================================
 
 	@chgdirection:
-		move.b	#0,buzz_buzzstatus(a0) ; set Buzz Bomber to "normal"
+		clr.b	buzz_buzzstatus(a0) ; set Buzz Bomber to "normal"
 		bchg	#0,obStatus(a0)	; change direction
 		move.w	#59,buzz_timedelay(a0)
 
 	@stop:
 		subq.b	#2,ob2ndRout(a0)
-		move.w	#0,obVelX(a0)	; stop Buzz Bomber moving
-		move.b	#0,obAnim(a0)	; use "hovering" animation
+		clr.w	obVelX(a0)	; stop Buzz Bomber moving
+		clr.b	obAnim(a0)	; use "hovering" animation
 
 @keepgoing:
 		rts	
 ; ===========================================================================
 
 Buzz_Delete:	; Routine 4
-		bsr.w	DeleteObject
-		rts	
+		bra.w	DeleteObject	

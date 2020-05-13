@@ -27,10 +27,11 @@ Msl_Main:	; Routine 0
 		move.w	#$180,obPriority(a0)
 		move.b	#8,obActWid(a0)
 		andi.b	#3,obStatus(a0)
-		tst.b	obSubtype(a0)	; was object created by	a Newtron?
-		beq.s	Msl_Animate	; if not, branch
+		bset	#stsReflect,obShieldProp(a0)	; Reflected by Elemental Shield
+		tst.b	obSubtype(a0)					; was object created by	a Newtron?
+		beq.s	Msl_Animate						; if not, branch
 
-		move.b	#8,obRoutine(a0) ; run "Msl_FromNewt" routine
+		move.b	#8,obRoutine(a0)				; run "Msl_FromNewt" routine
 		move.b	#$87,obColType(a0)
 		move.b	#1,obAnim(a0)
 		bra.s	Msl_Animate2
@@ -38,9 +39,9 @@ Msl_Main:	; Routine 0
 
 Msl_Animate:	; Routine 2
 		movea.l msl_parent(a0),a1
-		cmpi.b  #id_ExplosionItem,0(a1) ; has Buzz Bomber been destroyed?
-		beq.s   Msl_Delete  ; if yes, branch
-		lea	(Ani_Missile).l,a1
+		cmpi.b  #id_ExplosionItem,obID(a1)	; has Buzz Bomber been destroyed?
+		beq.s   Msl_Delete  				; if yes, branch
+		lea		(Ani_Missile).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
 
@@ -53,7 +54,7 @@ Msl_Animate:	; Routine 2
 
 Msl_ChkCancel:
 		movea.l	msl_parent(a0),a1
-		cmpi.b	#id_ExplosionItem,0(a1) ; has Buzz Bomber been destroyed?
+		cmpi.b	#id_ExplosionItem,obID(a1) ; has Buzz Bomber been destroyed?
 		beq.s	Msl_Delete	; if yes, branch
 		rts	
 ; End of function Msl_ChkCancel

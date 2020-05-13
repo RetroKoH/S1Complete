@@ -40,6 +40,7 @@ LWall_Main:	; Routine 0
 		move.w	#$80,obPriority(a1)
 		clr.b	obAnim(a1)
 		move.b	#$94,obColType(a1)
+		bset	#stsFlame,obShieldProp(a0) ; Negated by Flame Shield
 		move.l	a0,$3C(a1)
 
 	@fail:

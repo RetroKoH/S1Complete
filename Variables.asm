@@ -360,6 +360,8 @@ v_levseldelay:	equ $FFFFFF80	; level select - time until change when up/down is 
 v_levselitem:	equ $FFFFFF82	; level select - item selected (2 bytes)
 v_levselsound:	equ $FFFFFF84	; level select - sound selected (2 bytes)
 
+f_optmonitor:	equ $FFFFFF88	; Flag triggering monitor settings. (Sonic 1, Sonic 3K)
+
 f_level_started: 	equ $FFFFFF98	; Level started. Rings and HUD can be drawn
 v_hudscrollpos:		equ $FFFFFF99	; Scrolling x-position for the HUD.
 
@@ -375,6 +377,8 @@ f_debugcheat:	equ $FFFFFFE2	; debug mode cheat flag
 f_creditscheat:	equ $FFFFFFE3	; hidden credits & press start cheat flag
 v_title_dcount:	equ $FFFFFFE4	; number of times the d-pad is pressed on title screen (2 bytes)
 v_title_ccount:	equ $FFFFFFE6	; number of times C is pressed on title screen (2 bytes)
+
+
 
 f_demo:		equ $FFFFFFF0	; demo mode flag (0 = no; 1 = yes; $8001 = ending) (2 bytes)
 v_demonum:	equ $FFFFFFF2	; demo level number (not the same as the level number) (2 bytes)

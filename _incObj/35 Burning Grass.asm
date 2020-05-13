@@ -24,8 +24,9 @@ GFire_Main:	; Routine 0
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
 		move.b	#$8B,obColType(a0)
+		bset	#stsFlame,obShieldProp(a0) ; Negated by Flame Shield
 		move.b	#8,obActWid(a0)
-		sfx	sfx_Burning,0,0,0	 ; play burning sound
+		sfx		sfx_Burning,0,0,0	 ; play burning sound
 		tst.b	obSubtype(a0)
 		beq.s	loc_B238
 		addq.b	#2,obRoutine(a0)
@@ -56,7 +57,7 @@ loc_B238:	; Routine 2
 		bne.s	loc_B2B0
 		bsr.w	FindNextFreeObj
 		bne.s	loc_B2B0
-		move.b	#id_GrassFire,0(a1)
+		move.b	#id_GrassFire,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	d2,$2C(a1)
 		move.w	$3C(a0),$3C(a1)
@@ -74,6 +75,6 @@ GFire_Move:	; Routine 4
 		move.w	d0,obY(a0)
 
 GFire_Animate:
-		lea	(Ani_GFire).l,a1
+		lea		(Ani_GFire).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite

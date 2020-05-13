@@ -150,6 +150,9 @@ obRespawnNo:	equ $23	; respawn list index number
 obRoutine:		equ $24	; routine number
 ob2ndRout:		equ $25	; secondary routine number
 obAngle:		equ $26	; angle
+
+obShieldProp:	equ $27 ; How object responds to shields {Lightning-Bubble-Flame-Reflect 0-0-0-0}
+
 obSubtype:		equ $28	; object subtype
 obSolid:		equ ob2ndRout ; solid status flag
 
@@ -219,11 +222,15 @@ stsInvinc:		equ 1
 stsShoes:		equ 2
 stsGoggles:		equ 3
 stsSuper:		equ 4
+
+stsReflect:		equ 4 ; Shield Property for obstacles
+; Shield properties for Sonic and other objects
 stsFlame:		equ 5
 stsBubble:		equ 6
 stsLightning:	equ 7
 
 stsRmvShield:	equ $1E
+stsElShield:	equ $E0
 stsChkShield:	equ $E3
 
 ; NEW GLOBAL Animation IDs - To make easier the usage of animations across all 6 characters

@@ -28,6 +28,7 @@ Obj74_Main:	; Routine 0
 		tst.b	obSubtype(a0)
 		bne.s	loc_1870A
 		move.b	#$8B,obColType(a0)
+		bset	#stsFlame,obShieldProp(a0) ; Negated by Flame Shield
 		addq.b	#2,obRoutine(a0)
 		bra.w	loc_18886
 ; ===========================================================================
@@ -84,10 +85,10 @@ Obj74_MakeFlame:
 		move.w	obX(a0),$30(a0)
 		move.w	obY(a0),$38(a0)
 		move.b	#3,$29(a0)
-		jsr	(FindNextFreeObj).l
+		jsr		(FindNextFreeObj).l
 		bne.s	loc_187CA
-		lea	(a1),a3
-		lea	(a0),a2
+		lea		(a1),a3
+		lea		(a0),a2
 		moveq	#3,d0
 
 Obj74_Loop:
@@ -108,7 +109,7 @@ loc_187CA:
 
 
 Obj74_Duplicate2:
-		jsr	(FindNextFreeObj).l
+		jsr		(FindNextFreeObj).l
 		bne.s	locret_187EE
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)

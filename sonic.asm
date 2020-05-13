@@ -6459,8 +6459,8 @@ loc_DA3C:
 ; ===========================================================================
 
 OPL_MakeItem:
-		bsr.w	FindFreeObj
-		bne.s	locret_DA8A
+		bsr.w	FindFreeObj		; find empty slot
+		bne.s	locret_DA8A		; branch, if there is no room to load an object
 		move.w	(a0)+,obX(a1)
 		move.w	(a0)+,d0
 		move.w	d0,d1
@@ -6476,8 +6476,32 @@ OPL_MakeItem:
 		move.b	d2,obRespawnNo(a1)
 
 loc_DA80:
-		move.b	d0,0(a1)
+		move.b	d0,obID(a1)
 		move.b	(a0)+,obSubtype(a1)
+
+	; S3K Monitor setting check
+		moveq	#0,d0
+		cmpi.b	#id_Monitor,obID(a1)	; is the current object a monitor?
+		bne.s	@return					; if not, exit now
+		move.b	obSubtype(a1),d0
+		andi.b	#$F,d0
+		cmpi.b	#$B,d0					; $B-D = Elemental Shield
+		blt.s	@return
+		cmpi.b	#$E,d0					; $E = Broken Monitor
+		beq.s	@return
+		tst.b	(f_optmonitor).w		; Are elemental shields enabled?
+		bne.s	@return					; if yes, branch and exit
+; at this point, we don't want elemental shields. We can revert it or destroy it.
+		move.b	obSubtype(a1),d0
+		btst	#7,d0 					; should this monitor be destroyed?
+		beq.s	@revert	 	 	 	 	; if not, branch
+		move.b	#$FF,obSubtype(a1)		; to be deleted
+		bra.s	@return
+
+	@revert:
+		move.b	#4,obSubtype(a1)		; if not, default to blue shield
+
+	@return:
 		moveq	#0,d0
 
 locret_DA8A:

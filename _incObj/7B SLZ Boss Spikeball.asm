@@ -334,6 +334,7 @@ Obj7B_Loop:
 		move.w	(a2)+,obVelX(a1)
 		move.w	(a2)+,obVelY(a1)
 		move.b	#$98,obColType(a1)
+		bset	#stsReflect,obShieldProp(a0)	; Reflected by Elemental Shield
 		ori.b	#4,obRender(a1)
 		bset	#7,obRender(a1)
 		move.b	#$C,obActWid(a1)

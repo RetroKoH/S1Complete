@@ -87,13 +87,14 @@ Obj86_Loop:
 		move.l	#Map_Plasma,obMap(a1)
 		move.b	#$C,obHeight(a1)
 		move.b	#$C,obWidth(a1)
-		move.b	#0,obColType(a1)
+		clr.b	obColType(a1)
+		bset	#stsLightning,obShieldProp(a0) ; Negated by Electric Shield
 		move.w	#$180,obPriority(a1)
 		move.w	#$3E,obSubtype(a1)
 		move.b	#4,obRender(a1)
 		bset	#7,obRender(a1)
 		move.l	a0,$34(a1)
-		jsr	(RandomNumber).l
+		jsr		(RandomNumber).l
 		move.w	$32(a0),d1
 		muls.w	#-$4F,d1
 		addi.w	#$2578,d1

@@ -206,6 +206,7 @@ Crab_BallMain:	; Routine 6
 		move.b	#8,obActWid(a0)
 		move.w	#-$400,obVelY(a0)
 		move.b	#7,obAnim(a0)
+		bset	#stsReflect,obShieldProp(a0)	; Reflected by Elemental Shield
 
 Crab_BallMove:	; Routine 8
 		lea		(Ani_Crab).l,a1

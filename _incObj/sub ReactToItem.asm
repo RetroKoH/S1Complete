@@ -34,7 +34,6 @@ ReactToItem:
 	@skipclr:
 		moveq	#0,d0
 		rts
-		; INSTASHIELD ADDITION - REV C EDIT
 
 	@noInstaShield:
 		move.w	obX(a0),d2	; load Sonic's x-axis position
@@ -268,33 +267,67 @@ React_Enemy:
 ; ===========================================================================
 
 React_Caterkiller:
-	move.b	#1,d0
-	move.w  obInertia(a0),d1
-	bmi.s	@skip
-	move.b	#0,d0
+		move.b	#1,d0
+		move.w  obInertia(a0),d1
+		bmi.s	@skip
+		move.b	#0,d0
 
-@skip:
-	move.b	obStatus(a1),d1
-	andi.b	#1,d1
-	cmp.b	d0,d1			;are Sonic and the Caterkiller facing the same way?
-	bne.s	@hurt			;if not, move on
-	btst	#1,obStatus(a0)	;is Sonic in the air?
-	bne.s	@hurt			;if so, move on
-	btst	#2,obStatus(a0)	;is Sonic spinning?
-	beq.s	@hurt			;if not, move on
-	moveq	#-1,d0			;else, he's rolling on the ground, and shouldn't be hurt
-	rts				
+	@skip:
+		move.b	obStatus(a1),d1
+		andi.b	#1,d1
+		cmp.b	d0,d1			;are Sonic and the Caterkiller facing the same way?
+		bne.s	@hurt			;if not, move on
+		btst	#1,obStatus(a0)	;is Sonic in the air?
+		bne.s	@hurt			;if so, move on
+		btst	#2,obStatus(a0)	;is Sonic spinning?
+		beq.s	@hurt			;if not, move on
+		moveq	#-1,d0			;else, he's rolling on the ground, and shouldn't be hurt
+		rts				
 	
 @hurt:
 		bset	#7,obStatus(a1) ; Caterkiller fix
 
 React_ChkHurt:
-		btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
-		beq.s	HurtSonic	; if not, branch
+		move.b	(v_status_secondary).w,d0
+		andi.b	#stsChkShield,d0			; does the player have either a shield or invincibility?
+		beq.s	@noPowerUp					; if not, branch
+		and.b	obShieldProp(a1),d0			; is the object negated by player's current shield?
+		bne.s	@ret						; if yes, branch
+		btst	#0,(v_status_secondary).w	; does the player have a shield?
+		bne.s	@haveShield					; if yes, branch
 
-	@isflashing:
+	@chkInv:
+		btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
+		beq.s	HurtSonic							; if not, branch
+
+	@ret:
 		moveq	#-1,d0
 		rts
+
+	@noPowerUp:
+		cmpi.b	#1,obJumpFlag(a0)
+		bne.s	@chkInv
+
+	@haveShield:
+		move.b	obShieldProp(a1),d0
+		andi.b	#$10,d0				; is the object supposed to bounce off of shields?
+		beq.s	@chkInv					; if not, branch
+
+;Bounce_Projectile:
+		move.w	obX(a0),d1
+		move.w	obY(a0),d2
+		sub.w	obX(a1),d1
+		sub.w	obY(a1),d2
+		jsr		(CalcAngle).l
+		jsr		(CalcSine).l
+		muls.w	#-$800,d1
+		asr.l	#8,d1
+		move.w	d1,obVelX(a1)
+		muls.w	#-$800,d0
+		asr.l	#8,d0
+		move.w	d0,obVelY(a1)
+		clr.b	obColType(a1)
+		bra.s   @ret
 ; End of function ReactToItem
 ; ===========================================================================
 

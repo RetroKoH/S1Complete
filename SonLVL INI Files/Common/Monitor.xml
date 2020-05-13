@@ -13,7 +13,7 @@
       <ArtFile filename="../artnem/Monitors.bin" />
       <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="3" startpal="0" />
     </ImageFromMappings>
-    <ImageFromMappings id="sonic">
+    <ImageFromMappings id="1Up">
       <ArtFile filename="../artnem/Monitors.bin" />
       <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="4" startpal="0" />
     </ImageFromMappings>
@@ -41,22 +41,39 @@
       <ArtFile filename="../artnem/Monitors.bin" />
       <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="10" startpal="0" />
     </ImageFromMappings>
+    <ImageFromMappings id="fshield">
+      <ArtFile filename="../artnem/Monitors.bin" />
+      <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="13" startpal="0" />
+    </ImageFromMappings>
+    <ImageFromMappings id="bshield">
+      <ArtFile filename="../artnem/Monitors.bin" />
+      <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="14" startpal="0" />
+    </ImageFromMappings>
+    <ImageFromMappings id="lshield">
+      <ArtFile filename="../artnem/Monitors.bin" />
+      <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="15" startpal="0" />
+    </ImageFromMappings>
     <ImageFromMappings id="broken">
       <ArtFile filename="../artnem/Monitors.bin" />
-      <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="11" startpal="0" />
+      <MapFile type="ASM" filename="../_maps/Monitor.asm" frame="16" startpal="0" />
     </ImageFromMappings>
   </Images>
   <Subtypes>
     <Subtype id="00" name="Static" image="static" />
     <Subtype id="01" name="Eggman" image="eggman" />
-    <Subtype id="02" name="Sonic" image="sonic" />
+    <Subtype id="02" name="1-Up" image="1Up" />
     <Subtype id="03" name="Shoes" image="shoes" />
     <Subtype id="04" name="Shield" image="shield" />
     <Subtype id="05" name="Invincibility" image="invincibility" />
     <Subtype id="06" name="Rings" image="rings" />
     <Subtype id="07" name="S" image="s" />
     <Subtype id="08" name="Goggles" image="goggles" />
-    <Subtype id="09" name="Broken" image="broken" />
+    <Subtype id="09" name="Clock" image="goggles" />
+    <Subtype id="0A" name="Slow Shoes" image="goggles" />
+    <Subtype id="0B" name="F-Shield" image="fshield" />
+    <Subtype id="0C" name="B-Shield" image="bshield" />
+    <Subtype id="0D" name="L-Shield" image="lshield" />
+    <Subtype id="0E" name="Broken" image="broken" />
   </Subtypes>
   <Properties>
     <BitsProperty name="Contents" type="MonitorType" startbit="0" length="4" />
@@ -72,6 +89,11 @@
       <EnumMember name="Rings" />
       <EnumMember name="S" />
       <EnumMember name="Goggles" />
+      <EnumMember name="Clock" />
+      <EnumMember name="Slow Shoes" />
+      <EnumMember name="F-Shield" />
+      <EnumMember name="B-Shield" />
+      <EnumMember name="L-Shield" />
       <EnumMember name="Broken" />
     </Enum>
   </Enums>

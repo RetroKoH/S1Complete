@@ -6,9 +6,10 @@ LavaTag:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	LTag_Index(pc,d0.w),d1
-		jmp	LTag_Index(pc,d1.w)
+		jmp		LTag_Index(pc,d1.w)
 ; ===========================================================================
-LTag_Index:	dc.w LTag_Main-LTag_Index
+LTag_Index:
+		dc.w LTag_Main-LTag_Index
 		dc.w LTag_ChkDel-LTag_Index
 
 LTag_ColTypes:	dc.b $96, $94, $95
@@ -22,6 +23,7 @@ LTag_Main:	; Routine 0
 		move.b	LTag_ColTypes(pc,d0.w),obColType(a0)
 		move.l	#Map_LTag,obMap(a0)
 		move.b	#$84,obRender(a0)
+		bset	#stsFlame,obShieldProp(a0) ; Negated by Flame Shield
 
 LTag_ChkDel:	; Routine 2
 		move.w	obX(a0),d0
