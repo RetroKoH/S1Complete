@@ -274,6 +274,7 @@ loc_130BA:
 		move.b	#aniID_Stop,obAnim(a0) ; use "stopping" animation
 		bclr	#0,obStatus(a0)
 		sfx	sfx_Skid,0,0,0	; play stopping sound
+		move.b	#6,(v_effectspace+obRoutine).w
 
 locret_130E8:
 		rts	
@@ -322,6 +323,7 @@ loc_13120:
 		move.b	#aniID_Stop,obAnim(a0) ; use "stopping" animation
 		bset	#0,obStatus(a0)
 		sfx	sfx_Skid,0,0,0	; play stopping sound
+		move.b	#6,(v_effectspace+obRoutine).w
 
 locret_1314E:
 		rts	

@@ -1,5 +1,5 @@
 ; ----------------------------------------------------------------------------
-; Object 05 - Visual Effects (Spin Dash Dust, Insta-Shield, etc.)
+; Object 05 - Spindash and skid dust effects
 ; ----------------------------------------------------------------------------
 Effects:
 		moveq	#0,d0
@@ -11,6 +11,7 @@ Effects_Index:
 		dc.w Effects_Init-Effects_Index
 		dc.w Effects_Main-Effects_Index
 		dc.w Effects_Delete-Effects_Index
+		dc.w Effects_ChkSkid-Effects_Index
 ; ===========================================================================
 Effects_Init:
 		addq.b	#2,obRoutine(a0)
@@ -20,7 +21,6 @@ Effects_Init:
 		move.b	#$10,obActWid(a0)
 		move.b	#0,obAnim(a0)
 		move.w	#$7A0,obGfx(a0)
-		move.w	#$F400,$3C(a0)
 ; ===========================================================================
 Effects_Main:
 		lea		(v_player).w,a2
@@ -45,16 +45,15 @@ Fx_MdSpindashDust:
 		move.w	obY(a2),obY(a0)
 		move.b	obStatus(a2),obStatus(a0)	; match Player's x orientation
 		andi.b	#1,obStatus(a0)
+; ===========================================================================
 
 Fx_MdDisplay:
 		lea		(Ani_Effects).l,a1
 		jsr		AnimateSprite
-		bsr.s	Effects_LoadGfx
+		bsr.w	Effects_LoadGfx
 		jmp		DisplaySprite
-
-Fx_MdNull:
-		rts
 ; ===========================================================================
+
 Fx_ResetDisplayMode:
 		clr.b	obAnim(a0)
 		rts
@@ -62,6 +61,45 @@ Fx_ResetDisplayMode:
 Effects_Delete:	; Routine 4
 		jmp		DeleteObject	; delete when animation	is complete
 ; ===========================================================================
+
+Effects_ChkSkid:
+		lea	(v_player).w,a2
+		cmpi.b	#aniID_Stop,obAnim(a2)	; SonAni_Stop
+		beq.s	Effects_SkidDust
+		move.b	#2,obRoutine(a0)
+		move.b	#0,$32(a0)
+		rts
+; ===========================================================================
+; loc_1DE64:
+Effects_SkidDust:
+		subq.b	#1,$32(a0)
+		bpl.s	Effects_LoadGfx
+		move.b	#3,$32(a0)
+		jsr		FindFreeObj
+		bne.s	Effects_LoadGfx
+		move.b	obID(a0),obID(a1) ; load obj08
+		move.w	obX(a2),obX(a1)
+		move.w	obY(a2),obY(a1)
+		addi.w	#$10,obY(a1)
+;		cmpi.b	#id_TailsPlayer,obID(a2)		; is this spindash object for Tails?
+;		bra.s	@notTails			; if not, branch
+;		subi.w	#$4,obY(a0)			; adjust position
+;	@notTails:
+		clr.b	obStatus(a1)
+		move.b	#2,obAnim(a1)
+		addq.b	#2,obRoutine(a1)
+		move.l	obMap(a0),obMap(a1)
+		move.b	obRender(a0),obRender(a1)
+		move.w	#$80,obPriority(a1)
+		move.b	#4,obActWid(a1)
+		move.w	obGfx(a0),obGfx(a1)
+
+;BraToLoadArt:
+;		bra.s	Effects_LoadGfx
+
+; ---------------------------------------------------------------------------
+; Effects dynamic pattern loading subroutine
+; ---------------------------------------------------------------------------
 
 Effects_LoadGfx:
 		moveq	#0,d0
