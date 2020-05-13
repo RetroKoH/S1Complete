@@ -29,8 +29,17 @@ loc_137AE:
 		beq.s	loc_137E4
 		btst	#stsBubble,(v_status_secondary).w ; does Sonic have a Bubble Shield?
 		beq.s	@nobubble
-		bsr.s	BubbleShield_Bounce
+		bra.s	BubbleShield_Bounce
+
 	@nobubble:
+		move.b	(v_status_secondary).w,d0	; Check for any elemental shields
+		andi.b	#$E0,d0						; if he has, we will exit
+		bne.s	@noability
+		cmpi.b	#$16,obJumpFlag(a0)
+		blt.s	@noability
+		bra.w	DropDash
+		
+	@noability:
 		clr.b	obJumpFlag(a0)
 
 loc_137E4:
@@ -76,7 +85,29 @@ BubbleShield_Bounce:
 		ext.w	d0
 		sub.w	d0,obY(a0)
 		move.b	#aniID_BubbleBounceUp,(v_shieldspace+obAnim).w
+		clr.b	obJumpFlag(a0)
 		rts
 ;		move.w	#$44,d0
 ;		jmp	(Play_Sound_2).l
 ; End of function BubbleShield_Bounce
+
+; ---------------------------------------------------------------------------
+; Subroutine to	allow Sonic to perform the Drop Dash
+; ---------------------------------------------------------------------------
+
+; =============== S U B R O U T I N E =======================================
+
+
+DropDash:
+		move.b	#$E,obHeight(a0)
+		move.b	#7,obWidth(a0)
+		move.b	#aniID_Roll,obAnim(a0)
+		addq.w	#5,obY(a0)
+		move.w	#$C00,obInertia(a0)
+		btst	#staFacing,obStatus(a0)
+		beq.s	@dontflip
+		neg.w	obInertia(a0)
+	@dontflip:
+		bset	#staSpin,obStatus(a0)
+		clr.b	obJumpFlag(a0)
+		rts

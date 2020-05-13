@@ -54,7 +54,7 @@ Sonic_DoubleJumpMoves:
 
 Sonic_ShieldCheckFire:
 		btst	#stsInvinc,(v_status_secondary).w	; first, does Sonic have invincibility?
-		bne.w	Sonic_ShieldDoNothing				; if yes, branch
+		bne.w	Sonic_JumpReset						; if yes, branch
 		btst	#stsFlame,(v_status_secondary).w	; does Sonic have a Fire Shield?
 		beq.s	Sonic_ShieldCheckLightning			; if not, branch
 		addq.b	#1,(v_shieldspace+obAnim).w			; Set animation to aniID_FlameDash
@@ -100,12 +100,28 @@ Sonic_ShieldCheckSuper:
 
 Sonic_ShieldInsta:
 		btst	#stsShield,(v_status_secondary).w	; does Sonic have a blue shield?
-		bne.s	Sonic_ShieldDoNothing				; if yes, branch
+		bne.s	Sonic_JumpReset						; if yes, branch
 		addq.b	#1,(v_shieldspace+obAnim).w			; Set animation
 		move.b	#1,obJumpFlag(a0)
 		;move.w	#$42,d0
 		;jmp	(Play_Sound_2).l
+		rts
 
 Sonic_ChkDropDash:
+		move.b	(v_status_secondary).w,d0	; Check for any elemental shields
+		andi.b	#$E0,d0						; if he has, we will exit
+		bne.s	Sonic_ShieldDoNothing
+		move.b	(v_jpadhold2).w,d0
+		andi.b	#btnABC,d0					; is A, B or C held down?
+		beq.s	Sonic_JumpReset				; if no, branch
+		addq.b	#1,obJumpFlag(a0)			; increment flag
+		cmpi.b	#$16,obJumpFlag(a0)			; have we reached maximum?
+		bne.s	Sonic_ShieldDoNothing
+		move.b	#$16,obJumpFlag(a0)
+		rts
+
+Sonic_JumpReset:
+		move.b	#1,obJumpFlag(a0) 			; Should use double jump property for this rev variable
+
 Sonic_ShieldDoNothing:
 		rts
