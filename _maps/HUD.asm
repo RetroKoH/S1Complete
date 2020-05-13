@@ -17,7 +17,7 @@ Map_HUD:	mappingsTable
 	spritePiece	$20, -$60, 1, 2, 0, 0, 0, 0, 1
 	spritePiece	$30, -$60, 3, 2, $30, 0, 0, 0, 1
 	spritePiece	0, $40, 2, 2, $10A, 0, 0, 0, 1
-	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 0, 1
+	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 1, 1
 @allyellow_End
 	even
 @ringred:	spriteHeader
@@ -30,7 +30,7 @@ Map_HUD:	mappingsTable
 	;spritePiece	$20, -$60, 1, 2, 0, 0, 0, 0, 1
 	spritePiece	$30, -$60, 3, 2, $30, 0, 0, 0, 1
 	spritePiece	0, $40, 2, 2, $10A, 0, 0, 0, 1
-	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 0, 1
+	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 1, 1
 @ringred_End
 	even
 @timered:	spriteHeader
@@ -43,7 +43,7 @@ Map_HUD:	mappingsTable
 	spritePiece	$20, -$60, 1, 2, 0, 0, 0, 0, 1
 	spritePiece	$30, -$60, 3, 2, $30, 0, 0, 0, 1
 	spritePiece	0, $40, 2, 2, $10A, 0, 0, 0, 1
-	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 0, 1
+	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 1, 1
 @timered_End
 	even
 @allred:	spriteHeader
@@ -56,7 +56,7 @@ Map_HUD:	mappingsTable
 	;spritePiece	$20, -$60, 1, 2, 0, 0, 0, 0, 1
 	spritePiece	$30, -$60, 3, 2, $30, 0, 0, 0, 1
 	spritePiece	0, $40, 2, 2, $10A, 0, 0, 0, 1
-	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 0, 1
+	spritePiece	$10, $40, 4, 2, $10E, 0, 0, 1, 1
 @allred_End
 
 	even

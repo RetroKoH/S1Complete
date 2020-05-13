@@ -244,7 +244,9 @@ PLC_EndofAct:	dc.w ((PLC_EndofActend-PLC_EndofAct-2)/6)-1
 PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSBgCloud, 0	; bubble and cloud background
 		plcm	Nem_SSBgFish, $A20	; bird and fish	background
-		plcm	Nem_Bumper, $4760	; bumper
+		plcm	Nem_Ring, $2A40         ; Special Stage Rings
+		plcm	Nem_Hud_SS, $3EA0	; HUD
+		plcm	Nem_SSBumper, $4760	; bumper
 		plcm	Nem_SSGOAL, $4A20	; GOAL block
 		plcm	Nem_SSUpDown, $4C60	; UP and DOWN blocks
 		plcm	Nem_SSRBlock, $5E00	; R block
@@ -252,16 +254,10 @@ PLC_SpecialStage:	dc.w ((PLC_SpeStageend-PLC_SpecialStage-2)/6)-1
 		plcm	Nem_SSEmStars, $7E00	; emerald collection stars
 		plcm	Nem_SSRedWhite, $8E00	; red and white	block
 		plcm	Nem_SSGhost, $9E00	; ghost	block
-		plcm	Nem_SSWBlock, $AE00	; W block
 		plcm	Nem_SSGlass, $BE00	; glass	block
 		plcm	Nem_SSEmerald, $EE00	; emeralds
-		plcm	Nem_SSZone1, $F2E0	; ZONE 1 block
-		plcm	Nem_SSZone2, $F400	; ZONE 2 block
-		plcm	Nem_SSZone3, $F520	; ZONE 3 block
+		plcm	Nem_Lives, $4560	; lives ; use a seperate PLC for this part of HUD
 	PLC_SpeStageend:
-		plcm	Nem_SSZone4, $F2E0	; ZONE 4 block
-		plcm	Nem_SSZone5, $F400	; ZONE 5 block
-		plcm	Nem_SSZone6, $F520	; ZONE 6 block
 ; ---------------------------------------------------------------------------
 ; Pattern load cues - GHZ animals
 ; ---------------------------------------------------------------------------

@@ -549,7 +549,8 @@ Obj09_GetEmer:
 		addq.b	#1,(v_emeralds).w ; add 1 to number of emeralds
 
 Obj09_NoEmer:
-		sfx	bgm_Emerald,0,0,0 ;	play emerald music
+		clr.b	(f_timecount).w	; stop the time counter (remove the HUD)
+		sfx		bgm_Emerald,0,0,0 ;	play emerald music
 		moveq	#0,d4
 		rts	
 ; ===========================================================================
@@ -657,6 +658,7 @@ Obj09_GOAL:
 		cmpi.b	#$27,d0		; is the item a	"GOAL"?
 		bne.s	Obj09_UPblock
 		addq.b	#2,obRoutine(a0) ; run routine "Obj09_ExitStage"
+		clr.b	(f_timecount).w	; stop the time counter (remove the HUD)
 		sfx		sfx_SSGoal,0,0,0	; play "GOAL" sound
 		rts	
 ; ===========================================================================

@@ -34,11 +34,11 @@ BuildHUD:
 		move.w	#128+136,d2					; set Y pos
 		lea	(Map_HUD).l,a1
 		movea.w	#$6CA,a3					; set art tile and flags
-;		cmpi.b	#id_Special,(v_gamemode).w	; is this the Special Stage?
-;		bne.s	@notSS						; if yes, branch ahead
-;		lea		(Map_HUD_SS).l,a1
-;		movea.w	#$1F5,a3					; set art tile and flags
-;	@notSS:
+		cmpi.b	#id_Special,(v_gamemode).w	; is this the Special Stage?
+		bne.s	@notSS						; if yes, branch ahead
+		lea		(Map_HUD_SS).l,a1
+		movea.w	#$1F5,a3					; set art tile and flags
+	@notSS:
 		add.w	d1,d1
 		adda.w	(a1,d1.w),a1				; load frame
 		move.b	(a1)+,d1					; load # of pieces in frame

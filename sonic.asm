@@ -567,6 +567,7 @@ VBla_0A:
 
 	@update:
 		jsr	SS_LoadWalls
+		jsr	HUD_Update_SS
 
 		tst.w	(v_demolength).w	; is there time left on the demo?
 		beq.w	@end	; if not, return
@@ -638,6 +639,7 @@ VBla_16:
 		
 	@update:
 		jsr	SS_LoadWalls
+		jsr	HUD_Update_SS
 
 		tst.w	(v_demolength).w
 		beq.w	@end
@@ -3056,6 +3058,8 @@ GM_Special:
 		clr.l	(v_screenposy).w
 		move.b	#id_SonicSpecial,(v_player).w ; load special stage Sonic object
 		move.b	#$FF,(v_ssangleprev).w	; fill previous angle with obviously false value to force an update
+		move.b	#1,(f_timecount).w ; update time counter
+		jsr		Hud_Base_SS	; load basic HUD gfx
 		bsr.w	PalCycle_SS
 		clr.w	(v_ssangle).w	; set stage angle to "upright"
 		move.w	#$40,(v_ssrotate).w ; set stage rotation speed
@@ -3082,6 +3086,7 @@ GM_Special:
 		ori.b	#$40,d0
 		move.w	d0,(vdp_control_port).l
 		bsr.w	PaletteWhiteIn
+		move.b	#1,(f_level_started).w ; LEVEL START FLAG
 
 ; ---------------------------------------------------------------------------
 ; Main Special Stage loop
@@ -3093,9 +3098,23 @@ SS_MainLoop:
 		bsr.w	WaitForVBla
 		bsr.w	MoveSonicInDemo
 		move.w	(v_jpadhold1).w,(v_jpadhold2).w
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
-		jsr	(SS_ShowLayout).l
+		jsr		(ExecuteObjects).l
+
+		tst.b	(f_timecount).w
+		beq.s	@remove
+		cmpi.b	#$90,(v_hudscrollpos).w
+		beq.s	SS_SkipHUDScroll
+		add.b	#4,(v_hudscrollpos).w
+		bra.s	SS_SkipHUDScroll
+
+	@remove:
+		tst.b	(v_hudscrollpos).w
+		beq.s	SS_SkipHUDScroll
+		subq.b	#2,(v_hudscrollpos).w
+
+SS_SkipHUDScroll:
+		jsr		(BuildSprites).l
+		jsr		(SS_ShowLayout).l
 		bsr.w	SS_BGAnimate
 		tst.w	(f_demo).w	; is demo mode on?
 		beq.s	SS_ChkEnd	; if not, branch
@@ -3123,9 +3142,9 @@ SS_Finish:
 		bsr.w	WaitForVBla
 		bsr.w	MoveSonicInDemo
 		move.w	(v_jpadhold1).w,(v_jpadhold2).w
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
-		jsr	(SS_ShowLayout).l
+		jsr		(ExecuteObjects).l
+		jsr		(BuildSprites).l
+		jsr		(SS_ShowLayout).l
 		bsr.w	SS_BGAnimate
 		subq.w	#1,(v_palchgspeed).w
 		bpl.s	loc_47D4
@@ -7724,9 +7743,9 @@ SS_AniWallsRings:
 		lea	($FF4005).l,a1
 		subq.b	#1,(v_ani1_time).w
 		bpl.s	loc_1B2C8
-		move.b	#7,(v_ani1_time).w
+		move.b	#3,(v_ani1_time).w
 		addq.b	#1,(v_ani1_frame).w
-		andi.b	#3,(v_ani1_frame).w
+		andi.b	#7,(v_ani1_frame).w ; 8-frame rings
 
 loc_1B2C8:
 		move.b	(v_ani1_frame).w,$1D0(a1)
@@ -7742,7 +7761,7 @@ loc_1B2E4:
 		move.b	d0,$160(a1)
 		move.b	d0,$148(a1)
 		move.b	d0,$150(a1)
-		move.b	d0,$1D8(a1)
+		move.b	d0,$1D8(a1) ; Animation data for Chaos Emeralds. Change this to have them all flash to the same flicker frame, a la Sonic 1 (2013)
 		move.b	d0,$1E0(a1)
 		move.b	d0,$1E8(a1)
 		move.b	d0,$1F0(a1)
@@ -8159,7 +8178,9 @@ Map_SS_Down:	include	"_maps\SS DOWN Block.asm"
 		include	"_inc\AnimateLevelGfx.asm"
 
 			include "_incObj\21.asm"
-Map_HUD:	include	"_maps\HUD.asm"
+
+		include	"_maps\HUD.asm"
+		include	"_maps\HUD SS.asm"
 
 ; ---------------------------------------------------------------------------
 ; Add points subroutine
@@ -8195,6 +8216,7 @@ AddPoints:
 ; End of function AddPoints
 
 		include	"_inc\HUD_Update.asm"
+		include	"_inc\HUD_Update_SS.asm"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load countdown numbers on the continue screen
@@ -8335,6 +8357,8 @@ Eni_SSBg1:	incbin	"tilemaps\SS Background 1.bin" ; special stage background (map
 Nem_SSBgFish:	incbin	"artnem\Special Birds & Fish.bin" ; special stage birds and fish background
 		even
 Eni_SSBg2:	incbin	"tilemaps\SS Background 2.bin" ; special stage background (mappings)
+		even
+Nem_SSBumper:	incbin	"artnem\Special Bumper.bin" ; special stage bumper art
 		even
 Nem_SSBgCloud:	incbin	"artnem\Special Clouds.bin" ; special stage clouds background
 		even
@@ -8555,6 +8579,8 @@ Nem_Cater:	incbin	"artnem\Enemy Caterkiller.bin"
 Art_TitleCard:	incbin	"artunc\Title Cards.bin"
 Art_TitleCard_End:		even
 Nem_Hud:	incbin	"artnem\HUD.bin"	; HUD (rings, time, score)
+		even
+Nem_Hud_SS:	incbin	"artnem\HUD - SS.bin"	; HUD (rings)
 		even
 Nem_Lives:	incbin	"artnem\HUD - Life Counter Icon.bin"
 		even
@@ -8870,7 +8896,6 @@ ObjPos_Index:
 		dc.w ObjPos_SBZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_FZ-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_SBZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		zonewarning ObjPos_Index,$10
 		; Ending
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
 		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
@@ -8953,6 +8978,193 @@ ObjPos_SBZ1pf6:	incbin	"objpos\sbz1pf6.bin"
 ObjPos_End:	incbin	"objpos\ending.bin"
 		even
 ObjPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
+
+; --------------------------------------------------------------------------------------
+; Offset index of ring locations - REV C EDIT - RING MANAGER RELATED
+; --------------------------------------------------------------------------------------
+RingPos_Index:
+		; GHZ
+		dc.w RingPos_GHZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_GHZ2-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_GHZ3-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_GHZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		; LZ
+		dc.w RingPos_LZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_LZ2-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_LZ3-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SBZ3-RingPos_Index, RingPos_Null-RingPos_Index
+		; MZ
+		dc.w RingPos_MZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_MZ2-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_MZ3-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_MZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		; SLZ
+		dc.w RingPos_SLZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SLZ2-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SLZ3-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SLZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		; SYZ
+		dc.w RingPos_SYZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SYZ2-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SYZ3-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SYZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		; SBZ
+		dc.w RingPos_SBZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SBZ2-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_SBZ1-RingPos_Index, RingPos_Null-RingPos_Index
+		; Ending
+		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
+		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
+
+RingPos_GHZ1:	incbin	ringpos\ghz1.bin
+		even
+RingPos_GHZ1E:	incbin	ringpos\ghz1e.bin
+		even
+RingPos_GHZ1H:	incbin	ringpos\ghz1h.bin
+		even
+RingPos_GHZ2:	incbin	ringpos\ghz2.bin
+		even
+RingPos_GHZ2E:	incbin	ringpos\ghz2e.bin
+		even
+RingPos_GHZ2H:	incbin	ringpos\ghz2h.bin
+		even
+RingPos_GHZ3:	incbin	"ringpos\ghz3.bin"
+		even
+RingPos_GHZ3H:	incbin	ringpos\ghz3h.bin
+		even
+RingPos_LZ1:	incbin	"ringpos\lz1.bin"
+		even
+RingPos_LZ1E:	incbin	"ringpos\lz1e.bin"
+		even
+RingPos_LZ1H:	incbin	"ringpos\lz1h.bin"
+		even
+RingPos_LZ2:	incbin	ringpos\lz2.bin
+		even
+RingPos_LZ2E:	incbin	ringpos\lz2e.bin
+		even
+RingPos_LZ2H:	incbin	ringpos\lz2h.bin
+		even
+RingPos_LZ3:	incbin	"ringpos\lz3.bin"
+		even
+RingPos_LZ3H:	incbin	"ringpos\lz3h.bin"
+		even
+RingPos_SBZ3:	incbin	ringpos\sbz3.bin
+		even
+RingPos_SBZ3H:	incbin	ringpos\sbz3h.bin
+		even
+RingPos_MZ1:	incbin	"ringpos\mz1.bin"
+		even
+RingPos_MZ1E:	incbin	"ringpos\mz1e.bin"
+		even
+RingPos_MZ1H:	incbin	"ringpos\mz1h.bin"
+		even
+RingPos_MZ2:	incbin	ringpos\mz2.bin
+		even
+RingPos_MZ2E:	incbin	ringpos\mz2e.bin
+		even
+RingPos_MZ2H:	incbin	ringpos\mz2h.bin
+		even
+RingPos_MZ3:	incbin	ringpos\mz3.bin
+		even
+RingPos_MZ3H:	incbin	ringpos\mz3h.bin
+		even
+RingPos_SLZ1:	incbin	ringpos\slz1.bin
+		even
+RingPos_SLZ1E:	incbin	ringpos\slz1e.bin
+		even
+RingPos_SLZ1H:	incbin	ringpos\slz1h.bin
+		even
+RingPos_SLZ2:	incbin	ringpos\slz2.bin
+		even
+RingPos_SLZ2E:	incbin	ringpos\slz2e.bin
+		even
+RingPos_SLZ2H:	incbin	ringpos\slz2h.bin
+		even
+RingPos_SLZ3:	incbin	ringpos\slz3.bin
+		even
+RingPos_SLZ3H:	incbin	ringpos\slz3h.bin
+		even
+RingPos_SYZ1:	incbin	ringpos\syz1.bin
+		even
+RingPos_SYZ1E:	incbin	ringpos\syz1e.bin
+		even
+RingPos_SYZ1H:	incbin	ringpos\syz1h.bin
+		even
+RingPos_SYZ2:	incbin	ringpos\syz2.bin
+		even
+RingPos_SYZ2E:	incbin	ringpos\syz2e.bin
+		even
+RingPos_SYZ2H:	incbin	ringpos\syz2h.bin
+		even
+RingPos_SYZ3:	incbin	"ringpos\syz3.bin"
+		even
+RingPos_SYZ3H:	incbin	"ringpos\syz3h.bin"
+		even
+RingPos_SBZ1:	incbin	"ringpos\sbz1.bin"
+		even
+RingPos_SBZ1E:	incbin	"ringpos\sbz1e.bin"
+		even
+RingPos_SBZ1H:	incbin	"ringpos\sbz1h.bin"
+		even
+RingPos_SBZ2:	incbin	ringpos\sbz2.bin
+		even
+RingPos_SBZ2E:	incbin	ringpos\sbz2e.bin
+		even
+RingPos_SBZ2H:	incbin	ringpos\sbz2h.bin
+		even
+RingPos_BZ1:	incbin	"ringpos\bz1.bin"
+		even
+RingPos_BZ1E:	incbin	"ringpos\bz1e.bin"
+		even
+RingPos_BZ1H:	incbin	"ringpos\bz1h.bin"
+		even
+RingPos_BZ2:	incbin	"ringpos\bz2.bin"
+		even
+RingPos_BZ2E:	incbin	"ringpos\bz2e.bin"
+		even
+RingPos_BZ2H:	incbin	"ringpos\bz2h.bin"
+		even
+RingPos_BZ3:	incbin	"ringpos\bz3.bin"
+		even
+RingPos_BZ3H:	incbin	"ringpos\bz3h.bin"
+		even
+RingPos_JZ1:	incbin	"ringpos\jz1.bin"
+		even
+RingPos_JZ1E:	incbin	"ringpos\jz1e.bin"
+		even
+RingPos_JZ1H:	incbin	"ringpos\jz1h.bin"
+		even
+RingPos_JZ2:	incbin	"ringpos\jz2.bin"
+		even
+RingPos_JZ2E:	incbin	"ringpos\jz2e.bin"
+		even
+RingPos_JZ2H:	incbin	"ringpos\jz2h.bin"
+		even
+RingPos_JZ3:	incbin	"ringpos\jz3.bin"
+		even
+RingPos_JZ3H:	incbin	"ringpos\jz3h.bin"
+		even
+RingPos_SKBZ1:	incbin	"ringpos\skbz1.bin"
+		even
+RingPos_SKBZ1E:	incbin	"ringpos\skbz1e.bin"
+		even
+RingPos_SKBZ1H:	incbin	"ringpos\skbz1h.bin"
+		even
+RingPos_SKBZ2:	incbin	"ringpos\skbz2.bin"
+		even
+RingPos_SKBZ2E:	incbin	"ringpos\skbz2e.bin"
+		even
+RingPos_SKBZ2H:	incbin	"ringpos\skbz2h.bin"
+		even
+RingPos_SKBZ3:	incbin	"ringpos\skbz3.bin"
+		even
+RingPos_SKBZ3H:	incbin	"ringpos\skbz3h.bin"
+		even
+
+RingPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
 
 		dcb.b $63C,$FF
 

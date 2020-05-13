@@ -24,7 +24,7 @@ loc_137AE:
 		move.b	#$13,obHeight(a0)
 		move.b	#9,obWidth(a0)
 		move.b	#aniID_Walk,obAnim(a0) ; use running/walking animation
-		;subq.w	#5,obY(a0)
+		subq.w	#5,obY(a0)
 		tst.b	obJumpFlag(a0)
 		beq.s	loc_137E4
 		btst	#stsBubble,(v_status_secondary).w ; does Sonic have a Bubble Shield?

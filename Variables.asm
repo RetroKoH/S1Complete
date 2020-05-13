@@ -380,9 +380,9 @@ v_title_ccount:	equ $FFFFFFE6	; number of times C is pressed on title screen (2 
 
 
 
-f_demo:		equ $FFFFFFF0	; demo mode flag (0 = no; 1 = yes; $8001 = ending) (2 bytes)
-v_demonum:	equ $FFFFFFF2	; demo level number (not the same as the level number) (2 bytes)
+f_demo:			equ $FFFFFFF0	; demo mode flag (0 = no; 1 = yes; $8001 = ending) (2 bytes)
+v_demonum:		equ $FFFFFFF2	; demo level number (not the same as the level number) (2 bytes)
 v_creditsnum:	equ $FFFFFFF4	; credits index number (2 bytes)
 v_megadrive:	equ $FFFFFFF8	; Megadrive machine type
 f_debugmode:	equ $FFFFFFFA	; debug mode flag (sometimes 2 bytes)
-v_init:		equ $FFFFFFFC	; 'init' text string (4 bytes)
+v_init:			equ $FFFFFFFC	; 'init' text string (4 bytes)
