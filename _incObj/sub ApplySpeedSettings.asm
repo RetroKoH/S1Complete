@@ -12,7 +12,7 @@
 
 ApplySpeedSettings:
 		moveq   #0,d0                           ; Quickly clear d0
-		btst	#stsShoes,(v_status_secondary).w            ; Does character have speedshoes?
+		tst.b   obShoes(a0)         		    ; Does character have speedshoes?
 		beq.s   @noshoes                        ; If not, branch
 		addq.b  #8,d0
 

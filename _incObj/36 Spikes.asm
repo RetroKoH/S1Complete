@@ -83,7 +83,7 @@ Spik_Hurt:
 		bne.s	Spik_Display						; if yes, branch
 		btst	#stsInvinc,(v_status_secondary).w	; is Sonic invincible?
 		bne.s	Spik_Display						; if yes, branch
-		tst.w	(v_player+obInvuln).w				; +++ is Sonic invulnerable?
+		tst.b	(v_player+obInvuln).w				; +++ is Sonic invulnerable?
 		bne.s	Spik_Display						; +++ if yes, branch
 		move.l	a0,-(sp)
 		movea.l	a0,a2

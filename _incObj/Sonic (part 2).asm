@@ -3,6 +3,15 @@
 ; ---------------------------------------------------------------------------
 
 Sonic_Hurt:	; Routine 4
+		tst.w	(f_debugmode).w	; is debug cheat enabled?
+		beq.s	Sonic_Hurt_Normal	; if not, branch
+		btst	#bitB,(v_jpadpress1).w ; is button B pressed?
+		beq.s	Sonic_Hurt_Normal	; if not, branch
+		move.w	#1,(v_debuguse).w ; change Sonic into a ring/item
+		clr.b	(f_lockctrl).w
+		rts
+
+Sonic_Hurt_Normal:
 		clr.b	(v_cameralag).w
 		jsr		(SpeedToPos).l
 		addi.w	#$30,obVelY(a0)
@@ -36,7 +45,8 @@ Sonic_HurtStop:
 		clr.b	(f_lockmulti).w
 		move.b	#aniID_Walk,obAnim(a0)
 		subq.b	#2,obRoutine(a0)
-		move.w	#$78,$30(a0)
+		move.b	#$78,obInvuln(a0)
+		;clr.b	obDashFlag(a0)
 
 locret_13860:
 		rts	
@@ -47,6 +57,15 @@ locret_13860:
 ; ---------------------------------------------------------------------------
 
 Sonic_Death:	; Routine 6
+		tst.w	(f_debugmode).w	; is debug cheat enabled?
+		beq.s	Sonic_Death_Normal	; if not, branch
+		btst	#bitB,(v_jpadpress1).w ; is button B pressed?
+		beq.s	Sonic_Death_Normal	; if not, branch
+		move.w	#1,(v_debuguse).w ; change Sonic into a ring/item
+		clr.b	(f_lockctrl).w
+		rts
+
+Sonic_Death_Normal:
 		clr.b	(v_cameralag).w
 		bsr.w	GameOver
 		jsr		(ObjectFall).l

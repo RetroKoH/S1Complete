@@ -3,9 +3,9 @@
 ; ---------------------------------------------------------------------------
 
 Sonic_Display: 	; Invulnerability flashing
-		move.w	obInvuln(a0),d0
+		move.b	obInvuln(a0),d0
 		beq.s	@display
-		subq.w	#1,obInvuln(a0)
+		subq.b	#1,obInvuln(a0)
 		lsr.w	#3,d0
 		bcc.s	@chkinvincible
 
@@ -15,9 +15,12 @@ Sonic_Display: 	; Invulnerability flashing
 	@chkinvincible:
 		btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
 		beq.s	@chkshoes							; if not, branch
-		tst.w	obInvinc(a0)						; check	time remaining for invinciblity
+		tst.b	obInvinc(a0)						; check	time remaining for invinciblity
 		beq.s	@chkshoes							; if no	time remains, branch
-		subq.w	#1,obInvinc(a0)						; subtract 1 from time
+		move.b	(v_framebyte).w,d0
+		andi.b	#7,d0                       ; invincibility timer decrements once every 8 frames
+		bne.s	@chkshoes      			 	; if it's not the 8th frame, branch
+		subq.b	#1,obInvinc(a0)						; subtract 1 from time
 		bne.s	@chkshoes
 		tst.b	(f_lockscreen).w
 		bne.s	@removeinvincible
@@ -40,9 +43,12 @@ Sonic_Display: 	; Invulnerability flashing
 	@chkshoes:
 		btst	#stsShoes,(v_status_secondary).w	; does Sonic have speed	shoes?
 		beq.s	@exit				; if not, branch
-		tst.w	obShoes(a0)			; check	time remaining
+		tst.b	obShoes(a0)			; check	time remaining
 		beq.s	@exit
-		subq.w	#1,obShoes(a0)			; subtract 1 from time
+		move.b	(v_framebyte).w,d0
+		andi.b	#7,d0                        ; shoe timer decrements once every 8 frames
+		bne.s	@exit       ; if it's not the 8th frame, branch
+		subq.b	#1,obShoes(a0)			; subtract 1 from time
 		bne.s	@exit
 		lea     (v_sonspeedmax).w,a2    ; Load Sonic_top_speed into a2
 		bsr.w   ApplySpeedSettings      ; Fetch Speed settings

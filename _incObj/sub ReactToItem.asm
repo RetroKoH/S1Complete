@@ -166,7 +166,7 @@ ReactToItem:
 		andi.b	#$3F,d0
 		cmpi.b	#6,d0		; is collision type $46	?
 		beq.s	React_Monitor	; if yes, branch
-		cmpi.w	#90,obInvuln(a0)	; is Sonic invincible?
+		cmpi.b	#$5A,obInvuln(a0)	; is Sonic invincible?
 		bcc.w	@invincible	; if yes, branch
 		addq.b	#2,obRoutine(a1) ; advance the object's routine counter
 
@@ -341,7 +341,7 @@ React_ChkHurt:
 
 HurtSonic:
 		nop
-		tst.w	obInvuln(a0)	; is Sonic flashing?
+		tst.b	obInvuln(a0)	; is Sonic flashing?
 		bne.w	@rts			; if yes, branch
 		movea.l	a1,a2
 
@@ -380,7 +380,7 @@ HurtSonic:
 		bclr	#staSpinDash,obStatus2(a0)	; clear Spin Dash flag
 		move.w	#0,obInertia(a0)
 		move.b	#aniID_Hurt,obAnim(a0)
-		move.w	#120,obInvuln(a0)	; set temp invincible time to 2 seconds
+		move.b	#$78,obInvuln(a0)	; set temp invincible time to 2 seconds
 		move.w	#sfx_Death,d0	; load normal damage sound
 		cmpi.b	#id_Spikes,(a2)	; was damage caused by spikes?
 		bne.s	@sound		; if not, branch

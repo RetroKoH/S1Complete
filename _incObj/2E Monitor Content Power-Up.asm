@@ -91,7 +91,7 @@ ExtraLife:
 
 Pow_Shoes:
 		bset	#stsShoes,(v_status_secondary).w	; set shoes flag
-		move.w	#$4B0,(v_player+obShoes).w		; time limit for the power-up
+		move.b	#$96,(v_player+obShoes).w		; time limit for the power-up
 		movem.l a0-a2,-(sp)						; Move a0, a1 and a2 onto stack
 		lea     (v_player).w,a0					; Load Sonic to a0
 		lea		(v_sonspeedmax).w,a2			; Load Sonic_top_speed into a2
@@ -122,7 +122,7 @@ Pow_Invinc:
 		btst  	#stsSuper,(v_status_secondary).w	; Is Sonic in his Super form?
 		bne.s	@nomusic							; if yes, branch and don't do anything.
 		bset	#stsInvinc,(v_status_secondary).w	; make Sonic invincible
-		move.w	#$4B0,(v_player+obInvinc).w			; time limit for the power-up
+		move.b	#$96,(v_player+obInvinc).w			; time limit for the power-up
 		move.b	#id_ShieldItem,(v_invincspace).w	; load stars object ($3801)
 		move.b	#1,(v_invincspace+obAnim).w
 		move.b	#id_ShieldItem,(v_invincspace+$40).w	; load stars object ($3802)
