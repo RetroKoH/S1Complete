@@ -28,10 +28,13 @@ VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slo
 v_tracksonic:			equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 
-v_objspace:			equ $FFFFD000	; object variable space ($40 bytes per object) ($2000 bytes)
-v_player:			equ v_objspace	; object variable space for Sonic ($40 bytes)
-v_player2:			= v_objspace+$40	; object variable space reserved for player 2			- 1 object
-v_titlespace:		= v_objspace+$80	; object variable space reserved for the title card, credits, and other text ($100 bytes) - 4 objects for the title card
+v_objspace:			equ $FFFFD000			; object variable space ($40 bytes per object) ($2000 bytes)
+v_player:			equ v_objspace			; object variable space for Sonic ($40 bytes)
+v_player2:			equ v_objspace+$40		; object variable space reserved for player 2			- 1 object
+v_titlespace:		equ v_objspace+$80		; object variable space reserved for the title card, credits, and other text ($100 bytes) - 4 objects for the title card
+v_titlespace2:		equ v_titlespace+$40	;0C0
+v_titlespace3:		equ v_titlespace2+$40	;100
+v_titlespace4:		equ v_titlespace3+$40	;140
 v_shieldspace:		= v_objspace+$180	; object variable space reserved for the shield			- 1 object
 v_signspace:		= v_objspace+$1C0	; object variable space reserved for the signpost		- 1 object
 v_invincspace:		= v_objspace+$200	; object variable space reserved for the invincibility stars	- 4 objects
@@ -378,6 +381,8 @@ v_colladdr1:	equ $FFFFFFD0	; (4 bytes)
 v_colladdr2:	equ $FFFFFFD4	; (4 bytes)
 v_top_solid_bit:	equ $FFFFFFD8
 v_lrb_solid_bit:	equ $FFFFFFD9
+
+v_screenposx_coarse:	equ $FFFFFFDE
 f_levselcheat:	equ $FFFFFFE0	; level select cheat flag
 f_slomocheat:	equ $FFFFFFE1	; slow motion & frame advance cheat flag
 f_debugcheat:	equ $FFFFFFE2	; debug mode cheat flag
