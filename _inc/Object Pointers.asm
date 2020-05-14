@@ -79,7 +79,8 @@ ptr_GiantRing:		dc.l GiantRing
 ptr_GeyserMaker:	dc.l GeyserMaker
 ptr_LavaGeyser:		dc.l LavaGeyser
 ptr_LavaWall:		dc.l LavaWall
-ptr_Obj4F:			dc.l Obj4F
+ptr_RedRing:		dc.l RedRing
+;ptr_Obj4F:			dc.l Obj4F
 ptr_Yadrin:			dc.l Yadrin		; $50
 ptr_SmashBlock:		dc.l SmashBlock
 ptr_MovingBlock:	dc.l MovingBlock
@@ -92,27 +93,27 @@ ptr_BigSpikeBall:	dc.l BigSpikeBall	; $58
 ptr_Elevator:		dc.l Elevator
 ptr_CirclingPlatform:	dc.l CirclingPlatform
 ptr_Staircase:		dc.l Staircase
-ptr_Pylon:		dc.l Pylon
-ptr_Fan:		dc.l Fan
-ptr_Seesaw:		dc.l Seesaw
-ptr_Bomb:		dc.l Bomb
+ptr_Pylon:			dc.l Pylon
+ptr_Fan:			dc.l Fan
+ptr_Seesaw:			dc.l Seesaw
+ptr_Bomb:			dc.l Bomb
 ptr_Orbinaut:		dc.l Orbinaut		; $60
 ptr_LabyrinthBlock:	dc.l LabyrinthBlock
 ptr_Gargoyle:		dc.l Gargoyle
 ptr_LabyrinthConvey:	dc.l LabyrinthConvey
-ptr_Bubble:		dc.l Bubble
+ptr_Bubble:			dc.l Bubble
 ptr_Waterfall:		dc.l Waterfall
 ptr_Junction:		dc.l Junction
 ptr_RunningDisc:	dc.l RunningDisc
 ptr_Conveyor:		dc.l Conveyor		; $68
 ptr_SpinPlatform:	dc.l SpinPlatform
-ptr_Saws:		dc.l Saws
+ptr_Saws:			dc.l Saws
 ptr_ScrapStomp:		dc.l ScrapStomp
 ptr_VanishPlatform:	dc.l VanishPlatform
 ptr_Flamethrower:	dc.l Flamethrower
 ptr_Electro:		dc.l Electro
 ptr_SpinConvey:		dc.l SpinConvey
-ptr_Girder:		dc.l Girder		; $70
+ptr_Girder:			dc.l Girder		; $70
 ptr_Invisibarrier:	dc.l Invisibarrier
 ptr_Teleport:		dc.l Teleport
 ptr_BossMarble:		dc.l BossMarble
@@ -137,10 +138,11 @@ ptr_BossFinal:		dc.l BossFinal
 ptr_BossPlasma:		dc.l BossPlasma
 ptr_EndSonic:		dc.l EndSonic
 ptr_EndChaos:		dc.l EndChaos		; $88
-ptr_EndSTH:		dc.l EndSTH
+ptr_EndSTH:			dc.l EndSTH
 ptr_CreditsText:	dc.l CreditsText
 ptr_EndEggman:		dc.l EndEggman
 ptr_TryChaos:		dc.l TryChaos
+;ptr_RedRing:		dc.l RedRing
 
 NullObject:
 		;jmp	(DeleteObject).l	; It would be safer to have this instruction here, but instead it just falls through to ObjectFall
@@ -223,7 +225,8 @@ id_GiantRing:		equ ((ptr_GiantRing-Obj_Index)/4)+1
 id_GeyserMaker:		equ ((ptr_GeyserMaker-Obj_Index)/4)+1
 id_LavaGeyser:		equ ((ptr_LavaGeyser-Obj_Index)/4)+1
 id_LavaWall:		equ ((ptr_LavaWall-Obj_Index)/4)+1
-id_Obj4F:		equ ((ptr_Obj4F-Obj_Index)/4)+1
+;id_Obj4F:		equ ((ptr_Obj4F-Obj_Index)/4)+1
+id_RedRing:			equ ((ptr_RedRing-Obj_Index)/4)+1
 id_Yadrin:		equ ((ptr_Yadrin-Obj_Index)/4)+1		; $50
 id_SmashBlock:		equ ((ptr_SmashBlock-Obj_Index)/4)+1
 id_MovingBlock:		equ ((ptr_MovingBlock-Obj_Index)/4)+1
@@ -281,7 +284,8 @@ id_BossFinal:		equ ((ptr_BossFinal-Obj_Index)/4)+1
 id_BossPlasma:		equ ((ptr_BossPlasma-Obj_Index)/4)+1
 id_EndSonic:		equ ((ptr_EndSonic-Obj_Index)/4)+1
 id_EndChaos:		equ ((ptr_EndChaos-Obj_Index)/4)+1		; $88
-id_EndSTH:		equ ((ptr_EndSTH-Obj_Index)/4)+1
+id_EndSTH:			equ ((ptr_EndSTH-Obj_Index)/4)+1
 id_CreditsText:		equ ((ptr_CreditsText-Obj_Index)/4)+1
 id_EndEggman:		equ ((ptr_EndEggman-Obj_Index)/4)+1
 id_TryChaos:		equ ((ptr_TryChaos-Obj_Index)/4)+1
+;id_RedRing:			equ ((ptr_RedRing-Obj_Index)/4)+1

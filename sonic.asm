@@ -7449,7 +7449,7 @@ ObjHitWallLeft:
 		; Engine bug: colliding with left walls is erratic with this function.
 		; The cause is this: a missing instruction to flip collision on the found
 		; 16x16 block; this one:
-		;eori.w	#$F,d3
+		eori.w	#$F,d3
 		lea	(v_anglebuffer).w,a4
 		move.b	#0,(a4)
 		movea.w	#-$10,a3
@@ -7617,6 +7617,8 @@ Map_Plasma:	include	"_maps\Plasma Balls.asm"
 Map_Pri:	include	"_maps\Prison Capsule.asm"
 
 		include	"_incObj\sub ReactToItem.asm"
+
+		include "_incObj\8D Red Ring.asm"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	show the special stage layout
@@ -8356,11 +8358,16 @@ Art_SignPost:	incbin	"artunc\Signpost.bin"	; end of level signpost
 		even
 Art_BigRing:	incbin	"artunc\Giant Ring.bin"
 		even
+Art_RedRing:	incbin	"artunc\Red Ring.bin"
+		even
+
 
 		include "_maps\Effects.asm"
 		include "_maps\Effects - Dynamic Gfx Script.asm"
 		include "_anim\Effects.asm"
 
+		include "_maps\Red Ring.asm"
+		include "_maps\Red Ring - DPLC.asm"
 
 		include	"_maps\SS Walls.asm"
 
