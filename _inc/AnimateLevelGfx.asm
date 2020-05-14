@@ -196,7 +196,12 @@ AniArt_MZ_Torch:
 
 AniArt_SBZ:
 
+AniArt_SBZ_Smoke:
+
 @size:		equ 12	; number of tiles per frame
+
+		tst.b	(v_act).w			; is this act 1?
+		bne.w	AniArt_SBZ_Hologram	; if no, go away (We will load Death Egg Holo here)
 
 		tst.b	(v_lani2_frame).w
 		beq.s	@smokepuff	; branch if counter hits 0
@@ -266,7 +271,12 @@ AniArt_SBZ:
 ; ===========================================================================
 
 @end:
-		rts	
+		rts
+
+AniArt_SBZ_Hologram:
+
+@size:		equ 8	; number of tiles per frame
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Animated pattern routine - ending sequence
