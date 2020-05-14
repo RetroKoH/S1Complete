@@ -5972,8 +5972,9 @@ loc_D700:
 		btst	#5,d4
 		bne.s	loc_D71C
 		move.b	obFrame(a0),d1
-		add.b	d1,d1
+		add.w	d1,d1					; MJ: changed from byte to word (we want more than 7F sprites)
 		adda.w	(a1,d1.w),a1
+		moveq	#0,d1					; MJ: clear d1 (because of our byte to word change)
 		move.b	(a1)+,d1
 		subq.b	#1,d1
 		bmi.s	loc_D720

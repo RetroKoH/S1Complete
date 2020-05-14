@@ -12,8 +12,8 @@ Sonic_Animate:
 		cmp.b	obNextAni(a0),d0 ; is animation set to restart?
 		beq.s	@do		; if not, branch
 		move.b	d0,obNextAni(a0) ; set to "no restart"
-		move.b	#0,obAniFrame(a0) ; reset animation
-		move.b	#0,obTimeFrame(a0) ; reset frame duration
+		clr.b	obAniFrame(a0) ; reset animation
+		clr.b	obTimeFrame(a0) ; reset frame duration
 		bclr	#staPush,obStatus(a0) ; clear pushing flag
 
 	@do:
@@ -29,11 +29,12 @@ Sonic_Animate:
 		bpl.s	@delay		; if time remains, branch
 		move.b	d0,obTimeFrame(a0) ; load frame duration
 
-@loadframe:
+	@loadframe:
 		moveq	#0,d1
-		move.b	obAniFrame(a0),d1 ; load current frame number
-		move.b	1(a1,d1.w),d0	; read sprite number from script
-		bmi.s	@end_FF		; if animation is complete, branch
+		move.b	obAniFrame(a0),d1	; load current frame number
+		move.b	1(a1,d1.w),d0		; read sprite number from script
+		cmp.b	#$FD,d0				; MJ: is it a flag from FD to FF?
+		bhs		@end_FF				; MJ: if so, branch to flag routines
 
 	@next:
 		move.b	d0,obFrame(a0)	; load sprite number
@@ -46,7 +47,7 @@ Sonic_Animate:
 @end_FF:
 		addq.b	#1,d0		; is the end flag = $FF	?
 		bne.s	@end_FE		; if not, branch
-		move.b	#0,obAniFrame(a0) ; restart the animation
+		clr.b	obAniFrame(a0) ; restart the animation
 		move.b	1(a1),d0	; read sprite number
 		bra.s	@next
 ; ===========================================================================

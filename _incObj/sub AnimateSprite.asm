@@ -24,7 +24,8 @@ Anim_Run:
 		moveq	#0,d1
 		move.b	obAniFrame(a0),d1 ; load current frame number
 		move.b	1(a1,d1.w),d0	; read sprite number from script
-		bmi.s	Anim_End_FF	; if animation is complete, branch
+		cmp.b	#$FA,d0					; MJ: is it a flag from FA to FF?
+		bhs		Anim_End_FF				; MJ: if so, branch to flag routines
 
 Anim_Next:
 		move.b	d0,d1

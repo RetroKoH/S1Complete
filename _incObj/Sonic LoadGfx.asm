@@ -10,19 +10,17 @@ Sonic_LoadGfx:				; XREF: Obj01_Control; et al
 		move.b	obFrame(a0),d0	; load frame number
 		cmp.b	(v_sonframenum).w,d0 ; has frame changed?
 		beq.s	@nochange	; if not, branch
-
 		move.b	d0,(v_sonframenum).w
 		lea	(SonicDynPLC).l,a2 ; load PLC script
 		add.w	d0,d0
 		adda.w	(a2,d0.w),a2
-
-		; REV C EDIT - DMA QUEUE - The next set of lines replace the commented ones below.
 		moveq	#0,d5
 		move.b	(a2)+,d5	; read "number of entries" value
 		subq.w	#1,d5
 		bmi.s	@nochange	; if zero, branch
 		move.w	#$F000,d4
 		move.l	#Art_Sonic,d6
+
 	@readentry:
 		moveq	#0,d1
 		move.b	(a2)+,d1
