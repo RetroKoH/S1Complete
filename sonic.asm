@@ -1912,7 +1912,15 @@ GM_Title:
 		move.w	#$8720,(a6)					; set background colour (palette line 2, entry 0)
 		clr.b	(f_wtr_state).w
 		bsr.w	ClearScreen
-		clr.w	(f_level_started).w			; Clear Level Start Flag, and HUD Scroll
+
+		lea		(v_ringpos).w,a1
+		moveq	#0,d0
+		move.w	#$1A1,d1
+
+	Tit_ClrRing:
+		move.l	d0,(a1)+
+		dbf		d1,Tit_ClrRing		; clear ring RAM
+		clr.w	(f_level_started).w	; Clear Level Start Flag, and HUD Scroll
 
 		lea		(v_objspace).w,a1
 		moveq	#0,d0
@@ -2529,6 +2537,13 @@ loc_37FC:
 		bsr.w	AddPLC		; load standard	patterns
 
 Level_ClrRam:
+		lea		(v_ringpos).w,a1
+		moveq	#0,d0
+		move.w	#$1A1,d1
+
+	Level_ClrRingRam:
+		move.l	d0,(a1)+
+		dbf		d1,Level_ClrRingRam ; clear ring RAM
 		clr.w	(f_level_started).w	; clear HUD and ring drawing flag, and HUD scrolling.
 
 		lea		(v_objspace).w,a1
@@ -2683,9 +2698,10 @@ Level_ChkWater:
 		move.w	#$120,(v_objspace+$7C0+obX).w
 
 Level_LoadObj:
-		jsr	(ObjPosLoad).l
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
+		jsr		(ObjPosLoad).l
+		jsr		(RingsManager).l	
+		jsr		(ExecuteObjects).l
+		jsr		(BuildSprites).l
 		moveq	#0,d0
 		tst.b	(v_lastlamp).w	; are you starting from	a lamppost?
 		bne.s	Level_SkipClr	; if yes, branch
@@ -2791,9 +2807,10 @@ Level_MainLoop:
 		addq.w	#1,(v_framecount).w ; add 1 to level timer
 		bsr.w	MoveSonicInDemo
 		bsr.w	LZWaterFeatures
-		jsr	(ExecuteObjects).l
+		jsr		(ExecuteObjects).l
 		tst.w   (f_restart).w
 		bne     GM_Level
+		jsr		(RingsManager).l
 		tst.w	(v_debuguse).w	; is debug mode being used?
 		bne.s	Level_DoScroll	; if yes, branch
 		cmpi.b	#6,(v_player+obRoutine).w ; has Sonic just died?
@@ -5881,14 +5898,14 @@ BuildSprites:
 		lea		(v_spritequeue).w,a4
 		moveq	#7,d7
 
-loc_D66A: ; The first part of this is for when we add S2 or S3K rings
-;		cmpi.b	#2,d7
-;		bne.s	@notpriority2
-;		move.l	a4,-(sp)
-;		jsr		BuildRings
-;		move.l	(sp)+,a4
+BuildSprites_LevelLoop: ; The first part of this is for when we add S2 or S3K rings
+		cmpi.b	#2,d7
+		bne.s	@notpriority2
+		move.l	a4,-(sp)
+		jsr		BuildRings
+		move.l	(sp)+,a4
 
-;	@notpriority2:
+	@notpriority2:
 		tst.w	(a4)
 		beq.w	loc_D72E
 		moveq	#2,d6
@@ -5974,7 +5991,7 @@ loc_D726:
 
 loc_D72E:
 		lea		$80(a4),a4
-		dbf		d7,loc_D66A
+		dbf		d7,BuildSprites_LevelLoop
 		move.b	d5,(v_spritecount).w
 		cmpi.b	#$50,d5
 		beq.s	loc_D748
@@ -6271,7 +6288,7 @@ loc_D876:
 locret_D87C:
 		rts	
 
-;		include	"_inc\RingsManager.asm"
+		include	"_inc\RingsManager.asm"
 		include "_inc\BuildHUD.asm"
 		include	"_incObj\sub ChkObjectVisible.asm"
 
@@ -9018,6 +9035,7 @@ RingPos_Index:
 		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
 		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
 		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
+		;dc.b $FF, $FF, 0, 0, 0,	0
 
 RingPos_GHZ1:	incbin	ringpos\ghz1.bin
 		even

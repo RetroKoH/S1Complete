@@ -7,7 +7,8 @@
 
 ReactToItem:
 		nop
-;		jsr	Touch_Rings
+		jsr	Touch_Rings
+
 ;		tst.b	character_id(a0)			; is the player character Sonic?
 ;		bne.s	@noInstaShield				; if not, branch
 		move.b	(v_status_secondary).w,d0	; does the player have a Shield or Invincibility?

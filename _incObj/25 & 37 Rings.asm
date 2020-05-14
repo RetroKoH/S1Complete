@@ -20,91 +20,17 @@ id_Ring_Animate:		equ ptr_Ring_Animate-Ring_Index	; 2
 id_Ring_Collect:		equ ptr_Ring_Collect-Ring_Index	; 4
 id_Ring_Sparkle:		equ ptr_Ring_Sparkle-Ring_Index	; 6
 id_Ring_Delete:		equ ptr_Ring_Delete-Ring_Index	; 8
-; ---------------------------------------------------------------------------
-; Distances between rings (format: horizontal, vertical)
-; ---------------------------------------------------------------------------
-Ring_PosData:	dc.b $10, 0		; horizontal tight
-		dc.b $18, 0		; horizontal normal
-		dc.b $20, 0		; horizontal wide
-		dc.b 0,	$10		; vertical tight
-		dc.b 0,	$18		; vertical normal
-		dc.b 0,	$20		; vertical wide
-		dc.b $10, $10		; diagonal
-		dc.b $18, $18
-		dc.b $20, $20
-		dc.b $F0, $10
-		dc.b $E8, $18
-		dc.b $E0, $20
-		dc.b $10, 8
-		dc.b $18, $10
-		dc.b $F0, 8
-		dc.b $E8, $10
 ; ===========================================================================
 
-Ring_Main:	; Routine 0
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		lea	2(a2,d0.w),a2
-		move.b	(a2),d4
-		move.b	obSubtype(a0),d1
-		move.b	d1,d0
-		andi.w	#7,d1
-		cmpi.w	#7,d1
-		bne.s	loc_9B80
-		moveq	#6,d1
-
-	loc_9B80:
-		swap	d1
-		move.w	#0,d1
-		lsr.b	#4,d0
-		add.w	d0,d0
-		move.b	Ring_PosData(pc,d0.w),d5 ; load ring spacing data
-		ext.w	d5
-		move.b	Ring_PosData+1(pc,d0.w),d6
-		ext.w	d6
-		movea.l	a0,a1
-		move.w	obX(a0),d2
-		move.w	obY(a0),d3
-		lsr.b	#1,d4
-		bcs.s	loc_9C02
-		bclr	#7,(a2)
-		bra.s	loc_9BBA
-; ===========================================================================
-
-Ring_MakeRings:
-		swap	d1
-		lsr.b	#1,d4
-		bcs.s	loc_9C02
-		bclr	#7,(a2)
-		bsr.w	FindFreeObj
-		bne.s	loc_9C0E
-
-loc_9BBA:
-		move.b	#id_Rings,0(a1)	; load ring object
+Ring_Main:	; Routine 0 - Completely stripped out all placement code and respawn index code, as it's not needed anymore
 		addq.b	#2,obRoutine(a1)
-		move.w	d2,obX(a1)	; set x-axis position based on d2
 		move.w	obX(a0),$32(a1)
-		move.w	d3,obY(a1)	; set y-axis position based on d3
 		move.l	#Map_Ring,obMap(a1)
 		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.w	#$100,obPriority(a1)
 		move.b	#$47,obColType(a1)
 		move.b	#8,obActWid(a1)
-		move.b	obRespawnNo(a0),obRespawnNo(a1)
-		move.b	d1,$34(a1)
-
-loc_9C02:
-		addq.w	#1,d1
-		add.w	d5,d2		; add ring spacing value to d2
-		add.w	d6,d3		; add ring spacing value to d3
-		swap	d1
-		dbf	d1,Ring_MakeRings ; repeat for	number of rings
-
-loc_9C0E:
-		btst	#0,(a2)
-		bne.w	DeleteObject
 
 Ring_Animate:	; Routine 2
 		move.b	(v_ani2_frame).w,obFrame(a0) ; set frame
@@ -117,14 +43,9 @@ Ring_Collect:	; Routine 4
 		move.b	#0,obColType(a0)
 		move.w	#$80,obPriority(a0)
 		bsr.w	CollectRing
-		lea	(v_objstate).w,a2
-		moveq	#0,d0
-		move.b	obRespawnNo(a0),d0
-		move.b	$34(a0),d1
-		bset	d1,2(a2,d0.w)
 
 Ring_Sparkle:	; Routine 6
-		lea	(Ani_Ring).l,a1
+		lea		(Ani_Ring).l,a1
 		bsr.w	AnimateSprite
 		bra.w	DisplaySprite
 ; ===========================================================================
@@ -136,9 +57,11 @@ Ring_Delete:	; Routine 8
 
 
 CollectRing:
-		addq.w	#1,(v_rings).w	; add 1 to rings
+		move.w	#sfx_Ring,d0	 ; prepare to play ring sound
+		cmpi.w	#999,(v_rings).w ; did the Sonic collect 999+ rings? < Added ring cap
+		bcc.s	@playsnd         ; if yes, branch
+		addq.w	#1,(v_rings).w	 ; add 1 to rings
 		ori.b	#1,(f_ringcount).w ; update the rings counter
-		move.w	#sfx_Ring,d0	; play ring sound
 		cmpi.w	#100,(v_rings).w ; do you have < 100 rings?
 		bcs.s	@playsnd	; if yes, branch
 		bset	#1,(v_lifecount).w ; update lives counter

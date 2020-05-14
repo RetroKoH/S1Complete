@@ -3,7 +3,8 @@
 v_128x128:					equ $FFFF0000	; 128x128 tile mappings (4 bytes) Saved $A400
 v_16x16:					equ v_128x128+4	; 16x16 tile mappings (4 bytes) Saved $1800
 
-; $FFFF0008-A3FF - UNUSED
+							;	$FFFF0008
+							;	$FFFFA3FF - UNUSED
 
 v_lvllayoutfg:				equ $FFFFA400	; level layout ROM address (4 bytes)
 v_lvllayoutbg:				equ $FFFFA404	; background layout ROM address (4 bytes)
@@ -12,6 +13,12 @@ v_ngfx_buffer:				equ $FFFFAA00	; Nemesis graphics decompression buffer ($200 by
 v_spritequeue:				equ $FFFFAC00	; sprite display queue, in order of priority ($400 bytes)
 
 ; $FFFFB000-C7FF - UNUSED
+v_ringpos:					equ $FFFFB008 ; $600 bytes
+v_ringconsumedata:			equ $FFFFB608 ; $80 bytes
+v_ringsroutine:				equ $FFFFB688 ; 1 byte
+							;	$FFFFB681 - UNUSED
+v_ringstart_addr:			equ $FFFFB68A ; 2 bytes
+v_ringend_addr:				equ $FFFFB68C ; 2 bytes
 
 VDP_Command_Buffer:			equ $FFFFC800	; Buffer for DMA Queue replacing the old art buffer.
 VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slot for a queued VDP command
@@ -203,9 +210,9 @@ v_sonframenum:	equ $FFFFF766	; frame to display for Sonic
 f_sonframechg:	equ $FFFFF767	; flag set to update Sonic's sprite frame
 v_anglebuffer:	equ $FFFFF768	; angle of collision block that Sonic or object is standing on
 
-v_opl_routine:	equ $FFFFF76C	; ObjPosLoad - routine counter
-v_opl_screen:	equ $FFFFF76E	; ObjPosLoad - screen variable
-v_opl_data:	equ $FFFFF770	; ObjPosLoad - data buffer ($10 bytes)
+v_opl_routine:		equ $FFFFF76C	; ObjPosLoad - routine counter
+v_opl_screen:		equ $FFFFF76E	; ObjPosLoad - screen variable
+v_opl_data:			equ $FFFFF770	; ObjPosLoad - data buffer ($10 bytes)
 
 v_ssangle:			equ $FFFFF780	; Special Stage angle (2 bytes)
 v_ssrotate:			equ $FFFFF782	; Special Stage rotation speed (2 bytes)
@@ -220,13 +227,13 @@ v_palss_time:	equ $FFFFF79C	; palette cycling in Special Stage - time until next
 
 v_obj31ypos:	equ $FFFFF7A4	; y-position of object 31 (MZ stomper) (2 bytes)
 v_bossstatus:	equ $FFFFF7A7	; status of boss and prison capsule (01 = boss defeated; 02 = prison opened)
-v_trackpos:	equ $FFFFF7A8	; position tracking reference number (2 bytes)
+v_trackpos:		equ $FFFFF7A8	; position tracking reference number (2 bytes)
 v_trackbyte:	equ $FFFFF7A9	; low byte for position tracking
 f_lockscreen:	equ $FFFFF7AA	; flag set to lock screen during bosses
-v_256loop1:	equ $FFFFF7AC	; 256x256 level tile which contains a loop (GHZ/SLZ)
-v_256loop2:	equ $FFFFF7AD	; 256x256 level tile which contains a loop (GHZ/SLZ)
-v_256roll1:	equ $FFFFF7AE	; 256x256 level tile which contains a roll tunnel (GHZ)
-v_256roll2:	equ $FFFFF7AF	; 256x256 level tile which contains a roll tunnel (GHZ)
+v_256loop1:		equ $FFFFF7AC	; 256x256 level tile which contains a loop (GHZ/SLZ)
+v_256loop2:		equ $FFFFF7AD	; 256x256 level tile which contains a loop (GHZ/SLZ)
+v_256roll1:		equ $FFFFF7AE	; 256x256 level tile which contains a roll tunnel (GHZ)
+v_256roll2:		equ $FFFFF7AF	; 256x256 level tile which contains a roll tunnel (GHZ)
 v_lani0_frame:	equ $FFFFF7B0	; level graphics animation 0 - current frame
 v_lani0_time:	equ $FFFFF7B1	; level graphics animation 0 - time until next frame
 v_lani1_frame:	equ $FFFFF7B2	; level graphics animation 1 - current frame
