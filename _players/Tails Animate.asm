@@ -1,12 +1,13 @@
 ; ---------------------------------------------------------------------------
-; Subroutine to	animate	Sonic's sprites
+; Subroutine to	animate	Tails's sprites
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Sonic_Animate:
-		lea		(Ani_Sonic).l,a1
+Tails_Animate:
+		lea		(Ani_Tails).l,a1
+Tails_Animate_2:
 		moveq	#0,d0
 		move.b	obAnim(a0),d0
 		cmp.b	obNextAni(a0),d0 ; is animation set to restart?
@@ -62,7 +63,7 @@ Sonic_Animate:
 		bra.s	@next
 ; ===========================================================================
 
-@end_FD:
+	@end_FD:
 		addq.b	#1,d0		; is the end flag = $FD	?
 		bne.s	@end		; if not, branch
 		move.b	2(a1,d1.w),obAnim(a0) ; read next byte, run that animation
@@ -71,20 +72,20 @@ Sonic_Animate:
 		rts	
 ; ===========================================================================
 
-@walkrunroll:
+	@walkrunroll:
 		subq.b	#1,obTimeFrame(a0) ; subtract 1 from frame duration
 		bpl.s	@delay		; if time remains, branch
 		addq.b	#1,d0		; is animation walking/running?
 		bne.w	@rolljump	; if not, branch
 		moveq	#0,d1
-		move.b	obAngle(a0),d0	; get Sonic's angle
+		move.b	obAngle(a0),d0	; get Tails's angle
 		bmi.s	@ble 			; better handling of angles
 		beq.s	@ble
 		subq.b	#1,d0
 
 	@ble:
 		move.b	obStatus(a0),d2
-		andi.b	#1,d2		; is Sonic mirrored horizontally?
+		andi.b	#1,d2		; is Tails mirrored horizontally?
 		bne.s	@flip		; if yes, branch
 		not.b	d0		; reverse angle
 
@@ -97,25 +98,25 @@ Sonic_Animate:
 		andi.b	#$FC,obRender(a0)
 		eor.b	d1,d2
 		or.b	d2,obRender(a0)
-		btst	#5,obStatus(a0)	; is Sonic pushing something?
+		btst	#5,obStatus(a0)	; is Tails pushing something?
 		bne.w	@push		; if yes, branch
 
 		lsr.b	#4,d0		; divide angle by $10
 		andi.b	#6,d0		; angle	must be	0, 2, 4	or 6
-		move.w	obInertia(a0),d2 ; get Sonic's speed
+		move.w	obInertia(a0),d2 ; get Tails's speed
 		bpl.s	@nomodspeed
 		neg.w	d2		; modulus speed
 
 	@nomodspeed:
-		lea	(SonAni_Dash).l,a1 ; use Dashing animation
-		cmpi.w	#$A00,d2	; is Sonic at Dashing speed?
+		lea		(TailAni_Dash).l,a1 ; use Dashing animation
+		cmpi.w	#$A00,d2	; is Tails at Dashing speed?
 		bcc.s	@running	; if yes, branch
 
-		lea	(SonAni_Run).l,a1 ; use	running	animation
-		cmpi.w	#$600,d2	; is Sonic at running speed?
+		lea		(TailAni_Run).l,a1 ; use running	animation
+		cmpi.w	#$600,d2	; is Tails at running speed?
 		bcc.s	@running	; if yes, branch
 
-		lea	(SonAni_Walk).l,a1 ; use walking animation
+		lea		(TailAni_Walk).l,a1 ; use walking animation
 		move.b	d0,d1
 		lsr.b	#1,d1
 		add.b	d1,d0
@@ -139,15 +140,15 @@ Sonic_Animate:
 @rolljump:
 		addq.b	#1,d0		; is animation rolling/jumping?
 		bne.s	@push		; if not, branch
-		move.w	obInertia(a0),d2 ; get Sonic's speed
+		move.w	obInertia(a0),d2 ; get Tails's speed
 		bpl.s	@nomodspeed2
 		neg.w	d2
 
 	@nomodspeed2:
-		lea	(SonAni_Roll2).l,a1 ; use fast animation
-		cmpi.w	#$600,d2	; is Sonic moving fast?
+		lea		(TailAni_Roll2).l,a1 ; use fast animation
+		cmpi.w	#$600,d2	; is Tails moving fast?
 		bcc.s	@rollfast	; if yes, branch
-		lea	(SonAni_Roll).l,a1 ; use slower	animation
+		lea		(TailAni_Roll).l,a1 ; use slower	animation
 
 	@rollfast:
 		neg.w	d2
@@ -166,7 +167,7 @@ Sonic_Animate:
 ; ===========================================================================
 
 @push:
-		move.w	obInertia(a0),d2 ; get Sonic's speed
+		move.w	obInertia(a0),d2 ; get Tails's speed
 		bmi.s	@negspeed
 		neg.w	d2
 
@@ -178,11 +179,11 @@ Sonic_Animate:
 	@belowmax3:
 		lsr.w	#6,d2
 		move.b	d2,obTimeFrame(a0) ; modify frame duration
-		lea	(SonAni_Push).l,a1
+		lea		(TailAni_Push).l,a1
 		move.b	obStatus(a0),d1
 		andi.b	#1,d1
 		andi.b	#$FC,obRender(a0)
 		or.b	d1,obRender(a0)
 		bra.w	@loadframe
 
-; End of function Sonic_Animate
+; End of function Tails_Animate

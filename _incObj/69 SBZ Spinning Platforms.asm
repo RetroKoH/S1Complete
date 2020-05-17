@@ -71,19 +71,19 @@ Spin_Trapdoor:	; Routine 2
 		addq.w	#1,d3
 		move.w	obX(a0),d4
 		bsr.w	SolidObject
-		bra.w	RememberState
+		jmp		RememberState
 ; ===========================================================================
 
 @notsolid:
-		btst	#3,obStatus(a0) ; is Sonic standing on the trapdoor?
+		btst	#staOnObj,obStatus(a0) ; is a player standing on the trapdoor?
 		beq.s	@display	; if not, branch
-		lea	(v_player).w,a1
-		bclr	#3,obStatus(a1)
-		bclr	#3,obStatus(a0)
+		lea		(v_player).w,a1
+		bclr	#staOnObj,obStatus(a1)
+		bclr	#staOnObj,obStatus(a0)
 		clr.b	obSolid(a0)
 
 	@display:
-		bra.w	RememberState
+		jmp		RememberState
 ; ===========================================================================
 
 Spin_Spinner:	; Routine 4
@@ -111,17 +111,17 @@ Spin_Spinner:	; Routine 4
 		move.w	d2,d3
 		addq.w	#1,d3
 		move.w	obX(a0),d4
-		bsr.w	SolidObject
-		bra.w	RememberState
+		jsr		SolidObject
+		jmp		RememberState
 ; ===========================================================================
 
 @notsolid2:
-		btst	#3,obStatus(a0)
+		btst	#staOnObj,obStatus(a0) ; is a player on the object?
 		beq.s	@display
-		lea	(v_player).w,a1
-		bclr	#3,obStatus(a1)
-		bclr	#3,obStatus(a0)
+		lea		(v_player).w,a1
+		bclr	#staOnObj,obStatus(a1)
+		bclr	#staOnObj,obStatus(a0)
 		clr.b	obSolid(a0)
 
 	@display:
-		bra.w	RememberState
+		jmp		RememberState

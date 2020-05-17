@@ -1,11 +1,11 @@
-Sonic_SpinDash:
+Tails_SpinDash:
 		btst	#staSpinDash,obStatus2(a0)
-		bne.s	loc_1AC8E
+		bne.s	Tails_UpdateSpindash
 		cmpi.b	#aniID_Duck,obAnim(a0)
-		bne.s	locret_1AC8C
+		bne.s	@stop
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
-		beq.w	locret_1AC8C
+		beq.w	@stop
 		move.b	#aniID_SpinDash,obAnim(a0)
 		
 		move.b	#1,(v_effectspace+obAnim).w
@@ -18,29 +18,30 @@ Sonic_SpinDash:
 		addq.l	#4,sp
 		bset	#staSpinDash,obStatus2(a0)
  
-loc_1AC84:
-		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
+		bsr.w	Player_LevelBound
+		bsr.w	Player_AnglePos
  
-locret_1AC8C:
+	@stop:
 		rts	
 ; ---------------------------------------------------------------------------
  
-loc_1AC8E:
+Tails_UpdateSpindash:
 		move.b	#aniID_SpinDash,obAnim(a0)
 		move.b	(v_jpadhold2).w,d0
 		btst	#bitDn,d0
-		bne.w	loc_1AD30
+		bne.w	Tails_ChargingSpindash
+
+; unleash the charged spindash and start rolling quickly
 		move.b	#$E,obHeight(a0)
 		move.b	#7,obWidth(a0)
 		move.b	#aniID_Roll,obAnim(a0)
-		addq.w	#5,obY(a0)
+		addq.w	#1,obY(a0)
 		bclr	#staSpinDash,obStatus2(a0)
 		moveq	#0,d0
 		move.b	obRevSpeed(a0),d0
 		add.w	d0,d0
 		move.w	#1,obVelX(a0)	; force X speed to nonzero for camera lag's benefit
-		move.w	SpinDashSpeeds(pc,d0.w),obInertia(a0)
+		move.w	TailsSpinDashSpeeds(pc,d0.w),obInertia(a0)
 		
 		move.b	obInertia(a0),d0
 		subi.b	#$8,d0
@@ -53,8 +54,8 @@ loc_1AC8E:
 		btst	#staFacing,obStatus(a0)
 		beq.s	@dontflip
 		neg.w	obInertia(a0)
- 
-@dontflip:
+
+	@dontflip:
 		bset	#staSpin,obStatus(a0)
 		bclr	#7,obStatus(a0)
 		move.w	#sfx_Teleport,d0
@@ -70,7 +71,7 @@ loc_1AC8E:
 		move.w	d0,obVelY(a0)
 		bra.w	SpinDash_ResetScr
 ; ---------------------------------------------------------------------------
-SpinDashSpeeds:
+TailsSpinDashSpeeds:
 		dc.w  $800		; 0
 		dc.w  $880		; 1
 		dc.w  $900		; 2
@@ -82,9 +83,9 @@ SpinDashSpeeds:
 		dc.w  $C00		; 8
 ; ---------------------------------------------------------------------------
  
-loc_1AD30:				; If still charging the dash...
+Tails_ChargingSpindash:				; If still charging the dash...
 		tst.w	obRevSpeed(a0)
-		beq.s	loc_1AD48
+		beq.s	@1AD48
 		
 		move.w	obRevSpeed(a0),d0
 		lsr.w	#5,d0
@@ -95,13 +96,13 @@ loc_1AD30:				; If still charging the dash...
 		bne.s	@skip
 		clr.w	obRevSpeed(a0)				; clear SpinDash Counter
 		bclr	#staSpinDash,obStatus2(a0)	; cancel SpinDash
-		bra.s	SpinDash_ResetScr			; branch
+		bra.s	TailsSpinDash_ResetScr		; branch
 		
 	@skip:
-		bcc.s	loc_1AD48
+		bcc.s	@1AD48
 		clr.w	obRevSpeed(a0)
- 
-loc_1AD48:
+
+	@1AD48:
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
 		beq.w	SpinDash_ResetScr
@@ -113,16 +114,16 @@ loc_1AD48:
 		move.w	#sfx_SpinDash,d0
 		jsr	(PlaySound_Special).l
  
-SpinDash_ResetScr:
+TailsSpinDash_ResetScr:
 		addq.l	#4,sp			; increase stack ptr
 		cmpi.w	#$60,(v_lookshift).w
-		beq.s	loc_1AD8C
-		bcc.s	loc_1AD88
+		beq.s	@1AD8C
+		bcc.s	@1AD88
 		addq.w	#4,(v_lookshift).w
  
-loc_1AD88:
+	@1AD88:
 		subq.w	#2,(v_lookshift).w
  
-loc_1AD8C:
-		bsr.w	Sonic_LevelBound
-		bra.w	Sonic_AnglePos
+	@1AD8C:
+		bsr.w	Player_LevelBound
+		bra.w	Player_AnglePos

@@ -23,28 +23,34 @@ Sonic_Roll:
 		neg.w	d0 ; If not, negate it to get the absolute value
 
 	@cont: ; Slow ducking, a la Sonic 3K
-		cmpi.w	#$100,d0    ; is Sonic moving at $100 speed or faster?
-		bhi.s	Sonic_ChkRoll    ; if yes, branch
-		move.b	#aniID_Duck,obAnim(a0) 	; use "ducking" animation
+		cmpi.b	#aniID_Balance,obAnim(a0)	; is Sonic balancing?
+		blt.s	@no							; if not.... then, NO :)
+		cmpi.b	#aniID_Balance3,obAnim(a0)	; Are you sure? There are 3 animations
+		ble.s	@noroll						; Don't duck
+
+	@no:
+		cmpi.w	#$100,d0					; is Sonic moving at $100 speed or faster?
+		bhi.s	Sonic_ChkRoll				; if yes, branch
+		move.b	#aniID_Duck,obAnim(a0)		; use "ducking" animation
 
 	@noroll:
 		rts	
 ; ===========================================================================
 
 Sonic_ChkRoll:
-		btst	#2,obStatus(a0)	; is Sonic already rolling?
-		beq.s	@roll		; if not, branch
+		btst	#staSpin,obStatus(a0)	; is Sonic already rolling?
+		beq.s	@roll					; if not, branch
 		rts	
 ; ===========================================================================
 
-@roll:
-		bset	#2,obStatus(a0)
+	@roll:
+		bset	#staSpin,obStatus(a0)
 		move.b	#$E,obHeight(a0)
 		move.b	#7,obWidth(a0)
 		move.b	#aniID_Roll,obAnim(a0) 		; use "rolling" animation
 		move.b	#fr_SonRoll1,obFrame(a0)	; hard sets frame so no flicker when roll in tunnels
 		addq.w	#5,obY(a0)
-		sfx	sfx_Roll,0,0,0	; play rolling sound
+		sfx		sfx_Roll,0,0,0	; play rolling sound
 		tst.w	obInertia(a0)
 		bne.s	@ismoving
 		move.w	#$200,obInertia(a0) ; set inertia if 0

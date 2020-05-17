@@ -40,9 +40,8 @@ RedRing_Init:	; Routine 0
 
 RedRing_Animate:
 		move.b	(v_ani2_frame).w,obFrame(a0) ; set frame
-		out_of_range	RedRing_Delete
 		bsr.s	RedRing_LoadGfx
-		jmp		DisplaySprite
+		jmp		RememberState
 ; ===========================================================================
 
 RedRing_Collect:	; Routine 4

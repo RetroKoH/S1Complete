@@ -6,27 +6,27 @@
 
 
 Sonic_ResetOnFloor:
-		btst	#4,obStatus(a0)
-		beq.s	loc_137AE
+		btst	#staRollJump,obStatus(a0)
+		beq.s	@noRollJump
 		nop	
 		nop	
 		nop	
 
-loc_137AE:
-		bclr	#5,obStatus(a0)
-		bclr	#1,obStatus(a0)
-		bclr	#4,obStatus(a0)
-		clr.b	obJumping(a0)
-		clr.w	(v_itembonus).w
-		btst	#2,obStatus(a0)
-		beq.s	loc_137E4
-		bclr	#2,obStatus(a0)
+	@noRollJump:
+		bclr	#staPush,obStatus(a0)
+		bclr	#staAir,obStatus(a0)
+		bclr	#staRollJump,obStatus(a0)
+		btst	#staSpin,obStatus(a0)
+		beq.s	@skip
+		bclr	#staSpin,obStatus(a0)
 		move.b	#$13,obHeight(a0)
 		move.b	#9,obWidth(a0)
 		move.b	#aniID_Walk,obAnim(a0) ; use running/walking animation
 		subq.w	#5,obY(a0)
+		clr.b	obJumping(a0)
+		clr.w	(v_itembonus).w
 		tst.b	obJumpFlag(a0)
-		beq.s	loc_137E4
+		beq.s	@skip
 		btst	#stsBubble,(v_status_secondary).w ; does Sonic have a Bubble Shield?
 		beq.s	@nobubble
 		bra.s	BubbleShield_Bounce
@@ -42,7 +42,7 @@ loc_137AE:
 	@noability:
 		clr.b	obJumpFlag(a0)
 
-loc_137E4:
+	@skip:
 		rts	
 ; End of function Sonic_ResetOnFloor
 

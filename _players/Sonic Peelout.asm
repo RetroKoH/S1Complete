@@ -7,14 +7,14 @@ Sonic_Dash:
 		andi.b	#btnABC,d0
 		beq.w	@return
 		move.b	#aniID_Run,obAnim(a0)
-		move.w	#0,$3A(a0)
+		clr.w	obRevSpeed(a0)
 		move.w	#sfx_SpinDash,d0
 		jsr		(PlaySound_Special).l
 		addq.l	#4,sp
 		bset	#staDash,obStatus2(a0)
  
-		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
+		bsr.w	Player_LevelBound
+		bsr.w	Player_AnglePos
  
 	@return:
 		rts	
@@ -26,7 +26,7 @@ Sonic_DashLaunch:
 		btst	#bitUp,d0
 		bne.w	Sonic_DashCharge
 		bclr	#staDash,obStatus2(a0)	; stop Dashing
-		cmpi.b	#$1E,$3A(a0)	; have we been charging long enough?
+		cmpi.b	#$1E,obRevSpeed(a0)	; have we been charging long enough?
 		bne.s	Sonic_DashResetScr
 		move.b	#aniID_Dash,obAnim(a0)	; launches here
 		move.w	#1,obVelX(a0)	; force X speed to nonzero for camera lag's benefit
@@ -38,12 +38,11 @@ Sonic_DashLaunch:
 		neg.w	d0
 		addi.w	#$2000,d0
 		;move.w	d0,(v_cameralag).w
-		btst	#0,obStatus(a0)
+		btst	#staFacing,obStatus(a0)
 		beq.s	@dontflip
 		neg.w	obInertia(a0)
  
 @dontflip:
-		;bset	#2,obStatus(a0)
 		bclr	#7,obStatus(a0)
 		move.w	#sfx_Teleport,d0
 		jsr		(PlaySound_Special).l
@@ -51,9 +50,9 @@ Sonic_DashLaunch:
 ; ---------------------------------------------------------------------------
  
 Sonic_DashCharge:				; If still charging the dash...
-		cmpi.b	#$1E,$3A(a0)
+		cmpi.b	#$1E,obRevSpeed(a0)
 		beq.s	Sonic_DashResetScr
-		addi.b	#1,$3A(a0)
+		addi.b	#1,obRevSpeed(a0)
 		
  
 Sonic_DashResetScr:
@@ -67,7 +66,6 @@ Sonic_DashResetScr:
 		subq.w	#2,(v_lookshift).w
  
 	@finish:
-		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
-		rts
+		bsr.w	Player_LevelBound
+		bra.w	Player_AnglePos
 		

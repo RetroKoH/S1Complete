@@ -1,13 +1,13 @@
 ; ---------------------------------------------------------------------------
-; Subroutine for Sonic when he's underwater
+; Subroutine for player characters when underwater
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Sonic_Water:
-		cmpi.b	#1,(v_zone).w	; is level LZ?
-		beq.s	@islabyrinth	; if yes, branch
+Player_Water:
+		cmpi.b	#id_LZ,(v_zone).w	; is level LZ?
+		beq.s	@islabyrinth		; if yes, branch
 
 	@exit:
 		rts	
@@ -24,14 +24,14 @@ Sonic_Water:
 		bset	#staWater,obStatus(a0)
 		bne.s	@exit
 		bsr.w	ResumeMusic
-		move.b	#id_DrownCount,(v_objspace+$340).w ; load bubbles object from Sonic's mouth
+		move.b	#id_DrownCount,(v_objspace+$340).w ; load bubbles object from character's mouth
 		move.b	#$81,(v_objspace+$340+obSubtype).w
-		lea     (v_sonspeedmax).w,a2  ; Load Sonic_top_speed into a2
+		lea     (v_sonspeedmax).w,a2  ; Load top_speed into a2
 		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
 		asr		obVelX(a0)
 		asr		obVelY(a0)
-		asr		obVelY(a0)	; slow Sonic
-		beq.s	@exit		; branch if Sonic stops moving
+		asr		obVelY(a0)	; slow the player
+		beq.s	@exit		; branch if the player stops moving
 		move.b	#id_Splash,(v_objspace+$300).w ; load splash object
 		sfx		sfx_Splash,1,0,0	 ; play splash sound
 ; ===========================================================================
@@ -40,10 +40,9 @@ Sonic_Water:
 		bclr	#6,obStatus(a0)
 		beq.s	@exit
 		bsr.w	ResumeMusic
-		move.w	#$600,(v_sonspeedmax).w ; restore Sonic's speed
-		move.w	#$C,(v_sonspeedacc).w ; restore Sonic's acceleration
-		move.w	#$80,(v_sonspeeddec).w ; restore Sonic's deceleration
-		asl	obVelY(a0)
+		lea     (v_sonspeedmax).w,a2  ; Load top_speed into a2
+		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
+		asl		obVelY(a0)
 		beq.w	@exit
 		move.b	#id_Splash,(v_objspace+$300).w ; load splash object
 		cmpi.w	#-$1000,obVelY(a0)
@@ -52,4 +51,4 @@ Sonic_Water:
 
 	@belowmaxspeed:
 		sfx	sfx_Splash,1,0,0	 ; play splash sound
-; End of function Sonic_Water
+; End of function Player_Water

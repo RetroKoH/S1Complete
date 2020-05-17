@@ -109,7 +109,7 @@ Sto_Action:	; Routine 2
 		move.b	sto_height(a0),d2
 		move.w	d2,d3
 		addq.w	#1,d3
-		bsr.w	SolidObject
+		jsr	SolidObject
 
 	@chkdel:
 		out_of_range.s	@chkgone,sto_origX(a0)
