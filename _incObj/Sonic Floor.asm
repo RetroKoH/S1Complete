@@ -15,8 +15,11 @@ Sonic_Floor:
 		move.w	obVelX(a0),d1
 		move.w	obVelY(a0),d2
 		jsr	(CalcAngle).l
+		move.b	d0,($FFFFFFEC).w
 		subi.b	#$20,d0
+		move.b	d0,($FFFFFFED).w
 		andi.b	#$C0,d0
+		move.b	d0,($FFFFFFEE).w
 		cmpi.b	#$40,d0
 		beq.w	loc_13680
 		cmpi.b	#$80,d0
@@ -38,6 +41,7 @@ loc_135F0:
 
 loc_13602:
 		bsr.w	Sonic_HitFloor
+		move.b	d1,($FFFFFFEF).w
 		tst.w	d1
 		bpl.s	locret_1367E
 		move.b	obVelY(a0),d2

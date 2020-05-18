@@ -205,16 +205,13 @@ v_fg_scroll_flags:	equ $FFFFF754	; background scrolling variable 1
 v_bg1_scroll_flags:	equ $FFFFF756	; background scrolling variable 2
 v_bg2_scroll_flags:	equ $FFFFF758	; background scrolling variable 3
 v_bg3_scroll_flags:	equ $FFFFF75A	; background scrolling variable 4
-f_bgscrollvert:		equ $FFFFF75C	; flag for vertical background scrolling
-v_sonspeedmax:		equ $FFFFF760	; Sonic's maximum speed (2 bytes)
-v_sonspeedacc:		equ $FFFFF762	; Sonic's acceleration (2 bytes)
-v_sonspeeddec:		equ $FFFFF764	; Sonic's deceleration (2 bytes)
-v_sonframenum:		equ $FFFFF766	; frame to display for Sonic
-f_sonframechg:		equ $FFFFF767	; flag set to update Sonic's sprite frame
-v_anglebuffer:		equ $FFFFF768	; angle of collision block that Sonic or object is standing on
-v_anglebuffer2:		equ $FFFFF769	; angle of collision block that Sonic or object is standing on
-
-;					equ $FFFFF76A-B UNUSED
+f_bgscrollvert:	equ $FFFFF75C	; flag for vertical background scrolling
+v_sonspeedmax:	equ $FFFFF760	; Sonic's maximum speed (2 bytes)
+v_sonspeedacc:	equ $FFFFF762	; Sonic's acceleration (2 bytes)
+v_sonspeeddec:	equ $FFFFF764	; Sonic's deceleration (2 bytes)
+v_sonframenum:	equ $FFFFF766	; frame to display for Sonic
+f_sonframechg:	equ $FFFFF767	; flag set to update Sonic's sprite frame
+v_anglebuffer:	equ $FFFFF768	; angle of collision block that Sonic or object is standing on
 
 v_opl_routine:		equ $FFFFF76C	; ObjPosLoad - routine counter
 v_opl_screen:		equ $FFFFF76E	; ObjPosLoad - screen variable

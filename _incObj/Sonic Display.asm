@@ -1,22 +1,8 @@
 ; ---------------------------------------------------------------------------
-; Music	to play	after invincibility wears off
-; ---------------------------------------------------------------------------
-MusicList2:
-		dc.b bgm_GHZ
-		dc.b bgm_LZ
-		dc.b bgm_MZ
-		dc.b bgm_SLZ
-		dc.b bgm_SYZ
-		dc.b bgm_SBZ
-		zonewarning MusicList2,1
-		; The ending doesn't get an entry
-		even
-
-; ---------------------------------------------------------------------------
-; Subroutine to display player characters and set music
+; Subroutine to display Sonic and set music
 ; ---------------------------------------------------------------------------
 
-Player_Display: 	; Invulnerability flashing
+Sonic_Display: 	; Invulnerability flashing
 		move.b	obInvuln(a0),d0
 		beq.s	@display
 		subq.b	#1,obInvuln(a0)
@@ -27,7 +13,7 @@ Player_Display: 	; Invulnerability flashing
 		jsr	(DisplaySprite).l
 
 	@chkinvincible:
-		btst	#stsInvinc,(v_status_secondary).w	; does the player have invincibility?
+		btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
 		beq.s	@chkshoes							; if not, branch
 		tst.b	obInvinc(a0)						; check	time remaining for invinciblity
 		beq.s	@chkshoes							; if no	time remains, branch
@@ -55,16 +41,16 @@ Player_Display: 	; Invulnerability flashing
 		bclr	#stsInvinc,(v_status_secondary).w ; cancel invincibility
 
 	@chkshoes:
-		btst	#stsShoes,(v_status_secondary).w	; does the player have speed shoes?
+		btst	#stsShoes,(v_status_secondary).w	; does Sonic have speed	shoes?
 		beq.s	@exit				; if not, branch
 		tst.b	obShoes(a0)			; check	time remaining
 		beq.s	@exit
 		move.b	(v_framebyte).w,d0
 		andi.b	#7,d0                        ; shoe timer decrements once every 8 frames
-		bne.s	@exit       			; if it's not the 8th frame, branch
+		bne.s	@exit       ; if it's not the 8th frame, branch
 		subq.b	#1,obShoes(a0)			; subtract 1 from time
 		bne.s	@exit
-		lea     (v_sonspeedmax).w,a2    ; Load Top speed into a2
+		lea     (v_sonspeedmax).w,a2    ; Load Sonic_top_speed into a2
 		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
 		bclr	#stsShoes,(v_status_secondary).w	; cancel speed shoes
 		music	bgm_Slowdown,1,0,0		; run music at normal speed

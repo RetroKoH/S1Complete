@@ -1,33 +1,38 @@
 ; ---------------------------------------------------------------------------
-; Subroutine to	slow the player walking up a slope
+; Subroutine to	push Sonic down	a slope	while he's rolling
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Player_SlopeResist:
+Sonic_RollRepel:
 		move.b	obAngle(a0),d0
 		addi.b	#$60,d0
-		cmpi.b	#$C0,d0
-		bcc.s	locret_13508
+		cmpi.b	#-$40,d0
+		bcc.s	locret_13544
 		move.b	obAngle(a0),d0
 		jsr	(CalcSine).l
-		muls.w	#$20,d0
+		muls.w	#$50,d0
 		asr.l	#8,d0
 		tst.w	obInertia(a0)
-		beq.s	locret_13508
-		bmi.s	loc_13504
+		bmi.s	loc_1353A
 		tst.w	d0
-		beq.s	locret_13502
-		add.w	d0,obInertia(a0) ; change inertia
+		bpl.s	loc_13534
+		asr.l	#2,d0
 
-locret_13502:
+loc_13534:
+		add.w	d0,obInertia(a0)
 		rts	
 ; ===========================================================================
 
-loc_13504:
+loc_1353A:
+		tst.w	d0
+		bmi.s	loc_13540
+		asr.l	#2,d0
+
+loc_13540:
 		add.w	d0,obInertia(a0)
 
-locret_13508:
+locret_13544:
 		rts	
-; End of function Player_SlopeResist
+; End of function Sonic_RollRepel

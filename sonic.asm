@@ -273,40 +273,38 @@ GameProgram:
 		cmpi.l	#'init',(v_init).w ; has checksum routine already run?
 		beq.w	GameInit	; if yes, branch
 
-CheckSumCheck: ; FASTER CHECKSUM CHECK BY MARKEYJESTER; Fixed by Ralakimus
-        movea.w #$0200,a0               ; prepare start address
-        move.l  (RomEndLoc).w,d7        ; load size
-        sub.l   a0,d7                   ; minus start address
-        move.b  d7,d5                   ; copy end nybble
-        andi.w  #$000F,d5               ; get only the remaining nybble
-        lsr.l   #$04,d7                 ; divide the size by 20
-        move.w  d7,d6                   ; load lower word size
-        subq.w    #1,d6            ; fix lower word size for dbf
-        swap    d7                      ; get upper word size
-        moveq   #$00,d0                 ; clear d0
- 
+CheckSumCheck: ; FASTER CHECKSUM CHECK BY MARKEYJESTER
+		movea.w	#$0200,a0				; prepare start address
+		move.l	(RomEndLoc).w,d7		; load size
+		sub.l	a0,d7					; minus start address
+		move.b	d7,d5					; copy end nybble
+		andi.w	#$000F,d5				; get only the remaining nybble
+		lsr.l	#$04,d7					; divide the size by 20
+		move.w	d7,d6					; load lower word size
+		swap	d7						; get upper word size
+		moveq	#$00,d0					; clear d0
+
 CS_MainBlock:
-        add.w   (a0)+,d0                ; modular checksum (8 words)
-        add.w   (a0)+,d0                ; ''
-        add.w   (a0)+,d0                ; ''
-        add.w   (a0)+,d0                ; ''
-        add.w   (a0)+,d0                ; ''
-        add.w   (a0)+,d0                ; ''
-        add.w   (a0)+,d0                ; ''
-        add.w   (a0)+,d0                ; ''
-        dbf     d6,CS_MainBlock         ; repeat until all main block sections are done
-        dbf     d7,CS_MainBlock         ; ''
-        lsr.w    #$01,d5            ; divide remaining nybble by 2
-        bcs.s    CS_Remains        ; if there are remaining nybble, branch
-        beq.s   CS_Finish               ; if there is no remaining nybble, branch
- 
+		add.w	(a0)+,d0				; modular checksum (8 words)
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		add.w	(a0)+,d0				; ''
+		dbf		d6,CS_MainBlock			; repeat until all main block sections are done
+		dbf		d7,CS_MainBlock			; ''
+		subq.w	#$01,d5					; decrease remaining nybble for dbf
+		bpl.s	CS_Finish				; if there is no remaining nybble, branch
+
 CS_Remains:
-        add.w   (a0)+,d0                ; add remaining words
-        dbf     d5,CS_Remains           ; repeat until the remaining words are done
- 
+		add.w	(a0)+,d0				; add remaining words
+		dbf		d5,CS_Remains			; repeat until the remaining words are done
+
 CS_Finish:
-        cmp.w   (Checksum).w,d0         ; does the checksum match?
-        bne.w   CheckSumError           ; if not, branch
+		cmp.w	(Checksum).w,d0			; does the checksum match?
+		bne.w	CheckSumError			; if not, branch
 
 CheckSumOk:
 		lea		($FFFFFE00).w,a6
@@ -1781,7 +1779,6 @@ PalLoad4_Water:
 Pal_Title:		incbin	"palette\Title Screen.bin"
 Pal_LevelSel:	incbin	"palette\Level Select.bin"
 Pal_Sonic:		incbin	"palette\Sonic.bin"
-Pal_Tails:		incbin	"palette\Tails.bin"
 Pal_GHZ:		incbin	"palette\Green Hill Zone.bin"
 Pal_LZ:			incbin	"palette\Labyrinth Zone.bin"
 Pal_LZWater:	incbin	"palette\Labyrinth Zone Underwater.bin"
@@ -2676,10 +2673,11 @@ Level_TtlCardLoop:
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
+		jsr	(FloorLog_Unk).l
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
-		move.b	#id_TailsPlayer,(v_player).w		; load Sonic object
-		move.b	#id_ShieldItem,(v_shieldspace).w	; Create the instashield object
+		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
+		move.b	#id_ShieldItem,(v_shieldspace).w		; Create the instashield object
 		move.b	#$D,(v_shieldspace+obAnim).w
 
 Level_ChkDebug:
@@ -2780,27 +2778,6 @@ Level_Delay:
 		addq.b	#4,(v_objspace+$100+obRoutine).w
 		addq.b	#4,(v_objspace+$140+obRoutine).w
 		bra.s	Level_StartGame
-; ===========================================================================
-
-; ===========================================================================
-; Character selection variables
-; ===========================================================================
-;PlayerSettings:
-			; Player Object		; Palette	; Mappings
-;		dc.b	id_SonicPlayer,		palid_Sonic,0,0			; 0
-;		dc.l						Map_Sonic				; 4
-;		dc.b	id_TailsPlayer,		palid_Tails,0,0			; 8
-;		dc.l						Map_Tails				; $C
-;		dc.b	id_KnuxPlayer,		palid_Knux,0,0			; $10
-;		dc.l						Map_Knux				; $14
-;		dc.b	id_MightyPlayer,	palid_Mighty,0,0		; $18
-;		dc.l						Map_Mighty				; $1C
-;		dc.b	id_RayPlayer,		palid_Ray,0,0			; $28
-;		dc.l						Map_Ray					; $2C
-;		dc.b	id_AmyPlayer,		palid_Amy,0,0			; $20
-;		dc.l						Map_Amy					; $24
-;		dc.b	id_MetalPlayer,		palid_Sonic,0,0			; $20
-;		dc.l						Map_Metal				; $24
 ; ===========================================================================
 
 Level_ClrCardArt:
@@ -5665,9 +5642,7 @@ Map_Over:	include	"_maps\Game Over.asm"
 ; ---------------------------------------------------------------------------
 ; Sprite mappings - "SONIC HAS PASSED" title card
 ; ---------------------------------------------------------------------------
-Map_Got:
-		dc.w M_Got_SonicHas-Map_Got
-		dc.w M_Got_TailsHas-Map_Got
+Map_Got:	dc.w M_Got_SonicHas-Map_Got
 		dc.w M_Got_Passed-Map_Got
 		dc.w M_Got_Score-Map_Got
 		dc.w M_Got_TBonus-Map_Got
@@ -5685,16 +5660,6 @@ M_Got_SonicHas:	dc.b 8			; SONIC HAS
 		dc.b $F8, 5, 0,	$1C, $10
 		dc.b $F8, 5, 0,	0, $20
 		dc.b $F8, 5, 0,	$3E, $30
-M_Got_TailsHas:	dc.b 8                  ; TAILS HAS
-		dc.b $F8, 5, 0,	$42, $B8
-		dc.b $F8, 5, 0,	0, $C8
-		dc.b $F8, 1, 0,	$20, $D8
-		dc.b $F8, 5, 0,	$26, $E0
-		dc.b $F8, 5, 0,	$3E, $F0
-		dc.b $F8, 5, 0,	$1C, $10
-		dc.b $F8, 5, 0,	0, $20
-		dc.b $F8, 5, 0,	$3E, $30
-		even
 M_Got_Passed:	dc.b 6			; PASSED
 		dc.b $F8, 5, 0,	$36, $D0
 		dc.b $F8, 5, 0,	0, $E0
@@ -5731,14 +5696,13 @@ M_Got_RBonus:	dc.b 7			; RING BONUS
 ; ---------------------------------------------------------------------------
 Map_SSR:	dc.w M_SSR_Chaos-Map_SSR
 		dc.w M_SSR_Score-Map_SSR
-		dc.w M_SSR_RBonus-Map_SSR
+		dc.w byte_CD0D-Map_SSR
 		dc.w M_Card_Oval-Map_SSR
-		dc.w M_SSR_Cont1-Map_SSR
-		dc.w M_SSR_Cont2-Map_SSR
-		dc.w M_SSR_Cont-Map_SSR
-		dc.w M_SSR_SStage-Map_SSR
-		dc.w M_SSR_SonicGTA-Map_SSR
-		dc.w M_SSR_TailsGTA-Map_SSR
+		dc.w byte_CD31-Map_SSR
+		dc.w byte_CD46-Map_SSR
+		dc.w byte_CD5B-Map_SSR
+		dc.w byte_CD6B-Map_SSR
+		dc.w byte_CDA8-Map_SSR
 M_SSR_Chaos:	dc.b $D			; "CHAOS EMERALDS"
 		dc.b $F8, 5, 0,	8, $90
 		dc.b $F8, 5, 0,	$1C, $A0
@@ -5760,7 +5724,7 @@ M_SSR_Score:	dc.b 6			; "SCORE"
 		dc.b $F8, $D, 1, $6A, $30
 		dc.b $F7, 4, 0,	$6E, $CD
 		dc.b $FF, 4, $18, $6E, $CD
-M_SSR_RBonus:	dc.b 7
+byte_CD0D:	dc.b 7
 		dc.b $F8, $D, 1, $52, $B0
 		dc.b $F8, $D, 0, $66, $D9
 		dc.b $F8, 1, 1,	$4A, $F9
@@ -5768,21 +5732,21 @@ M_SSR_RBonus:	dc.b 7
 		dc.b $FF, 4, $18, $6E, $F6
 		dc.b $F8, $D, $FF, $F8,	$28
 		dc.b $F8, 1, 1,	$70, $48
-M_SSR_Cont1:	dc.b 4
+byte_CD31:	dc.b 4
 		dc.b $F8, $D, $FF, $D1,	$B0
 		dc.b $F8, $D, $FF, $D9,	$D0
 		dc.b $F8, 1, $FF, $E1, $F0
 		dc.b $F8, 6, $1F, $E3, $40
-M_SSR_Cont2:	dc.b 4
+byte_CD46:	dc.b 4
 		dc.b $F8, $D, $FF, $D1,	$B0
 		dc.b $F8, $D, $FF, $D9,	$D0
 		dc.b $F8, 1, $FF, $E1, $F0
 		dc.b $F8, 6, $1F, $E9, $40
-M_SSR_Cont:	dc.b 3
+byte_CD5B:	dc.b 3
 		dc.b $F8, $D, $FF, $D1,	$B0
 		dc.b $F8, $D, $FF, $D9,	$D0
 		dc.b $F8, 1, $FF, $E1, $F0
-M_SSR_SStage:	dc.b $C			; "SPECIAL STAGE"
+byte_CD6B:	dc.b $C			; "SPECIAL STAGE"
 		dc.b $F8, 5, 0,	$3E, $9C
 		dc.b $F8, 5, 0,	$36, $AC
 		dc.b $F8, 5, 0,	$10, $BC
@@ -5795,28 +5759,12 @@ M_SSR_SStage:	dc.b $C			; "SPECIAL STAGE"
 		dc.b $F8, 5, 0,	0, $34
 		dc.b $F8, 5, 0,	$18, $44
 		dc.b $F8, 5, 0,	$10, $54
-M_SSR_SonicGTA:	dc.b $F			; "SONIC GOT THEM ALL"
+byte_CDA8:	dc.b $F			; "SONIC GOT THEM ALL"
 		dc.b $F8, 5, 0,	$3E, $88
 		dc.b $F8, 5, 0,	$32, $98
 		dc.b $F8, 5, 0,	$2E, $A8
 		dc.b $F8, 1, 0,	$20, $B8
 		dc.b $F8, 5, 0,	8, $C0
-		dc.b $F8, 5, 0,	$18, $D8
-		dc.b $F8, 5, 0,	$32, $E8
-		dc.b $F8, 5, 0,	$42, $F8
-		dc.b $F8, 5, 0,	$42, $10
-		dc.b $F8, 5, 0,	$1C, $20
-		dc.b $F8, 5, 0,	$10, $30
-		dc.b $F8, 5, 0,	$2A, $40
-		dc.b $F8, 5, 0,	0, $58
-		dc.b $F8, 5, 0,	$26, $68
-		dc.b $F8, 5, 0,	$26, $78
-M_SSR_TailsGTA:	dc.b $F			; "TAILS GOT THEM ALL"
-		dc.b $F8, 5, 0,	$42, $88
-		dc.b $F8, 5, 0,	0, $98
-		dc.b $F8, 1, 0,	$20, $A8
-		dc.b $F8, 5, 0,	$26, $B0
-		dc.b $F8, 5, 0,	$3E, $C0
 		dc.b $F8, 5, 0,	$18, $D8
 		dc.b $F8, 5, 0,	$32, $E8
 		dc.b $F8, 5, 0,	$42, $F8
@@ -6754,12 +6702,211 @@ Map_WFall	include	"_maps\Waterfalls.asm"
 
 		include "_incObj\Sonic Effects.asm"
 
-		include "_players\00 Sonic.asm"
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Object 01 - Sonic
+; ---------------------------------------------------------------------------
+
+SonicPlayer:
+		tst.w	(v_debuguse).w	; is debug mode	being used?
+		beq.s	Sonic_Normal	; if not, branch
+		jmp		(DebugMode).l
+; ===========================================================================
+
+Sonic_Normal:
+		moveq	#0,d0
+		move.b	obRoutine(a0),d0
+		move.w	Sonic_Index(pc,d0.w),d1
+		jmp		Sonic_Index(pc,d1.w)
+; ===========================================================================
+Sonic_Index:
+ptr_Sonic_Init:		dc.w Sonic_Init-Sonic_Index
+ptr_Sonic_Control:	dc.w Sonic_Control-Sonic_Index
+ptr_Sonic_Hurt:		dc.w Sonic_Hurt-Sonic_Index
+ptr_Sonic_Death:	dc.w Sonic_Death-Sonic_Index
+ptr_Sonic_Reset:	dc.w Sonic_ResetLevel-Sonic_Index
+ptr_Sonic_Drown:	dc.w Sonic_Drowned-Sonic_Index
+
+id_Sonic_Init:		equ ptr_Sonic_Init-Sonic_Index		; 0
+id_Sonic_Control:	equ ptr_Sonic_Control-Sonic_Index	; 2
+id_Sonic_Hurt:		equ ptr_Sonic_Hurt-Sonic_Index		; 4
+id_Sonic_Death:		equ ptr_Sonic_Death-Sonic_Index		; 6
+id_Sonic_Reset:		equ ptr_Sonic_Reset-Sonic_Index		; 8
+id_Sonic_Drown:		equ ptr_Sonic_Drown-Sonic_Index		; $A
+; ===========================================================================
+
+Sonic_Init:	; Routine 0
+		move.b	#$C,(v_top_solid_bit).w	; MJ: set collision to 1st
+		move.b	#$D,(v_lrb_solid_bit).w	; MJ: set collision to 1st
+		addq.b	#2,obRoutine(a0)
+		move.b	#$13,obHeight(a0)
+		move.b	#9,obWidth(a0)
+		move.l	#Map_Sonic,obMap(a0)
+		move.w	#$780,obGfx(a0)
+		move.w	#$100,obPriority(a0)
+		move.b	#$18,obActWid(a0)
+		move.b	#4,obRender(a0)
+		lea     (v_sonspeedmax).w,a2	; Load Sonic_top_speed into a2
+		bsr.w   ApplySpeedSettings		; Fetch Speed settings
+		move.b	#id_Effects,(v_effectspace).w
+
+Sonic_Control:	; Routine 2
+		tst.w	(f_debugmode).w	; is debug cheat enabled?
+		beq.s	loc_12C58	; if not, branch
+		btst	#bitB,(v_jpadpress1).w ; is button B pressed?
+		beq.s	loc_12C58	; if not, branch
+		move.w	#1,(v_debuguse).w ; change Sonic into a ring/item
+		clr.b	(f_lockctrl).w
+		rts	
+; ===========================================================================
+
+loc_12C58:
+		tst.b	(f_lockctrl).w	; are controls locked?
+		bne.s	loc_12C64	; if yes, branch
+		move.w	(v_jpadhold1).w,(v_jpadhold2).w ; enable joypad control
+
+loc_12C64:
+		btst	#0,(f_lockmulti).w ; are controls locked?
+		bne.s	loc_12C7E	; if yes, branch
+		moveq	#0,d0
+		move.b	obStatus(a0),d0
+		andi.w	#6,d0
+		move.w	Sonic_Modes(pc,d0.w),d1
+		jsr	Sonic_Modes(pc,d1.w)
+
+loc_12C7E:
+		bsr.s	Sonic_Display
+		bsr.w	Sonic_RecordPosition
+		bsr.w	Sonic_Water
+		move.b	(v_anglebuffer).w,$36(a0)
+		move.b	($FFFFF76A).w,$37(a0)
+		tst.b	(f_wtunnelmode).w
+		beq.s	loc_12CA6
+		tst.b	obAnim(a0)
+		bne.s	loc_12CA6
+		move.b	obNextAni(a0),obAnim(a0)
+
+loc_12CA6:
+		bsr.w	Sonic_Animate
+		tst.b	(f_lockmulti).w
+		bmi.s	loc_12CB6
+		jsr	(ReactToItem).l
+
+loc_12CB6:
+		bsr.w	Sonic_Loops
+		bsr.w	Sonic_LoadGfx
+		rts	
+; ===========================================================================
+Sonic_Modes:	dc.w Sonic_MdNormal-Sonic_Modes
+		dc.w Sonic_MdJump-Sonic_Modes
+		dc.w Sonic_MdRoll-Sonic_Modes
+		dc.w Sonic_MdJump2-Sonic_Modes
+; ---------------------------------------------------------------------------
+; Music	to play	after invincibility wears off
+; ---------------------------------------------------------------------------
+MusicList2:
+		dc.b bgm_GHZ
+		dc.b bgm_LZ
+		dc.b bgm_MZ
+		dc.b bgm_SLZ
+		dc.b bgm_SYZ
+		dc.b bgm_SBZ
+		zonewarning MusicList2,1
+		; The ending doesn't get an entry
+		even
+
+		include	"_incObj\Sonic Display.asm"
+		include	"_incObj\Sonic RecordPosition.asm"
+		include	"_incObj\Sonic Water.asm"
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Modes	for controlling	Sonic
+; ---------------------------------------------------------------------------
+
+Sonic_MdNormal:
+		bsr.w	Sonic_Dash
+		bsr.w	Sonic_SpinDash
+		bsr.w	Sonic_Jump
+		bsr.w	Sonic_SlopeResist
+		bsr.w	Sonic_Move
+		bsr.w	Sonic_Roll
+		bsr.w	Sonic_LevelBound
+		jsr		(SpeedToPos).l
+		bsr.w	Sonic_AnglePos
+		bsr.w	Sonic_SlopeRepel
+		rts	
+; ===========================================================================
+
+Sonic_MdJump:
+		bclr	#staDash,obStatus2(a0)
+		bclr	#staSpinDash,obStatus2(a0)
+		bsr.w	Sonic_JumpHeight
+		bsr.w	Sonic_JumpDirection
+		bsr.w	Sonic_LevelBound
+		jsr	(ObjectFall).l
+		btst	#6,obStatus(a0)
+		beq.s	loc_12E5C
+		subi.w	#$28,obVelY(a0)
+
+loc_12E5C:
+		bsr.w	Sonic_JumpAngle
+		bsr.w	Sonic_Floor
+		rts	
+; ===========================================================================
+
+Sonic_MdRoll:
+		bsr.w	Sonic_Jump
+		bsr.w	Sonic_RollRepel
+		bsr.w	Sonic_RollSpeed
+		bsr.w	Sonic_LevelBound
+		jsr	(SpeedToPos).l
+		bsr.w	Sonic_AnglePos
+		bsr.w	Sonic_SlopeRepel
+		rts	
+; ===========================================================================
+
+Sonic_MdJump2:
+		bclr	#staDash,obStatus2(a0)
+		bclr	#staSpinDash,obStatus2(a0)
+		bsr.w	Sonic_JumpHeight
+		bsr.w	Sonic_JumpDirection
+		bsr.w	Sonic_LevelBound
+		jsr	(ObjectFall).l
+		btst	#6,obStatus(a0)
+		beq.s	loc_12EA6
+		subi.w	#$28,obVelY(a0)
+
+loc_12EA6:
+		bsr.w	Sonic_JumpAngle
+		bsr.w	Sonic_Floor
+		rts	
+
+		include	"_incObj\Sonic Move.asm"
+		include	"_incObj\Sonic RollSpeed.asm"
+		include	"_incObj\Sonic JumpDirection.asm"
+		include	"_incObj\Sonic LevelBound.asm"
+		include	"_incObj\Sonic Roll.asm"
+		include	"_incObj\Sonic Jump.asm"
+		include	"_incObj\Sonic JumpHeight.asm"
+		include	"_incObj\Sonic Peelout.asm"
+		include	"_incObj\Sonic SpinDash.asm"
+		include	"_incObj\Sonic SlopeResist.asm"
+		include	"_incObj\Sonic RollRepel.asm"
+		include	"_incObj\Sonic SlopeRepel.asm"
+		include	"_incObj\Sonic JumpAngle.asm"
+		include	"_incObj\Sonic Floor.asm"
+		include	"_incObj\Sonic ResetOnFloor.asm"
+		include	"_incObj\Sonic (part 2).asm"
+		include	"_incObj\Sonic Loops.asm"
+		include	"_incObj\Sonic Drowned.asm"
+		include	"_incObj\Sonic Animate.asm"
+		include	"_anim\Sonic.asm"
+		include	"_incObj\Sonic LoadGfx.asm"
 
 		include "_incObj\sub ApplySpeedSettings.asm"
 		include	"_incObj\0A Drowning Countdown.asm"
 
-		include "_players\01 Tails.asm"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	play music for LZ/SBZ3 after a countdown
@@ -6815,6 +6962,7 @@ Map_Drown:	include	"_maps\Drowning Countdown.asm"
 		include "_maps\Shield - Insta.asm"
 		include "_maps\Shield - Insta - Dynamic Gfx Script.asm"
 
+
 		include	"_incObj\38 Shield and Invincibility.asm"
 		include	"_incObj\4A Special Stage Entry (Unused).asm"
 		include	"_incObj\03 Collision Switcher.asm"
@@ -6825,12 +6973,108 @@ Map_Vanish:	include	"_maps\Special Stage Entry (Unused).asm"
 		include	"_anim\Water Splash.asm"
 Map_Splash:	include	"_maps\Water Splash.asm"
 
-		include	"_players\Player AnglePos.asm"
+		include	"_incObj\Sonic AnglePos.asm"
 
 		include	"_incObj\sub FindNearestTile.asm"
 		include	"_incObj\sub FindFloor.asm"
 		include	"_incObj\sub FindWall.asm"
 
+; ---------------------------------------------------------------------------
+; Unused floor/wall subroutine - logs something	to do with collision
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+
+
+FloorLog_Unk:
+		rts	
+
+		lea	(CollArray1).l,a1
+		lea	(CollArray1).l,a2
+		move.w	#$FF,d3
+
+loc_14C5E:
+		moveq	#$10,d5
+		move.w	#$F,d2
+
+loc_14C64:
+		moveq	#0,d4
+		move.w	#$F,d1
+
+loc_14C6A:
+		move.w	(a1)+,d0
+		lsr.l	d5,d0
+		addx.w	d4,d4
+		dbf	d1,loc_14C6A
+
+		move.w	d4,(a2)+
+		suba.w	#$20,a1
+		subq.w	#1,d5
+		dbf	d2,loc_14C64
+
+		adda.w	#$20,a1
+		dbf	d3,loc_14C5E
+
+		lea	(CollArray1).l,a1
+		lea	(CollArray2).l,a2
+		bsr.s	FloorLog_Unk2
+		lea	(CollArray1).l,a1
+		lea	(CollArray1).l,a2
+
+; End of function FloorLog_Unk
+
+; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+
+
+FloorLog_Unk2:
+		move.w	#$FFF,d3
+
+loc_14CA6:
+		moveq	#0,d2
+		move.w	#$F,d1
+		move.w	(a1)+,d0
+		beq.s	loc_14CD4
+		bmi.s	loc_14CBE
+
+loc_14CB2:
+		lsr.w	#1,d0
+		bhs.s	loc_14CB8
+		addq.b	#1,d2
+
+loc_14CB8:
+		dbf	d1,loc_14CB2
+
+		bra.s	loc_14CD6
+; ===========================================================================
+
+loc_14CBE:
+		cmpi.w	#-1,d0
+		beq.s	loc_14CD0
+
+loc_14CC4:
+		lsl.w	#1,d0
+		bhs.s	loc_14CCA
+		subq.b	#1,d2
+
+loc_14CCA:
+		dbf	d1,loc_14CC4
+
+		bra.s	loc_14CD6
+; ===========================================================================
+
+loc_14CD0:
+		move.w	#$10,d0
+
+loc_14CD4:
+		move.w	d0,d2
+
+loc_14CD6:
+		move.b	d2,(a2)+
+		dbf	d3,loc_14CA6
+
+		rts	
+
+; End of function FloorLog_Unk2
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -6856,7 +7100,7 @@ Sonic_WalkSpeed:
 		swap	d2
 		swap	d3
 		move.b	d0,(v_anglebuffer).w
-		move.b	d0,(v_anglebuffer2).w
+		move.b	d0,($FFFFF76A).w
 		move.b	d0,d1
 		addi.b	#$20,d0
 		bpl.s	loc_14D1A
@@ -6905,7 +7149,7 @@ sub_14D48:
 @first:
 		move.b	(v_lrb_solid_bit).w,d5			; MJ: load L/R/B soldity bit
 		move.b	d0,(v_anglebuffer).w
-		move.b	d0,(v_anglebuffer2).w
+		move.b	d0,($FFFFF76A).w
 		addi.b	#$20,d0
 		andi.b	#$C0,d0
 		cmpi.b	#$40,d0
@@ -6954,7 +7198,7 @@ Sonic_HitFloor:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindFloor	; MJ: check solidity
@@ -6962,7 +7206,7 @@ Sonic_HitFloor:
 		move.b	#0,d2
 
 loc_14DD0:
-		move.b	(v_anglebuffer2).w,d3
+		move.b	($FFFFF76A).w,d3
 		cmp.w	d0,d1
 		ble.s	loc_14DDE
 		move.b	(v_anglebuffer).w,d3
@@ -7029,7 +7273,7 @@ sub_14E50:
 		move.b	obHeight(a0),d0
 		ext.w	d0
 		add.w	d0,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#$10,a3
 		move.w	#0,d6
 		bsr.w	FindWall	; MJ: check solidity
@@ -7118,7 +7362,7 @@ Sonic_DontRunOnWalls:
 		move.b	obWidth(a0),d0
 		ext.w	d0
 		sub.w	d0,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#-$10,a3
 		move.w	#$800,d6	; MJ: $1000/2
 		bsr.w	FindFloor	; MJ: check solidity
@@ -7194,7 +7438,7 @@ loc_14FD6:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	(v_anglebuffer2).w,a4
+		lea	($FFFFF76A).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity
@@ -8119,18 +8363,12 @@ Nem_JapNames:	incbin	"artnem\Hidden Japanese Credits.bin"
 ; ---------------------------------------------------------------------------
 
 				include	"_maps\Sonic.asm"
-				include	"_maps\Sonic - DPLC.asm"
-				include	"_anim\Sonic.asm"
-				include	"_maps\Tails.asm"
-				include	"_maps\Tails - DPLC.asm"
-				include	"_anim\Tails.asm"
+				include	"_maps\Sonic - Dynamic Gfx Script.asm"
 
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics
 ; ---------------------------------------------------------------------------
-Art_Sonic:		incbin	"artunc\Sonic.bin"
-		even
-Art_Tails:		incbin	"artunc\Tails.bin"
+Art_Sonic:		incbin	"artunc\Sonic.bin"	; Sonic
 		even
 Art_Effects:	incbin	"artunc\Dust Effects.bin"	; Spindash/Skid Dust
 		even
@@ -9001,8 +9239,6 @@ SoundDriver:	include "s1.sounddriver.asm"
 
    include   "ErrorHandler.asm"
 
-
-		align	$10,0 ; ROM Padding
 
 EndOfRom:
 

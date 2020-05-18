@@ -39,24 +39,17 @@ Got_Loop:
 		move.w	(a2)+,got_finalX(a1) ; load finish x-position (same as start)
 		move.w	(a2)+,got_mainX(a1) ; load main x-position
 		move.w	(a2)+,obScreenY(a1) ; load y-position
-		move.b	(a2)+,obRoutine(a1) ; load routine to run
-		move.b	(a2)+,d0            ; load value for mapping
-
-		tst.b	d0                    ; is the character name being loaded?
-		bne.s	@notname              ; if not, branch
-		add.b	#0,d0;(v_playermode).w,d0   ; add player mode # to get proper frame number
-		bra.s	loc_C5CA              ; branch and skip the next check.
-
-	@notname:
-		cmpi.b	#7,d0			; is the act number being loaded?
-		bne.s	loc_C5CA        ; if not, branch
+		move.b	(a2)+,obRoutine(a1)
+		move.b	(a2)+,d0
+		cmpi.b	#6,d0
+		bne.s	loc_C5CA
 		add.b	(v_act).w,d0	; add act number to frame number
 
 	loc_C5CA:
 		move.b	d0,obFrame(a1)
 		move.l	#Map_Got,obMap(a1)
 		move.w	#$8580,obGfx(a1)
-		clr.b	obRender(a1)
+		move.b	#0,obRender(a1)
 		lea		$40(a1),a1
 		dbf		d1,Got_Loop	; repeat 6 times
 
@@ -270,24 +263,23 @@ loc_C766:	; Routine $10
 		;    x-start,	x-main,	y-main,
 		;				routine, frame number
 
-Got_Config:
-		dc.w 	4,	$124,	$BC			; "SONIC HAS"
+Got_Config:	dc.w 4,		$124,	$BC			; "SONIC HAS"
 		dc.b 				2,	0
 
 		dc.w -$120,	$120,	$D0			; "PASSED"
-		dc.b 				2,	2
+		dc.b 				2,	1
 
 		dc.w $40C,	$14C,	$D6			; "ACT" 1/2/3
-		dc.b 				2,	7
+		dc.b 				2,	6
 
 		dc.w $520,	$120,	$EC			; score
-		dc.b 				2,	3
+		dc.b 				2,	2
 
 		dc.w $540,	$120,	$FC			; time bonus
+		dc.b 				2,	3
+
+		dc.w $560,	$120,	$10C			; ring bonus
 		dc.b 				2,	4
 
-		dc.w $560,	$120,	$10C		; ring bonus
-		dc.b 				2,	5
-
 		dc.w $20C,	$14C,	$CC			; oval
-		dc.b 				2,	6
+		dc.b 				2,	5

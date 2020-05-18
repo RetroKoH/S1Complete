@@ -1,15 +1,15 @@
 ; ---------------------------------------------------------------------------
-; Subroutine to	push the player down a slope
+; Subroutine to	push Sonic down	a slope
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Player_SlopeRepel:
+Sonic_SlopeRepel:
 		nop	
-		tst.b	obOnWheel(a0)
+		tst.b	$38(a0)
 		bne.s	locret_13580
-		tst.w	obLRLock(a0)
+		tst.w	$3E(a0)
 		bne.s	loc_13582
 		move.b	obAngle(a0),d0
 		addi.b	#$20,d0
@@ -23,14 +23,14 @@ loc_1356A:
 		cmpi.w	#$280,d0
 		bcc.s	locret_13580
 		clr.w	obInertia(a0)
-		bset	#staAir,obStatus(a0)
-		move.w	#$1E,obLRLock(a0)
+		bset	#1,obStatus(a0)
+		move.w	#$1E,$3E(a0)
 
 locret_13580:
 		rts	
 ; ===========================================================================
 
 loc_13582:
-		subq.w	#1,obLRLock(a0)
+		subq.w	#1,$3E(a0)
 		rts	
-; End of function Player_SlopeRepel
+; End of function Sonic_SlopeRepel

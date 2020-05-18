@@ -2,7 +2,7 @@
 ; Object pointers
 ; ---------------------------------------------------------------------------
 ptr_SonicPlayer:	dc.l SonicPlayer	; $01
-ptr_TailsPlayer:	dc.l TailsPlayer
+ptr_Obj02:			dc.l NullObject
 ptr_PathSwapper:	dc.l PathSwapper
 ptr_Obj04:			dc.l NullObject
 ptr_Obj05:			dc.l NullObject
@@ -145,10 +145,10 @@ ptr_TryChaos:		dc.l TryChaos
 ;ptr_RedRing:		dc.l RedRing
 
 NullObject:
-		jmp	(DeleteObject).l	; It would be safer to have this instruction here, but instead it just falls through to ObjectFall
+		;jmp	(DeleteObject).l	; It would be safer to have this instruction here, but instead it just falls through to ObjectFall
 
 id_SonicPlayer:		equ ((ptr_SonicPlayer-Obj_Index)/4)+1		; $01
-id_TailsPlayer:		equ ((ptr_TailsPlayer-Obj_Index)/4)+1
+id_Obj02:		equ ((ptr_Obj02-Obj_Index)/4)+1
 id_PathSwapper:		equ ((ptr_PathSwapper-Obj_Index)/4)+1
 id_Obj04:		equ ((ptr_Obj04-Obj_Index)/4)+1
 id_Obj05:		equ ((ptr_Obj05-Obj_Index)/4)+1

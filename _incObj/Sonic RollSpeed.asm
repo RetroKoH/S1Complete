@@ -14,7 +14,7 @@ Sonic_RollSpeed:
 		asr.w	#2,d4
 		tst.b	(f_jumponly).w
 		bne.w	loc_131CC
-		tst.w	obLRLock(a0)
+		tst.w	$3E(a0)
 		bne.s	@notright
 		btst	#bitL,(v_jpadhold2).w ; is left being pressed?
 		beq.s	@notleft	; if not, branch
@@ -49,7 +49,7 @@ loc_131A6:
 loc_131AA:
 		tst.w	obInertia(a0)	; is Sonic moving?
 		bne.s	loc_131CC	; if yes, branch
-		bclr	#staSpin,obStatus(a0)
+		bclr	#2,obStatus(a0)
 		move.b	#$13,obHeight(a0)
 		move.b	#9,obWidth(a0)
 		move.b	#aniID_Wait,obAnim(a0) ; use "standing" animation
@@ -83,7 +83,7 @@ loc_131F0:
 
 loc_131FA:
 		move.w	d1,obVelX(a0)
-		bra.w	Player_CheckWallsOnGround
+		bra.w	loc_1300C
 ; End of function Sonic_RollSpeed
 
 
@@ -96,7 +96,7 @@ Sonic_RollLeft:
 		bpl.s	loc_13218
 
 loc_1320A:
-		bset	#staFacing,obStatus(a0)
+		bset	#0,obStatus(a0)
 		move.b	#aniID_Roll,obAnim(a0) ; use "rolling" animation
 		rts	
 ; ===========================================================================
@@ -118,7 +118,7 @@ loc_13220:
 Sonic_RollRight:
 		move.w	obInertia(a0),d0
 		bmi.s	loc_1323A
-		bclr	#staFacing,obStatus(a0)
+		bclr	#0,obStatus(a0)
 		move.b	#aniID_Roll,obAnim(a0) ; use "rolling" animation
 		rts	
 ; ===========================================================================

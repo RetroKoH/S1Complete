@@ -1,20 +1,20 @@
 ; ---------------------------------------------------------------------------
-; Subroutine to	change direction while jumping
+; Subroutine to	change Sonic's direction while jumping
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Player_JumpDirection:
+Sonic_JumpDirection:
 		move.w	(v_sonspeedmax).w,d6
 		move.w	(v_sonspeedacc).w,d5
 		asl.w	#1,d5
-		btst	#staRollJump,obStatus(a0)
+		btst	#4,obStatus(a0)
 		bne.s	Obj01_ResetScr2
 		move.w	obVelX(a0),d0
 		btst	#bitL,(v_jpadhold2).w ; is left being pressed?
 		beq.s	loc_13278	; if not, branch
-		bset	#staFacing,obStatus(a0)
+		bset	#0,obStatus(a0)
 		sub.w	d5,d0
 		move.w	d6,d1
 		neg.w	d1
@@ -28,17 +28,17 @@ Player_JumpDirection:
 loc_13278:
 		btst	#bitR,(v_jpadhold2).w ; is right being pressed?
 		beq.s	Obj01_JumpMove	; if not, branch
-		bclr	#staFacing,obStatus(a0)
+		bclr	#0,obStatus(a0)
 		add.w	d5,d0
 		cmp.w	d6,d0
 		blt.s	Obj01_JumpMove
-		sub.w	d5,d0			; +++ remove this frame's acceleration change
-		cmp.w	d6,d0			; +++ compare speed with top speed
+		sub.w	d5,d0		; +++ remove this frame's acceleration change
+		cmp.w	d6,d0		; +++ compare speed with top speed
 		bge.s	Obj01_JumpMove	; +++ if speed was already greater than the maximum, branch
 		move.w	d6,d0
 
 Obj01_JumpMove:
-		move.w	d0,obVelX(a0)	; change player's horizontal speed
+		move.w	d0,obVelX(a0)	; change Sonic's horizontal speed
 
 Obj01_ResetScr2:
 		cmpi.w	#$60,(v_lookshift).w ; is the screen in its default position?
@@ -50,7 +50,7 @@ loc_132A0:
 		subq.w	#2,(v_lookshift).w
 
 loc_132A4:
-		cmpi.w	#-$400,obVelY(a0) ; is the player moving faster than -$400 upwards?
+		cmpi.w	#-$400,obVelY(a0) ; is Sonic moving faster than -$400 upwards?
 		bcs.s	locret_132D2	; if yes, branch
 		move.w	obVelX(a0),d0
 		move.w	d0,d1
@@ -76,4 +76,4 @@ loc_132CE:
 
 locret_132D2:
 		rts	
-; End of function Player_JumpDirection
+; End of function Sonic_JumpDirection

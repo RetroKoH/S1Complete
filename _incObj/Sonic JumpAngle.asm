@@ -1,11 +1,11 @@
 ; ---------------------------------------------------------------------------
-; Subroutine to	return player's angle to 0 as he jumps
+; Subroutine to	return Sonic's angle to 0 as he jumps
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Player_JumpAngle:
+Sonic_JumpAngle:
 		move.b	obAngle(a0),d0	; get Sonic's angle
 		beq.s	locret_135A2	; if already 0,	branch
 		bpl.s	loc_13598	; if higher than 0, branch
