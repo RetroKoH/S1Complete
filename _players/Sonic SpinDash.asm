@@ -20,7 +20,7 @@ Sonic_SpinDash:
  
 loc_1AC84:
 		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
+		bra.w	Player_AnglePos
  
 locret_1AC8C:
 		rts	
@@ -125,4 +125,4 @@ loc_1AD88:
  
 loc_1AD8C:
 		bsr.w	Sonic_LevelBound
-		bra.w	Sonic_AnglePos
+		bra.w	Player_AnglePos

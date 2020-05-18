@@ -14,7 +14,7 @@ Sonic_Dash:
 		bset	#staDash,obStatus2(a0)
  
 		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
+		bra.w	Player_AnglePos
  
 	@return:
 		rts	
@@ -68,6 +68,5 @@ Sonic_DashResetScr:
  
 	@finish:
 		bsr.w	Sonic_LevelBound
-		bsr.w	Sonic_AnglePos
-		rts
+		bra.w	Player_AnglePos
 		
