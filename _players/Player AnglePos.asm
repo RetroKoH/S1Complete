@@ -1,11 +1,11 @@
 ; ---------------------------------------------------------------------------
-; Subroutine to	change Sonic's angle & position as he walks along the floor
+; Subroutine to	change the player's angle & position as they walk along the floor
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Sonic_AnglePos:
+Player_AnglePos:
 		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w				; MJ: is second collision set to be used?
 		beq.s	@first								; MJ: if not, branch
@@ -123,49 +123,8 @@ loc_146CC:
 locret_146E6:
 		rts	
 ; End of function Sonic_AnglePos
-
-; ===========================================================================
-		move.l	obX(a0),d2
-		move.w	obVelX(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d2
-		move.l	d2,obX(a0)
-		move.w	#$38,d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d3,obY(a0)
-		rts	
 ; ===========================================================================
 
-locret_1470A:
-		rts	
-; ===========================================================================
-		move.l	obY(a0),d3
-		move.w	obVelY(a0),d0
-		subi.w	#$38,d0
-		move.w	d0,obVelY(a0)
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d3,obY(a0)
-		rts	
-		rts	
-; ===========================================================================
-		move.l	obX(a0),d2
-		move.l	obY(a0),d3
-		move.w	obVelX(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d2
-		move.w	obVelY(a0),d0
-		ext.l	d0
-		asl.l	#8,d0
-		sub.l	d0,d3
-		move.l	d2,obX(a0)
-		move.l	d3,obY(a0)
-		rts	
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	change Sonic's angle as he walks along the floor
@@ -184,16 +143,16 @@ Sonic_Angle:
 loc_1475E:
 		btst	#0,d2
 		bne.s	loc_1476A
-	tst.b	$38(a0)
-	bne.s	@onwheel
-	move.b	d2,d0
-	sub.b	obAngle(a0),d0
-	bpl.s	@next
-	neg.b	d0
-@next:
-	cmpi.b	#$20,d0
-	bcc.s	loc_1476A
-@onwheel:
+		tst.b	$38(a0)
+		bne.s	@onwheel
+		move.b	d2,d0
+		sub.b	obAngle(a0),d0
+		bpl.s	@next
+		neg.b	d0
+	@next:
+		cmpi.b	#$20,d0
+		bcc.s	loc_1476A
+	@onwheel:
 		move.b	d2,obAngle(a0)
 		rts	
 ; ===========================================================================
@@ -248,7 +207,7 @@ Sonic_WalkVertR:
 		beq.s	locret_147F0
 		bpl.s	loc_147F2
 		cmpi.w	#-$E,d1
-		blt.w	locret_1470A
+		blt.s	locret_147F0
 		add.w	d1,obX(a0)
 
 locret_147F0:
@@ -256,16 +215,16 @@ locret_147F0:
 ; ===========================================================================
 
 loc_147F2:
-	move.b	obVelY(a0),d0
-	bpl.s	@next1
-	neg.b	d0
-@next1:
-	addq.b	#4,d0
-	cmpi.b	#$E,d0
-	bcs.s	@next2
-	move.b	#$E,d0
-@next2:
-	cmp.b	d0,d1
+		move.b	obVelY(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_147FE
 
 loc_147F8:
@@ -333,16 +292,16 @@ locret_14892:
 ; ===========================================================================
 
 loc_14894:
-	move.b	obVelX(a0),d0
-	bpl.s	@next1
-	neg.b	d0
-@next1:	
-	addq.b	#4,d0
-	cmpi.b	#$E,d0
-	bcs.s	@next2
-	move.b	#$E,d0
-@next2:
-	cmp.b	d0,d1
+		move.b	obVelX(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:	
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_148A0
 
 loc_1489A:
@@ -402,7 +361,7 @@ Sonic_WalkVertL:
 		beq.s	locret_14934
 		bpl.s	loc_14936
 		cmpi.w	#-$E,d1
-		blt.w	locret_1470A
+		blt.s	locret_14934
 		sub.w	d1,obX(a0)
 
 locret_14934:
@@ -410,16 +369,16 @@ locret_14934:
 ; ===========================================================================
 
 loc_14936:
-	move.b	obVelY(a0),d0
-	bpl.s	@next1
-	neg.b	d0
-@next1:
-	addq.b	#4,d0
-	cmpi.b	#$E,d0
-	bcs.s	@next2
-	move.b	#$E,d0
-@next2:
-	cmp.b	d0,d1
+		move.b	obVelY(a0),d0
+		bpl.s	@next1
+		neg.b	d0
+	@next1:
+		addq.b	#4,d0
+		cmpi.b	#$E,d0
+		bcs.s	@next2
+		move.b	#$E,d0
+	@next2:
+		cmp.b	d0,d1
 		bgt.s	loc_14942
 
 loc_1493C:
