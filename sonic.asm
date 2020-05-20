@@ -1779,17 +1779,41 @@ PalLoad4_Water:
 Pal_Title:		incbin	"palette\Title Screen.bin"
 Pal_LevelSel:	incbin	"palette\Level Select.bin"
 Pal_Sonic:		incbin	"palette\Sonic.bin"
-Pal_GHZ:		incbin	"palette\Green Hill Zone.bin"
-Pal_LZ:			incbin	"palette\Labyrinth Zone.bin"
-Pal_LZWater:	incbin	"palette\Labyrinth Zone Underwater.bin"
-Pal_MZ:			incbin	"palette\Marble Zone.bin"
-Pal_SLZ:		incbin	"palette\Star Light Zone.bin"
-Pal_SYZ:		incbin	"palette\Spring Yard Zone.bin"
-Pal_SBZ1:		incbin	"palette\SBZ Act 1.bin"
-Pal_SBZ2:		incbin	"palette\SBZ Act 2.bin"
+
+
+Pal_GHZ:			incbin	"palette\Green Hill Zone.bin"
+Pal_GHZ_Easy:		incbin	"palette\Green Hill Zone - Easy.bin"
+Pal_GHZ_Hard:		incbin	"palette\Green Hill Zone - Hard.bin"
+Pal_LZ:				incbin	"palette\Labyrinth Zone.bin"
+Pal_LZ_Easy:		incbin	"palette\Labyrinth Zone - Easy.bin"
+Pal_LZ_Hard:		incbin	"palette\Labyrinth Zone - Hard.bin"
+Pal_LZWater:		incbin	"palette\Labyrinth Zone Underwater.bin"
+Pal_LZWater_Easy:	incbin	"palette\Labyrinth Zone Underwater - Easy.bin"
+Pal_LZWater_Hard:	incbin	"palette\Labyrinth Zone Underwater - Hard.bin"
+Pal_MZ:				incbin	"palette\Marble Zone.bin"
+Pal_MZ_Easy:		incbin	"palette\Marble Zone - Easy.bin"
+Pal_MZ_Hard:		incbin	"palette\Marble Zone - Hard.bin"
+Pal_SLZ:			incbin	"palette\Star Light Zone.bin"
+Pal_SLZ_Easy:		incbin	"palette\Star Light Zone - Easy.bin"
+Pal_SLZ_Hard:		incbin	"palette\Star Light Zone - Hard.bin"
+Pal_SYZ:			incbin	"palette\Spring Yard Zone.bin"
+Pal_SYZ_Easy:		incbin	"palette\Spring Yard Zone - Easy.bin"
+Pal_SYZ_Hard:		incbin	"palette\Spring Yard Zone - Hard.bin"
+Pal_SBZ1:			incbin	"palette\SBZ Act 1.bin"
+Pal_SBZ1_Easy:		incbin	"palette\SBZ Act 1 - Easy.bin"
+Pal_SBZ1_Hard:		incbin	"palette\SBZ Act 1 - Hard.bin"
+Pal_SBZ2:			incbin	"palette\SBZ Act 2.bin"
+Pal_SBZ2_Easy:		incbin	"palette\SBZ Act 2 - Easy.bin"
+Pal_SBZ2_Hard:		incbin	"palette\SBZ Act 2 - Hard.bin"
+Pal_SBZ3:			incbin	"palette\SBZ Act 3.bin"
+Pal_SBZ3_Easy:		incbin	"palette\SBZ Act 3 - Easy.bin"
+Pal_SBZ3_Hard:		incbin	"palette\SBZ Act 3 - Hard.bin"
+Pal_SBZ3Water:		incbin	"palette\SBZ Act 3 Underwater.bin"
+Pal_SBZ3Water_Easy:	incbin	"palette\SBZ Act 3 Underwater - Easy.bin"
+Pal_SBZ3Water_Hard:	incbin	"palette\SBZ Act 3 Underwater - Hard.bin"
+
+
 Pal_Special:	incbin	"palette\Special Stage.bin"
-Pal_SBZ3:		incbin	"palette\SBZ Act 3.bin"
-Pal_SBZ3Water:	incbin	"palette\SBZ Act 3 Underwater.bin"
 Pal_LZSonWater:	incbin	"palette\Sonic - LZ Underwater.bin"
 Pal_SBZ3SonWat:	incbin	"palette\Sonic - SBZ3 Underwater.bin"
 Pal_SSResult:	incbin	"palette\Special Stage Results.bin"
@@ -2519,6 +2543,8 @@ MusicList2:
 ; ---------------------------------------------------------------------------
 
 GM_Level:
+		move.b	#2,(v_difficulty).w
+
 		bset	#7,(v_gamemode).w ; add $80 to screen mode (for pre level sequence)
 		tst.w	(f_demo).w
 		bmi.s	Level_NoMusicFade
@@ -4880,11 +4906,11 @@ LevelDataLoad:
 		andi.l	#$FFFFFF,(v_16x16).l
 
 		move.l	(a2)+,(v_128x128).l	; store the ROM address for the chunk mappings
-
 		bsr.w	LevelLayoutLoad
-		move.w	(a2)+,d0
-		move.w	(a2),d0
-		andi.w	#$FF,d0
+
+; LOAD LEVEL PALETTE ; SETS PALETTE BASED ON DIFFICULTY
+		moveq	#0,d0
+		move.b	(a2),d0				; load palette ID byte
 		cmpi.w	#(id_LZ<<8)+3,(v_zone).w ; is level SBZ3 (LZ4) ?
 		bne.s	@notSBZ3	; if not, branch
 		moveq	#palid_SBZ3,d0	; use SB3 palette
@@ -4899,7 +4925,9 @@ LevelDataLoad:
 		moveq	#palid_SBZ2,d0	; use SBZ2/FZ palette
 
 	@normalpal:
+		add.b	(v_difficulty).w,d0	; set palette based on difficulty (SHOULD BE +1 for easy mode, +2 for hard mode)
 		bsr.w	PalLoad1	; load palette (based on d0)
+
 		movea.l	(sp)+,a2
 		addq.w	#4,a2		; read number for 2nd PLC
 		moveq	#0,d0
