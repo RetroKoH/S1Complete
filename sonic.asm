@@ -1921,6 +1921,8 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
+		move.b	#difEasy,(v_difficulty).w
+
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
 		bsr.w	PaletteFadeOut
@@ -2208,38 +2210,22 @@ LevSel_Credits:
 LevSel_Level_SS:
 		add.w	d0,d0
 		move.w	LevSel_Ptrs(pc,d0.w),d0 ; load level number
+
 		bmi.w	LevelSelect
 		cmpi.w	#id_SS*$100,d0	; check	if level is 0700 (Special Stage)
 		bne.s	LevSel_Level	; if not, branch
 		move.b	#id_Special,(v_gamemode).w ; set screen mode to $10 (Special Stage)
 		clr.w	(v_zone).w	; clear	level
 		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+	@clear:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		rts	
-; ===========================================================================
-
-LevSel_Level:
-		andi.w	#$3FFF,d0
-		move.w	d0,(v_zone).w	; set level number
-
-PlayLevel:
-		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
-		move.b	#3,(v_lives).w	; set lives to 3
-		moveq	#0,d0
-		move.w	d0,(v_rings).w	; clear rings
-		move.l	d0,(v_time).w	; clear time
-		move.l	d0,(v_score).w	; clear score
-		move.b	d0,(v_lastspecial).w ; clear special stage number
-		move.b	d0,(v_emeralds).w ; clear emeralds
-		move.l	d0,(v_emldlist).w ; clear emeralds
-		move.l	d0,(v_emldlist+4).w ; clear emeralds
-		move.b	d0,(v_continues).w ; clear continues
-		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		sfx	bgm_Fade,0,1,1 ; fade out music
 		rts	
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -2269,6 +2255,33 @@ LevSel_Ptrs:
 		dc.b id_SS, 0		; Special Stage
 		dc.w $8000		; Sound Test
 		even
+; ===========================================================================
+
+LevSel_Level:
+		andi.w	#$3FFF,d0
+		move.w	d0,(v_zone).w	; set level number
+
+PlayLevel:
+		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
+		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+	@clear:
+		moveq	#0,d0
+		move.w	d0,(v_rings).w	; clear rings
+		move.l	d0,(v_time).w	; clear time
+		move.l	d0,(v_score).w	; clear score
+		move.b	d0,(v_lastspecial).w ; clear special stage number
+		move.b	d0,(v_emeralds).w ; clear emeralds
+		move.l	d0,(v_emldlist).w ; clear emeralds
+		move.l	d0,(v_emldlist+4).w ; clear emeralds
+		move.b	d0,(v_continues).w ; clear continues
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
+		sfx	bgm_Fade,0,1,1 ; fade out music
+		rts	
+; ===========================================================================
+
 ; ---------------------------------------------------------------------------
 ; Level	select codes
 ; ---------------------------------------------------------------------------
@@ -2325,6 +2338,10 @@ loc_3422:
 
 Demo_Level:
 		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+	@clear:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
@@ -2543,8 +2560,6 @@ MusicList2:
 ; ---------------------------------------------------------------------------
 
 GM_Level:
-		move.b	#difEasy,(v_difficulty).w
-
 		bset	#7,(v_gamemode).w ; add $80 to screen mode (for pre level sequence)
 		tst.w	(f_demo).w
 		bmi.s	Level_NoMusicFade
@@ -3648,6 +3663,10 @@ loc_4DF2:
 Cont_GotoLevel:
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
 		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+	@clear:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
@@ -3989,6 +4008,10 @@ EndingDemoLoad:
 		move.w	#$8001,(f_demo).w ; set demo+ending mode
 		move.b	#id_Demo,(v_gamemode).w ; set game mode to 8 (demo)
 		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+	@clear:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
@@ -8053,7 +8076,7 @@ SS_ChkEmldRepeat:
 
 SS_LoadData:
 		lsl.w	#2,d0
-		lea	SS_StartLoc(pc,d0.w),a1
+		lea		SS_StartLoc(pc,d0.w),a1
 		move.w	(a1)+,(v_player+obX).w
 		move.w	(a1)+,(v_player+obY).w
 		movea.l	SS_LayoutIndex(pc,d0.w),a0
