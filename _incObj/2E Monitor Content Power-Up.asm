@@ -146,18 +146,27 @@ Pow_NoMusic:
 ; ===========================================================================
 
 Pow_Rings:
-		addi.w	#10,(v_rings).w	  ; add 10 rings to the number of rings you have
-		cmpi.w  #999,(v_rings).w  ; does Sonic have 999+ rings?
-		bcs.s   @chk100           ; if not, branch
-		move.w  #999,(v_rings).w  ; cap rings at 999.
+		addi.w	#10,(v_rings).w		; add 10 rings to the number of rings you have
+		cmpi.w  #999,(v_rings).w	; does Sonic have 999+ rings?
+		bcs.s   @chklife			; if not, branch
+		move.w  #999,(v_rings).w	; cap rings at 999.
 
-	@chk100:
-		ori.b	#1,(f_ringcount).w ; update the ring counter
-		cmpi.w	#100,(v_rings).w ; check if you have 100 rings
+	@chklife:
+		ori.b	#1,(f_ringcount).w			; update the ring counter
+		cmpi.b	#difHard,(v_difficulty).w	; is this hard mode?
+		beq.s	Pow_RingSound				; if yes, branch and skip lives
+		move.w	#50,d1						; check 50 rings (Easy)
+		tst.b	(v_difficulty).w			; is this easy mode?
+		bne.s	@easy						; if yes, branch and check for 50 rings
+		lsl.b	#1,d1						; check for 100 rings
+	@easy:
+		move.w	(v_rings).w,d2
+		cmp.w	d1,d2			; do you have < 50/100 rings?
 		bcs.s	Pow_RingSound
 		bset	#1,(v_lifecount).w
 		beq.w	ExtraLife
-		cmpi.w	#200,(v_rings).w ; check if you have 200 rings
+		lsl.b	#1,d1
+		cmp.w	d1,d2			; do you have < 100/200 rings?
 		bcs.s	Pow_RingSound
 		bset	#2,(v_lifecount).w
 		beq.w	ExtraLife

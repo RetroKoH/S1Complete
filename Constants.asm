@@ -284,6 +284,11 @@ afRoutine:	equ $FC	; increment routine counter
 afReset:	equ $FB	; reset animation and 2nd object routine counter
 af2ndRoutine:	equ $FA	; increment 2nd routine counter
 
+; Difficulty settings
+difNormal:	equ 0
+difEasy:	equ 1
+difHard:	equ 2
+
 ; Background music
 bgm__First:	equ $81
 bgm_GHZ:	equ ((ptr_mus81-MusicIndex)/4)+bgm__First

@@ -16,9 +16,9 @@ ptr_Ring_Sparkle:	dc.w Ring_Sparkle-Ring_Index
 ptr_Ring_Delete:	dc.w Ring_Delete-Ring_Index
 
 id_Ring_Main:		equ ptr_Ring_Main-Ring_Index	; 0
-id_Ring_Animate:		equ ptr_Ring_Animate-Ring_Index	; 2
-id_Ring_Collect:		equ ptr_Ring_Collect-Ring_Index	; 4
-id_Ring_Sparkle:		equ ptr_Ring_Sparkle-Ring_Index	; 6
+id_Ring_Animate:	equ ptr_Ring_Animate-Ring_Index	; 2
+id_Ring_Collect:	equ ptr_Ring_Collect-Ring_Index	; 4
+id_Ring_Sparkle:	equ ptr_Ring_Sparkle-Ring_Index	; 6
 id_Ring_Delete:		equ ptr_Ring_Delete-Ring_Index	; 8
 ; ===========================================================================
 
@@ -62,11 +62,22 @@ CollectRing:
 		bcc.s	@playsnd         ; if yes, branch
 		addq.w	#1,(v_rings).w	 ; add 1 to rings
 		ori.b	#1,(f_ringcount).w ; update the rings counter
-		cmpi.w	#100,(v_rings).w ; do you have < 100 rings?
+
+; Lives check
+		cmpi.b	#difHard,(v_difficulty).w
+		beq.s	@playsnd
+		move.w	#50,d1
+		tst.b	(v_difficulty).w
+		bne.s	@easy
+		lsl.b	#1,d1
+	@easy:
+		move.w	(v_rings).w,d2
+		cmp.w	d1,d2 ; do you have < 50/100 rings?
 		bcs.s	@playsnd	; if yes, branch
 		bset	#1,(v_lifecount).w ; update lives counter
 		beq.s	@got100
-		cmpi.w	#200,(v_rings).w ; do you have < 200 rings?
+		lsl.b	#1,d1
+		cmp.w	d1,d2 ; do you have < 100/200 rings?
 		bcs.s	@playsnd	; if yes, branch
 		bset	#2,(v_lifecount).w ; update lives counter
 		bne.s	@playsnd
@@ -104,10 +115,24 @@ RLoss_Index:
 
 RLoss_Count:	; Routine 0
 		movea.l	a0,a1
-		moveq	#0,d5
-		move.w	(v_rings).w,d5		; check number of rings you have
-		lea		SpillRingData,a3	; load the address of the array in a3
-		moveq	#32,d0
+		moveq	#0,d5						; d5 will contain # rings to spawn
+		move.w	(v_rings).w,d5				; check number of rings you have
+		cmpi.b	#difEasy,(v_difficulty).w	; is this easy mode?
+		bne.s	@loadSpeeds					; if no, branch
+		move.w	d5,d4						; We'll subtract d4 from our ring count (preset)
+		; We set it twice. If rings aren't halved then the second instruction is skipped.
+		cmpi.b	#6,d5						; do you have more than 5 rings?
+		blt.s	@loadSpeeds					; if not, don't halve rings
+		lsr.b	#1,d5						; lose half rings (rounded down)
+		move.w	d5,d4						; We'll subtract d4 from our ring count
+
+	@loadSpeeds:
+		moveq	#32,d0						; max rings ever allotted
+		cmpi.b	#difHard,(v_difficulty).w	; is this hard mode?
+		bne.s	@notHard					; if no, branch
+		lsr.b	#1,d0						; We will only spawn up to 16 rings in Hard
+	@notHard:
+		lea		SpillRingData,a3		; load the address of the array in a3
  		lea     (v_player).w,a2			; a2=character
 		btst    #staWater,obStatus(a2)	; is Sonic underwater?
 		beq.s   @abovewater				; if not, branch
@@ -127,18 +152,18 @@ RLoss_Count:	; Routine 0
 		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
 		addq.b	#2,obRoutine(a1)
 		move.w	#808,obHeight(a1) ; Height and Width
-;		move.b	#8,obHeight(a1)
-;		move.b	#8,obWidth(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.l	#Map_Ring,obMap(a1)
 		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
+		clr.b	obColType(a1)
+		cmpi.b	#difHard,(v_difficulty).w
+		beq.s	@nocollect
 		move.b	#$47,obColType(a1)
+	@nocollect:
 		move.b	#8,obActWid(a1)
 		move.l	(a3)+,obVelX(a1)	; move the data contained in the array to the speed data. Increment a3
-;		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
-;		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
 		subq	#1,d5				; decrement for the first ring created
 		bmi.s	@resetcounter		; if only one ring is needed, branch and skip EVERYTHING below altogether
 		; Here we begin what's replacing SingleObjLoad, in order to avoid resetting its d0 every time an object is created.
@@ -157,23 +182,31 @@ RLoss_Count:	; Routine 0
 		move.b	#id_RingLoss,obID(a1) ; load bouncing ring object
 		addq.b	#2,obRoutine(a1)
 		move.w	#808,obHeight(a1) ; Height and Width
-;		move.b	#8,obHeight(a1)
-;		move.b	#8,obWidth(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.l	#Map_Ring,obMap(a1)
 		move.w	#ArtNem_Ring,obGfx(a1)
 		move.b	#4,obRender(a1)
+		clr.b	obColType(a1)
+		cmpi.b	#difHard,(v_difficulty).w
+		beq.s	@nocollect2
 		move.b	#$47,obColType(a1)
+	@nocollect2:
 		move.b	#8,obActWid(a1)
 		move.l	(a3)+,obVelX(a1)	; move the data contained in the array to the speed data. Increment a3
-;		move.w  (a3)+,obVelX(a1)	; move the data contained in the array to the x velocity and increment the address in a3
-;		move.w  (a3)+,obVelY(a1)	; move the data contained in the array to the y velocity and increment the address in a3
 		dbf		d5,@loop			; repeat for number of rings (max 31)
 
 	@resetcounter:
-		clr.w	(v_rings).w	; reset number of rings to zero
-		move.b	#$80,(f_ringcount).w ; update ring counter
+		cmpi.b	#difEasy,(v_difficulty).w	; is this easy mode?
+		bne.s	@clearRings					; if no, branch and remove all rings
+		sub.w	d4,(v_rings).w				; halve rings (rounded up)
+		bra.s	@update
+
+	@clearRings:
+		clr.w	(v_rings).w				; reset number of rings to zero
+
+	@update:
+		move.b	#$80,(f_ringcount).w 	; update ring counter
 		clr.b	(v_lifecount).w
 		moveq   #-1,d0					; Move #-1 to d0
 		move.b  d0,obDelayAni(a0)		; Move d0 to new timer
@@ -193,7 +226,9 @@ RLoss_Bounce:	; Routine 2
 		subi.w  #$E,obVelY(a0)          ; Reduce gravity by $E ($18-$E=$A), giving the underwater effect
 
 	@skipbounceslow:
-		bmi.s	@chkdel
+		bmi.s	@chkdel						; Rings moving upward won't bounce off the floor
+		cmpi.b	#difHard,(v_difficulty).w
+		beq.s	@chkdel						; rings won't bounce in Hard Mode
 		move.b	(v_vbla_byte).w,d0
 		add.b	d7,d0
 		andi.b	#3,d0

@@ -2543,7 +2543,7 @@ MusicList2:
 ; ---------------------------------------------------------------------------
 
 GM_Level:
-		move.b	#2,(v_difficulty).w
+		move.b	#difEasy,(v_difficulty).w
 
 		bset	#7,(v_gamemode).w ; add $80 to screen mode (for pre level sequence)
 		tst.w	(f_demo).w
