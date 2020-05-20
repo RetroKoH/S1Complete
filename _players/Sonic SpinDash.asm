@@ -1,40 +1,41 @@
+; ---------------------------------------------------------------------------
+; Subroutine to check for starting to charge a spindash
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+
 Sonic_SpinDash:
 		btst	#staSpinDash,obStatus2(a0)
-		bne.s	loc_1AC8E
+		bne.s	Sonic_UpdateSpindash
 		cmpi.b	#aniID_Duck,obAnim(a0)
-		bne.s	locret_1AC8C
+		bne.s	@ret
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
-		beq.w	locret_1AC8C
+		beq.w	@ret
 		move.b	#aniID_SpinDash,obAnim(a0)
-		
 		move.b	#1,(v_effectspace+obAnim).w
-		move.b	#0,(v_effectspace+obTimeFrame).w
-	
+		clr.b	(v_effectspace+obTimeFrame).w
 		move.w	#$80,obRevSpeed(a0) ; Spin Dash Cancel
-	
 		move.w	#sfx_SpinDash,d0
 		jsr		(PlaySound_Special).l
 		addq.l	#4,sp
 		bset	#staSpinDash,obStatus2(a0)
- 
-loc_1AC84:
 		bsr.w	Sonic_LevelBound
 		bra.w	Player_AnglePos
- 
-locret_1AC8C:
+
+	@ret:
 		rts	
 ; ---------------------------------------------------------------------------
  
-loc_1AC8E:
-		move.b	#aniID_SpinDash,obAnim(a0)
+Sonic_UpdateSpindash:
 		move.b	(v_jpadhold2).w,d0
 		btst	#bitDn,d0
-		bne.w	loc_1AD30
-		move.b	#$E,obHeight(a0)
-		move.b	#7,obWidth(a0)
+		bne.w	Sonic_ChargingSpindash
+		move.b	#obBallHeight,obHeight(a0)
+		move.b	#obBallWidth,obWidth(a0)
 		move.b	#aniID_Roll,obAnim(a0)
-		addq.w	#5,obY(a0)
+		addq.w	#obPlayerHeight-obBallHeight,obY(a0)
 		bclr	#staSpinDash,obStatus2(a0)
 		moveq	#0,d0
 		move.b	obRevSpeed(a0),d0
@@ -53,10 +54,9 @@ loc_1AC8E:
 		btst	#staFacing,obStatus(a0)
 		beq.s	@dontflip
 		neg.w	obInertia(a0)
- 
-@dontflip:
+
+	@dontflip:
 		bset	#staSpin,obStatus(a0)
-		bclr	#7,obStatus(a0)
 		move.w	#sfx_Teleport,d0
 		jsr		(PlaySound_Special).l
 ; added to fix spindash bug
@@ -82,9 +82,9 @@ SpinDashSpeeds:
 		dc.w  $C00		; 8
 ; ---------------------------------------------------------------------------
  
-loc_1AD30:				; If still charging the dash...
+Sonic_ChargingSpindash:				; If still charging the dash...
 		tst.w	obRevSpeed(a0)
-		beq.s	loc_1AD48
+		beq.s	@chkInput
 		
 		move.w	obRevSpeed(a0),d0
 		lsr.w	#5,d0
@@ -98,10 +98,10 @@ loc_1AD30:				; If still charging the dash...
 		bra.s	SpinDash_ResetScr			; branch
 		
 	@skip:
-		bcc.s	loc_1AD48
+		bcc.s	@chkInput
 		clr.w	obRevSpeed(a0)
- 
-loc_1AD48:
+
+	@chkInput:
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0
 		beq.w	SpinDash_ResetScr
@@ -114,15 +114,15 @@ loc_1AD48:
 		jsr	(PlaySound_Special).l
  
 SpinDash_ResetScr:
-		addq.l	#4,sp			; increase stack ptr
-		cmpi.w	#$60,(v_lookshift).w
-		beq.s	loc_1AD8C
-		bcc.s	loc_1AD88
+		addq.l	#4,sp					; increase stack ptr
+		cmpi.w	#$60,(v_lookshift).w	; is screen in its default position?
+		beq.s	@finish					; if yes, branch
+		bcc.s	@scroll
 		addq.w	#4,(v_lookshift).w
  
-loc_1AD88:
+	@scroll:
 		subq.w	#2,(v_lookshift).w
  
-loc_1AD8C:
+	@finish:
 		bsr.w	Sonic_LevelBound
 		bra.w	Player_AnglePos

@@ -6891,11 +6891,16 @@ loc_14CD6:
 
 ; End of function FloorLog_Unk2
 
+; ---------------------------------------------------------------------------
+; Subroutine to calculate how much space is in front of the player on the ground
+; d0 = some input angle
+; d1 = output about how many pixels (up to some high enough amount)
+; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Sonic_WalkSpeed:
+CalcRoomInFront:
 		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	@first					; MJ: if not, branch
@@ -6940,7 +6945,7 @@ loc_14D24:
 		andi.b	#$C0,d0
 		beq.w	loc_14DF0
 		cmpi.b	#$80,d0
-		beq.w	loc_14F7C
+		beq.w	CheckCeilingDist_Part2
 		andi.b	#$38,d1
 		bne.s	loc_14D3C
 		addq.w	#8,d2
@@ -6950,13 +6955,18 @@ loc_14D3C:
 		beq.w	loc_1504A
 		bra.w	loc_14EBC
 
-; End of function Sonic_WalkSpeed
+; End of function CalcRoomInFront
 
+; ---------------------------------------------------------------------------
+; Subroutine to calculate how much space is empty above Sonic's head
+; d0 = input angle perpendicular to the spine
+; d1 = output about how many pixels are overhead (up to some high enough amount)
+; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_14D48:
+CalcRoomOverHead: ; sub_14D48:
 		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	@first					; MJ: if not, branch
@@ -6968,22 +6978,22 @@ sub_14D48:
 		addi.b	#$20,d0
 		andi.b	#$C0,d0
 		cmpi.b	#$40,d0
-		beq.w	loc_14FD6
+		beq.w	CheckLeftCeilingDist
 		cmpi.b	#$80,d0
-		beq.w	Sonic_DontRunOnWalls
+		beq.w	Sonic_CheckCeiling
 		cmpi.b	#$C0,d0
-		beq.w	sub_14E50
+		beq.w	CheckRightCeilingDist
 
-; End of function sub_14D48
+; End of function CalcRoomOverHead
 
 ; ---------------------------------------------------------------------------
-; Subroutine to	make Sonic land	on the floor after jumping
+; Subroutine to check if Sonic/Tails is near the floor
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Sonic_HitFloor:
+Sonic_CheckFloor: ;Sonic_HitFloor:
 		move.l	(v_colladdr1).w,(v_collindex).w		; MJ: load first collision data location
 		cmpi.b	#$C,(v_top_solid_bit).w			; MJ: is second collision set to be used?
 		beq.s	@first					; MJ: if not, branch
@@ -7033,13 +7043,9 @@ loc_14DDE:
 		move.b	d2,d3
 
 locret_14DE6:
-		rts	
-
-; End of function Sonic_HitFloor
-
+		rts
+; End of function Sonic_CheckFloor
 ; ===========================================================================
-		move.w	obY(a0),d2
-		move.w	obX(a0),d3
 
 loc_14DF0:
 		addi.w	#$A,d2
@@ -7061,10 +7067,15 @@ locret_14E16:
 		include	"_incObj\sub ObjFloorDist.asm"
 
 
+; ---------------------------------------------------------------------------
+; Stores a distance to the nearest wall above Sonic/Tails,
+; where "above" = right, into d1
+; ---------------------------------------------------------------------------
+
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
-
-sub_14E50:
+;sub_14E50:
+CheckRightCeilingDist:
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 		moveq	#0,d0
@@ -7096,13 +7107,23 @@ sub_14E50:
 		move.b	#-$40,d2
 		bra.w	loc_14DD0
 
-; End of function sub_14E50
+; End of function CheckRightCeilingDist
 
 
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+; ---------------------------------------------------------------------------
+; Stores a distance to the nearest wall on the right of Sonic/Tails into d1
+; ---------------------------------------------------------------------------
 
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
-sub_14EB4:
+; Checks a 16x16 block to find solid walls. May check an additional
+; 16x16 block up for walls.
+; d5 = ($c,$d) or ($e,$f) - solidity type bit (L/R/B or top)
+; returns relevant block ID in (a1)
+; returns distance in d1
+; returns angle in d3, or zero if angle was odd
+;sub_14EB4:
+CheckRightWallDist:
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 
@@ -7115,7 +7136,7 @@ loc_14EBC:
 		move.b	#-$40,d2
 		bra.w	loc_14E0A
 
-; End of function sub_14EB4
+; End of function CheckRightWallDist
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	detect when an object hits a wall to its right
@@ -7144,14 +7165,13 @@ locret_14F06:
 ; End of function ObjHitWallRight
 
 ; ---------------------------------------------------------------------------
-; Subroutine preventing	Sonic from running on walls and	ceilings when he
-; touches them
+; Stores a distance from Sonic/Tails to the nearest ceiling into d1
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-Sonic_DontRunOnWalls:
+Sonic_CheckCeiling: ;Sonic_DontRunOnWalls:
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 		moveq	#0,d0
@@ -7184,13 +7204,22 @@ Sonic_DontRunOnWalls:
 		move.w	(sp)+,d0
 		move.b	#-$80,d2
 		bra.w	loc_14DD0
-; End of function Sonic_DontRunOnWalls
+; End of function Sonic_CheckCeiling
 
 ; ===========================================================================
-		move.w	obY(a0),d2
-		move.w	obX(a0),d3
 
-loc_14F7C:
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+; Checks a 16x16 block to find solid ceiling. May check an additional
+; 16x16 block up for ceilings.
+; d2 = y_pos
+; d3 = x_pos
+; d5 = ($c,$d) or ($e,$f) - solidity type bit (L/R/B or top)
+; returns relevant block ID in (a1)
+; returns distance in d1
+; returns angle in d3, or zero if angle was odd
+
+CheckCeilingDist_Part2: ;loc_14F7C:
 		subi.w	#$A,d2
 		eori.w	#$F,d2
 		lea	(v_anglebuffer).w,a4
@@ -7200,10 +7229,15 @@ loc_14F7C:
 		move.b	#-$80,d2
 		bra.w	loc_14E0A
 
+; ---------------------------------------------------------------------------
+; Stores a distance to the nearest wall above the object into d1
+; ---------------------------------------------------------------------------
+
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-ObjHitCeiling:
+;ObjHitCeiling:
+ObjCheckCeilingDist:
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 		moveq	#0,d0
@@ -7223,11 +7257,19 @@ ObjHitCeiling:
 
 locret_14FD4:
 		rts	
-; End of function ObjHitCeiling
+; End of function ObjCheckCeilingDist
 
 ; ===========================================================================
 
-loc_14FD6:
+; ---------------------------------------------------------------------------
+; Stores a distance to the nearest wall above Sonic/Tails,
+; where "above" = left, into d1
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
+
+;loc_14FD6:
+CheckLeftCeilingDist:
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 		moveq	#0,d0
@@ -7238,11 +7280,12 @@ loc_14FD6:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	(v_anglebuffer).w,a4
+		lea		(v_anglebuffer).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity
 		move.w	d1,-(sp)
+
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 		moveq	#0,d0
@@ -7253,7 +7296,7 @@ loc_14FD6:
 		ext.w	d0
 		sub.w	d0,d3
 		eori.w	#$F,d3
-		lea	($FFFFF76A).w,a4
+		lea		($FFFFF76A).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity
@@ -7262,20 +7305,26 @@ loc_14FD6:
 		bra.w	loc_14DD0
 
 ; ---------------------------------------------------------------------------
-; Subroutine to	stop Sonic when	he jumps at a wall
+; Stores a distance to the nearest wall on the left of Sonic/Tails into d1
 ; ---------------------------------------------------------------------------
 
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
-
-Sonic_HitWall:
+; Checks a 16x16 block to find solid walls. May check an additional
+; 16x16 block up for walls.
+; d5 = ($c,$d) or ($e,$f) - solidity type bit (L/R/B or top)
+; returns relevant block ID in (a1)
+; returns distance in d1
+; returns angle in d3, or zero if angle was odd
+; Sonic_HitWall:
+CheckLeftWallDist:
 		move.w	obY(a0),d2
 		move.w	obX(a0),d3
 
 loc_1504A:
 		subi.w	#$A,d3
 		eori.w	#$F,d3
-		lea	(v_anglebuffer).w,a4
+		lea		(v_anglebuffer).w,a4
 		movea.w	#-$10,a3
 		move.w	#$400,d6	; MJ: $800/2
 		bsr.w	FindWall	; MJ: check solidity

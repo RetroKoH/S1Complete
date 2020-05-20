@@ -14,10 +14,10 @@ Sonic_LevelBound:
 		swap	d1
 		move.w	(v_limitleft2).w,d0
 		addi.w	#$10,d0
-		cmp.w	d1,d0		; has Sonic touched the	side boundary?
-		bhi.s	@sides		; if yes, branch
+		cmp.w	d1,d0					; has Sonic touched the	side boundary?
+		bhi.s	@sides					; if yes, branch
 		move.w	(v_limitright2).w,d0
-		addi.w	#$128,d0
+		addi.w	#$128,d0				; screen width - Sonic's width_pixels
 		tst.b	(f_lockscreen).w
 		bne.s	@screenlocked
 		addi.w	#$40,d0
@@ -39,13 +39,13 @@ Sonic_LevelBound:
 ; ===========================================================================
 
 	@bottom:
-		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w ; is level SBZ2 ?
-		bne.s	@killsonic	; if not, kill Sonic	; MJ: Fix out-of-range branch
+		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w	; is level SBZ2 ?
+		bne.s	@killsonic					; if not, kill Sonic	; MJ: Fix out-of-range branch
 		cmpi.w	#$2000,(v_player+obX).w
-		bcs.s	@killsonic				; MJ: Fix out-of-range branch
-		clr.b	(v_lastlamp).w	; clear	lamppost counter
-		move.w	#1,(f_restart).w ; restart the level
-		move.w	#(id_LZ<<8)+3,(v_zone).w ; set level to SBZ3 (LZ4)
+		bcs.s	@killsonic					; MJ: Fix out-of-range branch
+		clr.b	(v_lastlamp).w				; clear	lamppost counter
+		move.w	#1,(f_restart).w			; restart the level
+		move.w	#(id_LZ<<8)+3,(v_zone).w	; set level to SBZ3 (LZ4)
 	@nobottom:
 		rts
 	@killsonic:

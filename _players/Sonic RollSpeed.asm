@@ -13,77 +13,79 @@ Sonic_RollSpeed:
 		move.w	(v_sonspeeddec).w,d4
 		asr.w	#2,d4
 		tst.b	(f_jumponly).w
-		bne.w	loc_131CC
-		tst.w	$3E(a0)
-		bne.s	@notright
-		btst	#bitL,(v_jpadhold2).w ; is left being pressed?
-		beq.s	@notleft	; if not, branch
+		bne.w	Sonic_Roll_ResetScr
+		tst.w	obLRLock(a0)
+		bne.s	@applyrollspeed
+		btst	#bitL,(v_jpadhold2).w	; is left being pressed?
+		beq.s	@notleft				; if not, branch
 		bsr.w	Sonic_RollLeft
 
 	@notleft:
-		btst	#bitR,(v_jpadhold2).w ; is right being pressed?
-		beq.s	@notright	; if not, branch
+		btst	#bitR,(v_jpadhold2).w	; is right being pressed?
+		beq.s	@applyrollspeed			; if not, branch
 		bsr.w	Sonic_RollRight
 
-	@notright:
+	@applyrollspeed:
 		move.w	obInertia(a0),d0
-		beq.s	loc_131AA
-		bmi.s	loc_1319E
+		beq.s	Sonic_CheckRollStop
+		bmi.s	Sonic_ApplyRollSpeedLeft
+; Sonic_ApplyRollSpeedRight:
 		sub.w	d5,d0
-		bcc.s	loc_13198
+		bcc.s	@setInertia
 		move.w	#0,d0
 
-loc_13198:
+	@setInertia:
 		move.w	d0,obInertia(a0)
-		bra.s	loc_131AA
+		bra.s	Sonic_CheckRollStop
 ; ===========================================================================
 
-loc_1319E:
+Sonic_ApplyRollSpeedLeft:
 		add.w	d5,d0
-		bcc.s	loc_131A6
+		bcc.s	@setInertia
 		move.w	#0,d0
 
-loc_131A6:
+	@setInertia:
 		move.w	d0,obInertia(a0)
 
-loc_131AA:
-		tst.w	obInertia(a0)	; is Sonic moving?
-		bne.s	loc_131CC	; if yes, branch
-		bclr	#2,obStatus(a0)
-		move.b	#$13,obHeight(a0)
-		move.b	#9,obWidth(a0)
-		move.b	#aniID_Wait,obAnim(a0) ; use "standing" animation
-		subq.w	#5,obY(a0)
+Sonic_CheckRollStop:
+		tst.w	obInertia(a0)				; is Sonic moving?
+		bne.s	Sonic_Roll_ResetScr			; if yes, branch
+		bclr	#staSpin,obStatus(a0)
+		move.b	#obPlayerHeight,obHeight(a0)
+		move.b	#obPlayerWidth,obWidth(a0)
+		move.b	#aniID_Wait,obAnim(a0)		; use "standing" animation
+		subq.w	#obPlayerHeight-obBallHeight,obY(a0)
 
-loc_131CC:
-	cmp.w	#$60,(v_lookshift).w
-	beq.s	@cont2
-	bcc.s	@cont1
-	addq.w	#4,(v_lookshift).w
+; resets the screen to normal while rolling, like Obj01_ResetScr
+Sonic_Roll_ResetScr:
+		cmp.w	#$60,(v_lookshift).w
+		beq.s	Sonic_SetRollSpeeds
+		bcc.s	@cont
+		addq.w	#4,(v_lookshift).w
 
-@cont1:
-	subq.w	#2,(v_lookshift).w
+	@cont:
+		subq.w	#2,(v_lookshift).w
 
-@cont2:
+Sonic_SetRollSpeeds:
 		move.b	obAngle(a0),d0
-		jsr	(CalcSine).l
+		jsr		(CalcSine).l
 		muls.w	obInertia(a0),d0
 		asr.l	#8,d0
-		move.w	d0,obVelY(a0)
+		move.w	d0,obVelY(a0)	; set y velocity based on inertia and angle
 		muls.w	obInertia(a0),d1
 		asr.l	#8,d1
 		cmpi.w	#$1000,d1
 		ble.s	loc_131F0
-		move.w	#$1000,d1
+		move.w	#$1000,d1	; limit Sonic's speed rolling right
 
 loc_131F0:
 		cmpi.w	#-$1000,d1
 		bge.s	loc_131FA
-		move.w	#-$1000,d1
+		move.w	#-$1000,d1	; limit Sonic's speed rolling left
 
 loc_131FA:
 		move.w	d1,obVelX(a0)
-		bra.w	loc_1300C
+		bra.w	Sonic_CheckWallsOnGround
 ; End of function Sonic_RollSpeed
 
 
@@ -92,21 +94,21 @@ loc_131FA:
 
 Sonic_RollLeft:
 		move.w	obInertia(a0),d0
-		beq.s	loc_1320A
-		bpl.s	loc_13218
+		beq.s	@skip
+		bpl.s	Sonic_BrakeRollingRight
 
-loc_1320A:
-		bset	#0,obStatus(a0)
+	@skip:
+		bset	#staFacing,obStatus(a0)
 		move.b	#aniID_Roll,obAnim(a0) ; use "rolling" animation
 		rts	
 ; ===========================================================================
 
-loc_13218:
-		sub.w	d4,d0
-		bcc.s	loc_13220
+Sonic_BrakeRollingRight:
+		sub.w	d4,d0		; reduce rightward rolling speed
+		bcc.s	@skip
 		clr.w	d0
 
-loc_13220:
+	@skip:
 		move.w	d0,obInertia(a0)
 		rts	
 ; End of function Sonic_RollLeft
@@ -117,18 +119,18 @@ loc_13220:
 
 Sonic_RollRight:
 		move.w	obInertia(a0),d0
-		bmi.s	loc_1323A
-		bclr	#0,obStatus(a0)
+		bmi.s	Sonic_BrakeRollingLeft
+		bclr	#staFacing,obStatus(a0)
 		move.b	#aniID_Roll,obAnim(a0) ; use "rolling" animation
 		rts	
 ; ===========================================================================
 
-loc_1323A:
-		add.w	d4,d0
-		bcc.s	loc_13242
+Sonic_BrakeRollingLeft:
+		add.w	d4,d0	; reduce leftward rolling speed
+		bcc.s	@skip
 		clr.w	d0
 
-loc_13242:
+	@skip:
 		move.w	d0,obInertia(a0)
 		rts	
 ; End of function Sonic_RollRight

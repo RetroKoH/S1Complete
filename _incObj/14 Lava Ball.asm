@@ -91,7 +91,7 @@ locret_E430:
 
 LBall_Type04:
 		bset	#1,obStatus(a0)
-		jsr		ObjHitCeiling ; was bsr.w
+		jsr		ObjCheckCeilingDist ; was bsr.w
 		tst.w	d1
 		bpl.s	locret_E452
 		move.b	#8,obSubtype(a0)

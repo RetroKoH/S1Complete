@@ -6,34 +6,34 @@
 
 
 Sonic_ResetOnFloor:
-		btst	#4,obStatus(a0)
-		beq.s	loc_137AE
+		btst	#staRollJump,obStatus(a0)
+		beq.s	@noRollJump
 		nop	
 		nop	
 		nop	
 
-loc_137AE:
-		bclr	#5,obStatus(a0)
-		bclr	#1,obStatus(a0)
-		bclr	#4,obStatus(a0)
+	@noRollJump:
+		bclr	#staPush,obStatus(a0)
+		bclr	#staAir,obStatus(a0)
+		bclr	#staRollJump,obStatus(a0)
 		clr.b	obJumping(a0)
 		clr.w	(v_itembonus).w
-		btst	#2,obStatus(a0)
-		beq.s	loc_137E4
-		bclr	#2,obStatus(a0)
-		move.b	#$13,obHeight(a0)
-		move.b	#9,obWidth(a0)
+		btst	#staSpin,obStatus(a0)
+		beq.s	@ret
+		bclr	#staSpin,obStatus(a0)
+		move.b	#obPlayerHeight,obHeight(a0)
+		move.b	#obPlayerWidth,obWidth(a0)
 		move.b	#aniID_Walk,obAnim(a0) ; use running/walking animation
-		subq.w	#5,obY(a0)
+		subq.w	#obPlayerHeight-obBallHeight,obY(a0)
 		tst.b	obJumpFlag(a0)
-		beq.s	loc_137E4
+		beq.s	@ret
 		btst	#stsBubble,(v_status_secondary).w ; does Sonic have a Bubble Shield?
 		beq.s	@nobubble
 		bra.s	BubbleShield_Bounce
 
 	@nobubble:
 		move.b	(v_status_secondary).w,d0	; Check for any elemental shields
-		andi.b	#$E0,d0						; if he has, we will exit
+		andi.b	#stsElShield,d0				; if he has, we will exit
 		bne.s	@noability
 		cmpi.b	#$16,obJumpFlag(a0)
 		blt.s	@noability
@@ -42,7 +42,7 @@ loc_137AE:
 	@noability:
 		clr.b	obJumpFlag(a0)
 
-loc_137E4:
+	@ret:
 		rts	
 ; End of function Sonic_ResetOnFloor
 
@@ -72,16 +72,16 @@ BubbleShield_Bounce:
 		asr.l	#8,d0
 		add.w	d0,obVelY(a0)
 		movem.l	(sp)+,d1-d2
-		bset	#1,obStatus(a0)
-		bclr	#5,obStatus(a0)
+		bset	#staAir,obStatus(a0)
+		bclr	#staPush,obStatus(a0)
 		move.b	#1,obJumping(a0)
 		clr.b	obOnWheel(a0)
-		move.b	#$E,obHeight(a0)
-		move.b	#7,obWidth(a0)
+		move.b	#obBallHeight,obHeight(a0)
+		move.b	#obBallWidth,obWidth(a0)
 		move.b	#aniID_Roll,obAnim(a0)
-		bset	#2,obStatus(a0)
+		bset	#staSpin,obStatus(a0)
 		move.b	obHeight(a0),d0
-		sub.b	#$13,d0
+		sub.b	#obPlayerHeight,d0
 		ext.w	d0
 		sub.w	d0,obY(a0)
 		move.b	#aniID_BubbleBounceUp,(v_shieldspace+obAnim).w
@@ -99,10 +99,10 @@ BubbleShield_Bounce:
 
 
 DropDash:
-		move.b	#$E,obHeight(a0)
-		move.b	#7,obWidth(a0)
+		move.b	#obBallHeight,obHeight(a0)
+		move.b	#obBallWidth,obWidth(a0)
 		move.b	#aniID_Roll,obAnim(a0)
-		addq.w	#5,obY(a0)
+		addq.w	#obPlayerHeight-obBallHeight,obY(a0)
 		move.w	#$C00,obInertia(a0)
 		btst	#staFacing,obStatus(a0)
 		beq.s	@dontflip

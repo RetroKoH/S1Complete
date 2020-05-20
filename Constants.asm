@@ -157,19 +157,20 @@ obSubtype:		equ $28	; object subtype
 obSolid:		equ ob2ndRout ; solid status flag
 
 ; Object variables used by Sonic
-obJumpFlag:	equ $2E ; Flag for Double Jump
-obInvuln:	equ $30	; Invulnerable (blinking) timer ; $31 reserved as well
-obInvinc:	equ $32	; Invincibility timer ; $33 reserved as well
-obShoes:	equ $34	; Speed Shoes timer ; $35 reserved as well
+obJumpFlag:		equ $2E ; Flag for Double Jump
+obInvuln:		equ $30	; Invulnerable (blinking) timer ; $31 reserved as well
+obInvinc:		equ $32	; Invincibility timer ; $33 reserved as well
+obShoes:		equ $34	; Speed Shoes timer ; $35 reserved as well
 obFrontAngle:	equ $36
 obRearAngle:	equ $37
-obOnWheel:	equ $38	; on convex wheel flag
-obStatus2:	equ $39	; status for abilities such as Spin Dash
-obRevSpeed:	equ $3A	; rev speed for Spin Dash or Dash
+obOnWheel:		equ $38	; on convex wheel flag
+obStatus2:		equ $39	; status for abilities such as Spin Dash
+obRevSpeed:		equ $3A	; rev speed for Spin Dash or Dash
 obRestartTimer:	equ $3A ; level restart timer
-obJumping:	equ $3C	; jumping flag
+obJumping:		equ $3C	; jumping flag
 obPlatformID:	equ $3D	; ost slot of the object Sonic's on top of
-obLRLock:	equ $3E	; flag for preventing left and right input
+obLRLock:		equ $3E	; flag for preventing left and right input
+obSize:			equ $40
 
 ; Ralakimus Subsprite SSTs
 mainspr_mapframe = $B
@@ -203,14 +204,14 @@ sub9_mapframe = $3F
 next_subspr = $6
 
 ; Sonic Status Bits
-staFacing:	equ 0
-staAir:		equ 1
-staSpin:	equ 2
-staOnObj:	equ 3
+staFacing:		equ 0
+staAir:			equ 1
+staSpin:		equ 2
+staOnObj:		equ 3
 staRollJump:	equ 4
-staPush:	equ 5
-staWater:	equ 6
-staSSJump:	equ 7
+staPush:		equ 5
+staWater:		equ 6
+staSSJump:		equ 7
 
 ; Ability Status
 staSpinDash:	equ 0
@@ -232,6 +233,12 @@ stsLightning:	equ 7
 stsRmvShield:	equ $1E
 stsElShield:	equ $E0
 stsChkShield:	equ $E3
+
+obPlayerHeight:	equ $13
+obTailsHeight:	equ $F
+obPlayerWidth:	equ 9
+obBallHeight:	equ $E
+obBallWidth:	equ 7
 
 ; NEW GLOBAL Animation IDs - To make easier the usage of animations across all 6 characters
 aniID_Null:			equ 0		; Null animation

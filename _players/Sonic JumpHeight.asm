@@ -7,32 +7,32 @@
 
 Sonic_JumpHeight:
 		tst.b	obJumping(a0)
-		beq.s	loc_134C4
+		beq.s	Sonic_UpVelCap
 		move.w	#-$400,d1
 		btst	#staWater,obStatus(a0)
-		beq.s	loc_134AE
+		beq.s	@noWater
 		move.w	#-$200,d1
 
-loc_134AE:
-		cmp.w	obVelY(a0),d1
-		ble.s	Sonic_DoubleJumpMoves
+	@noWater:
+		cmp.w	obVelY(a0),d1			; is Sonic going up faster than d1?
+		ble.s	Sonic_DoubleJumpMoves	; if not, branch
 		move.b	(v_jpadhold2).w,d0
 		andi.b	#btnABC,d0			; is A, B or C pressed?
-		bne.s	locret_134C2		; if yes, branch
+		bne.s	@end		;		 if yes, branch
 		move.w	d1,obVelY(a0)
 
-locret_134C2:
+	@end:
 		rts	
 ; ===========================================================================
 
-loc_134C4:
-;		tst.b	obDashFlag(a0)	; is Sonic charging his spin dash?
-;		bne.s	locret_134D2		; if yes, branch
+Sonic_UpVelCap:
+		tst.b	obStatus2(a0)	; is Sonic charging a spindash or in a rolling-only area?
+		bne.s	@end			; if yes, branch
 		cmpi.w	#-$FC0,obVelY(a0)
-		bge.s	locret_134D2
+		bge.s	@end
 		move.w	#-$FC0,obVelY(a0)
 
-locret_134D2:
+	@end:
 		rts	
 ; End of function Sonic_JumpHeight
 ; ===========================================================================
@@ -45,7 +45,7 @@ Sonic_DoubleJumpMoves:
 		move.b	(v_jpadpress2).w,d0
 		andi.b	#btnABC,d0							; are buttons A, B, or C being pressed?
 		beq.w	Sonic_ShieldDoNothing				; if not, branch
-		bclr	#4,obStatus(a0)						; clear Roll Jump flag
+		bclr	#staRollJump,obStatus(a0)			; clear Roll Jump flag
 		btst	#stsSuper,(v_status_secondary).w	; is Sonic currently in his Super form?
 		beq.s	Sonic_ShieldCheckFire				; if not, branch
 	; super sonic

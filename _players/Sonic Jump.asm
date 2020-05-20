@@ -7,50 +7,50 @@
 
 Sonic_Jump:
 		move.b	(v_jpadpress2).w,d0
-		andi.b	#btnABC,d0	; is A, B or C pressed?
-		beq.w	locret_1348E	; if not, branch
+		andi.b	#btnABC,d0				; is A, B or C pressed?
+		beq.w	@ret					; if not, branch and exit
 		moveq	#0,d0
 		move.b	obAngle(a0),d0
 		addi.b	#$80,d0
-		bsr.w	sub_14D48
-		cmpi.w	#6,d1
-		blt.w	locret_1348E
+		bsr.w	CalcRoomOverHead
+		cmpi.w	#6,d1					; does Sonic have enough room to jump?
+		blt.w	@ret					; if not, branch and exit
 		move.w	#$680,d2
-		btst	#6,obStatus(a0)
-		beq.s	loc_1341C
-		move.w	#$380,d2
+		btst	#staWater,obStatus(a0)	; Test if underwater
+		beq.s	@noWater
+		move.w	#$380,d2				; set lower jump speed if under
 
-loc_1341C:
+	@noWater:
 		moveq	#0,d0
 		move.b	obAngle(a0),d0
 		subi.b	#$40,d0
-		jsr	(CalcSine).l
+		jsr		(CalcSine).l
 		muls.w	d2,d1
 		asr.l	#8,d1
-		add.w	d1,obVelX(a0)	; make Sonic jump
+		add.w	d1,obVelX(a0)				; make Sonic jump (in X... this adds nothing on level ground)
 		muls.w	d2,d0
 		asr.l	#8,d0
-		add.w	d0,obVelY(a0)	; make Sonic jump
-		bset	#1,obStatus(a0)
-		bclr	#5,obStatus(a0)
+		add.w	d0,obVelY(a0)				; make Sonic jump
+		bset	#staAir,obStatus(a0)		; put Sonic in the air
+		bclr	#staPush,obStatus(a0)		; no longer pushing
 		addq.l	#4,sp
-		move.b	#1,$3C(a0)
-		clr.b	$38(a0)
-		sfx	sfx_Jump,0,0,0	; play jumping sound
+		move.b	#1,obJumping(a0)
+		clr.b	obOnWheel(a0)				; take Sonic off the wheel
+		sfx		sfx_Jump,0,0,0				; play jumping sound
 		; Don't set height/width here
-		btst	#2,obStatus(a0)
-		bne.s	loc_13490
-		move.b	#$E,obHeight(a0)
-		move.b	#7,obWidth(a0)
-		move.b	#aniID_Roll,obAnim(a0) ; use "jumping" animation
-		bset	#2,obStatus(a0)
-		addq.w	#5,obY(a0)
+		btst	#staSpin,obStatus(a0)		; was Sonic already in a ball?
+		bne.s	@rolljump					; this is a rolling jump
+		move.b	#obBallHeight,obHeight(a0)
+		move.b	#obBallWidth,obWidth(a0)
+		move.b	#aniID_Roll,obAnim(a0)		; use "jumping" animation
+		bset	#staSpin,obStatus(a0)
+		addq.w	#obPlayerHeight-obBallHeight,obY(a0) ; 5
 
-locret_1348E:
+	@ret:
 		rts
 ; ===========================================================================
 
-loc_13490:
-		bset	#4,obStatus(a0)
+	@rolljump:
+		bset	#staRollJump,obStatus(a0)
 		rts	
 ; End of function Sonic_Jump

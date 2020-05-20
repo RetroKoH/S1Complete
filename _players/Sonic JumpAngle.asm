@@ -6,26 +6,24 @@
 
 
 Sonic_JumpAngle:
-		move.b	obAngle(a0),d0	; get Sonic's angle
-		beq.s	locret_135A2	; if already 0,	branch
-		bpl.s	loc_13598	; if higher than 0, branch
+		move.b	obAngle(a0),d0		; get Sonic's angle
+		beq.s	Sonic_JumpAngle_End	; if already 0,	branch
+		bpl.s	@notNegative		; if higher than 0, branch
 
 		addq.b	#2,d0		; increase angle
-		bcc.s	loc_13596
+		bcc.s	Sonic_JumpAngleSet
 		moveq	#0,d0
-
-loc_13596:
-		bra.s	loc_1359E
+		bra.s	Sonic_JumpAngleSet
 ; ===========================================================================
 
-loc_13598:
+	@notNegative:
 		subq.b	#2,d0		; decrease angle
-		bcc.s	loc_1359E
+		bcc.s	Sonic_JumpAngleSet
 		moveq	#0,d0
 
-loc_1359E:
+Sonic_JumpAngleSet:
 		move.b	d0,obAngle(a0)
 
-locret_135A2:
+Sonic_JumpAngle_End:
 		rts	
 ; End of function Sonic_JumpAngle

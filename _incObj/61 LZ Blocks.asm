@@ -122,7 +122,7 @@ LBlk_Action:	; Routine 2
 @type04:
 		bsr.w	SpeedToPos
 		subq.w	#8,obVelY(a0)	; make block rise
-		bsr.w	ObjHitCeiling
+		bsr.w	ObjCheckCeilingDist
 		tst.w	d1		; has block hit the ceiling?
 		bpl.w	@noceiling04	; if not, branch
 		sub.w	d1,obY(a0)
@@ -154,7 +154,7 @@ LBlk_Action:	; Routine 2
 
 	@loc_1214E:
 		add.w	d0,obY(a0)	; make the block rise with water level
-		bsr.w	ObjHitCeiling
+		bsr.w	ObjCheckCeilingDist
 		tst.w	d1		; has block hit the ceiling?
 		bpl.w	@noceiling07	; if not, branch
 		sub.w	d1,obY(a0)	; stop block
