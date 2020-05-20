@@ -223,7 +223,6 @@ Sonic_HurtStop:
 		clr.b	(f_lockmulti).w
 		move.b	#aniID_Walk,obAnim(a0)
 		subq.b	#2,obRoutine(a0)
-		move.b	#$78,obInvuln(a0)
 		clr.b	obStatus2(a0)
 
 	@ret:

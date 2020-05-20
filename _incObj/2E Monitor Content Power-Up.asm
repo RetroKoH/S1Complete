@@ -146,7 +146,12 @@ Pow_NoMusic:
 ; ===========================================================================
 
 Pow_Rings:
-		addi.w	#10,(v_rings).w		; add 10 rings to the number of rings you have
+		move.w	#10,d1
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@notHard
+		lsr.b	#1,d1
+	@notHard:
+		add.w	d1,(v_rings).w		; add 10 rings to the number of rings you have
 		cmpi.w  #999,(v_rings).w	; does Sonic have 999+ rings?
 		bcs.s   @chklife			; if not, branch
 		move.w  #999,(v_rings).w	; cap rings at 999.

@@ -164,11 +164,11 @@ ReactToItem:
 
 		move.b	obColType(a1),d0
 		andi.b	#$3F,d0
-		cmpi.b	#6,d0		; is collision type $46	?
-		beq.s	React_Monitor	; if yes, branch
+		cmpi.b	#6,d0				; is collision type $46	?
+		beq.s	React_Monitor		; if yes, branch
 		cmpi.b	#$5A,obInvuln(a0)	; is Sonic invincible?
-		bcc.w	@invincible	; if yes, branch
-		addq.b	#2,obRoutine(a1) ; advance the object's routine counter
+		bcc.w	@invincible			; if yes, branch
+		addq.b	#2,obRoutine(a1) 	; advance the object's routine counter
 
 	@invincible:
 		rts	
@@ -244,7 +244,7 @@ React_Enemy:
 
 	@lessthan16:
 		bsr.w	AddPoints
-		move.b	#id_ExplosionItem,0(a1) ; change object to explosion
+		move.b	#id_ExplosionItem,obID(a1) ; change object to explosion
 		move.b	#0,obRoutine(a1)
 		tst.w	obVelY(a0)
 		bmi.s	@bouncedown
@@ -342,21 +342,22 @@ React_ChkHurt:
 HurtSonic:
 		nop
 		tst.b	obInvuln(a0)	; is Sonic flashing?
-		bne.w	@rts			; if yes, branch
+		bne.w	HurtSonic_End	; if yes, branch
 		movea.l	a1,a2
 
+HurtSonic2:
 		btst	#stsShield,(v_status_secondary).w	; does Sonic have a shield?
-		bne.s	@hasshield	; if yes, branch
-		tst.w	(v_rings).w	; does Sonic have any rings?
-		beq.w	@norings	; if not, branch
+		bne.s	HurtSonic_HasShield					; if yes, branch
+		tst.w	(v_rings).w			; does Sonic have any rings?
+		beq.w	HurtSonic_NoRings	; if not, branch
 
 		jsr		(FindFreeObj).l
-		bne.s	@hasshield
+		bne.s	HurtSonic_HasShield
 		move.b	#id_RingLoss,obID(a1) ; load bouncing multi rings object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
-	@hasshield:
+HurtSonic_HasShield:
 		andi.b	#stsRmvShield,(v_status_secondary).w	; remove shield
 		move.b	#4,obRoutine(a0)
 		jsr		Sonic_ResetOnFloor ; was bsr.w
@@ -378,9 +379,16 @@ HurtSonic:
 	@isleft:
 		bclr	#staDash,obStatus2(a0)		; clear Dash flag
 		bclr	#staSpinDash,obStatus2(a0)	; clear Spin Dash flag
-		move.w	#0,obInertia(a0)
+		clr.w	obInertia(a0)
 		move.b	#aniID_Hurt,obAnim(a0)
-		move.b	#$78,obInvuln(a0)	; set temp invincible time to 2 seconds
+		move.b	#$78,d1			; set temp invincible time to 2 seconds
+
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@notHard
+		lsr.b	#1,d1			;  set temp invincible time to 1 second
+
+	@notHard:
+		move.b	d1,obInvuln(a0)
 		move.w	#sfx_Death,d0	; load normal damage sound
 		cmpi.b	#id_Spikes,(a2)	; was damage caused by spikes?
 		bne.s	@sound		; if not, branch
@@ -391,13 +399,14 @@ HurtSonic:
 	@sound:
 		jsr	(PlaySound_Special).l
 		moveq	#-1,d0
-	@rts:
+
+HurtSonic_End:
 		rts	
 ; ===========================================================================
 
-@norings:
-		tst.w	(f_debugmode).w	; is debug mode	cheat on?
-		bne.w	@hasshield	; if yes, branch
+HurtSonic_NoRings:
+		tst.w	(f_debugmode).w		; is debug mode	cheat on?
+		bne.w	HurtSonic_HasShield	; if yes, branch
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	kill Sonic

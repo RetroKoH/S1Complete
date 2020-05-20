@@ -8,13 +8,15 @@ Spikes:
 		move.w	Spik_Index(pc,d0.w),d1
 		jmp	Spik_Index(pc,d1.w)
 ; ===========================================================================
-Spik_Index:	dc.w Spik_Main-Spik_Index
+Spik_Index:
+		dc.w Spik_Main-Spik_Index
 		dc.w Spik_Solid-Spik_Index
 
 spik_origX:	equ $30		; start X position
 spik_origY:	equ $32		; start Y position
 
-Spik_Var:	dc.b 0,	$14		; frame	number,	object width
+Spik_Var:
+		dc.b 0,	$14		; frame	number,	object width
 		dc.b 1,	$10
 		dc.b 2,	4
 		dc.b 3,	$1C
@@ -31,7 +33,7 @@ Spik_Main:	; Routine 0
 		move.b	obSubtype(a0),d0
 		andi.b	#$F,obSubtype(a0)
 		andi.w	#$F0,d0
-		lea	(Spik_Var).l,a1
+		lea		(Spik_Var).l,a1
 		lsr.w	#3,d0
 		adda.w	d0,a1
 		move.b	(a1)+,obFrame(a0)
@@ -49,7 +51,6 @@ Spik_Solid:	; Routine 2
 		move.w	#$14,d2
 
 ; Spikes types $1x and $5x face	sideways
-
 Spik_SideWays:
 		move.w	#$1B,d1
 		move.w	d2,d3
@@ -64,7 +65,6 @@ Spik_SideWays:
 ; ===========================================================================
 
 ; Spikes types $0x, $2x, $3x and $4x face up or	down
-
 Spik_Upright:
 		moveq	#0,d1
 		move.b	obActWid(a0),d1
@@ -79,12 +79,13 @@ Spik_Upright:
 		bpl.s	Spik_Display
 
 Spik_Hurt:
-		btst	#stsSuper,(v_status_secondary).w	; is Sonic Super?
-		bne.s	Spik_Display						; if yes, branch
 		btst	#stsInvinc,(v_status_secondary).w	; is Sonic invincible?
 		bne.s	Spik_Display						; if yes, branch
+		cmpi.b	#difHard,(v_difficulty).w
+		beq.s	@spikebug
 		tst.b	(v_player+obInvuln).w				; +++ is Sonic invulnerable?
 		bne.s	Spik_Display						; +++ if yes, branch
+	@spikebug:
 		move.l	a0,-(sp)
 		movea.l	a0,a2
 		lea		(v_player).w,a0
@@ -96,7 +97,7 @@ Spik_Hurt:
 		asl.l	#8,d0
 		sub.l	d0,d3
 		move.l	d3,obY(a0)
-		jsr		(HurtSonic).l
+		jsr		(HurtSonic2).l
 
 loc_CF20:
 		movea.l	(sp)+,a0
