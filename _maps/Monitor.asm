@@ -15,7 +15,7 @@ Map_Monitor:	mappingsTable
 	mappingsTableEntry.w	@s
 	mappingsTableEntry.w	@goggles
 	mappingsTableEntry.w	@clock
-	mappingsTableEntry.w	@slowshoes
+	mappingsTableEntry.w	@shoes ; Slow Shoes are identical to shoes
 	mappingsTableEntry.w	@flameshield
 	mappingsTableEntry.w	@bubbleshield
 	mappingsTableEntry.w	@lightningshield
@@ -82,11 +82,6 @@ Map_Monitor:	mappingsTable
 	spritePiece	-8, -$B, 2, 2, $1C, 0, 0, 1, 0
 	spritePiece	-$10, -$11, 4, 4, 0, 0, 0, 1, 0
 @clock_End
-
-@slowshoes:	spriteHeader
-	spritePiece	-8, -$B, 2, 2, $20, 0, 0, 1, 0
-	spritePiece	-$10, -$11, 4, 4, 0, 0, 0, 1, 0
-@slowshoes_End
 
 @flameshield:	spriteHeader
 	spritePiece	-8, -$B, 2, 2, $42, 0, 0, 1, 0

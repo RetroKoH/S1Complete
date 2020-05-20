@@ -6,6 +6,7 @@ Ani_Monitor:	dc.w @static-Ani_Monitor, @eggman-Ani_Monitor, @sonic-Ani_Monitor
 		dc.w @rings-Ani_Monitor, @s-Ani_Monitor, @goggles-Ani_Monitor
 		dc.w @clock-Ani_Monitor, @slowshoes-Ani_Monitor, @flameshield-Ani_Monitor
 		dc.w @bubbleshield-Ani_Monitor, @lightningshield-Ani_Monitor, @breaking-Ani_Monitor
+
 @static:	dc.b 1,	0, 1, 2, afEnd
 		even
 @eggman:	dc.b 1,	0, 3, 3, 1, 3, 3, 2, 3,	3, afEnd

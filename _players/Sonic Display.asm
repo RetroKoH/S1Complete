@@ -41,19 +41,32 @@ Sonic_Display: 	; Invulnerability flashing
 		bclr	#stsInvinc,(v_status_secondary).w ; cancel invincibility
 
 	@chkshoes:
-		btst	#stsShoes,(v_status_secondary).w	; does Sonic have speed	shoes?
-		beq.s	@exit				; if not, branch
-		tst.b	obShoes(a0)			; check	time remaining
+		btst	#stsShoes,(v_status_secondary).w	; does Sonic have speed	or slow shoes?
+		beq.s	@exit								; if not, branch
+		tst.b	obShoes(a0)							; check	time remaining
+		beq.s	@chkslowshoes
+		move.b	(v_framebyte).w,d0
+		andi.b	#7,d0								; shoe timer decrements once every 8 frames
+		bne.s	@exit								; if it's not the 8th frame, branch
+		subq.b	#1,obShoes(a0)						; subtract 1 from time
+		bne.s	@exit
+		lea     (v_sonspeedmax).w,a2    			; Load Sonic_top_speed into a2
+		bsr.w   ApplySpeedSettings      			; Fetch Speed settings
+		bclr	#stsShoes,(v_status_secondary).w	; cancel speed shoes
+		music	bgm_Slowdown,1,0,0					; run music at normal speed
+
+	@chkslowshoes:
+		tst.b	obSShoes(a0)							; check	time remaining
 		beq.s	@exit
 		move.b	(v_framebyte).w,d0
-		andi.b	#7,d0                        ; shoe timer decrements once every 8 frames
-		bne.s	@exit       ; if it's not the 8th frame, branch
-		subq.b	#1,obShoes(a0)			; subtract 1 from time
+		andi.b	#7,d0								; shoe timer decrements once every 8 frames
+		bne.s	@exit								; if it's not the 8th frame, branch
+		subq.b	#1,obSShoes(a0)						; subtract 1 from time
 		bne.s	@exit
-		lea     (v_sonspeedmax).w,a2    ; Load Sonic_top_speed into a2
-		bsr.w   ApplySpeedSettings      ; Fetch Speed settings
-		bclr	#stsShoes,(v_status_secondary).w	; cancel speed shoes
-		music	bgm_Slowdown,1,0,0		; run music at normal speed
+		lea     (v_sonspeedmax).w,a2    			; Load Sonic_top_speed into a2
+		bsr.w   ApplySpeedSettings      			; Fetch Speed settings
+		bclr	#stsShoes,(v_status_secondary).w	; cancel slow shoes
+		music	bgm_Slowdown,1,0,0					; run music at normal speed	
 
 	@exit:
 		rts	

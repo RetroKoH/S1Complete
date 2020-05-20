@@ -159,8 +159,9 @@ obSolid:		equ ob2ndRout ; solid status flag
 ; Object variables used by Sonic
 obJumpFlag:		equ $2E ; Flag for Double Jump
 obInvuln:		equ $30	; Invulnerable (blinking) timer ; $31 reserved as well
-obInvinc:		equ $32	; Invincibility timer ; $33 reserved as well
-obShoes:		equ $34	; Speed Shoes timer ; $35 reserved as well
+obInvinc:		equ $31	; Invincibility timer
+obShoes:		equ $32	; Speed Shoes timer
+obSShoes:		equ $33 ; Slow Shoes timer
 obFrontAngle:	equ $36
 obRearAngle:	equ $37
 obOnWheel:		equ $38	; on convex wheel flag

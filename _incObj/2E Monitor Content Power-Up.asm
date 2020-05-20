@@ -91,6 +91,7 @@ ExtraLife:
 
 Pow_Shoes:
 		bset	#stsShoes,(v_status_secondary).w	; set shoes flag
+		clr.b	(v_player+obSShoes).w
 		move.b	#$96,(v_player+obShoes).w		; time limit for the power-up
 		movem.l a0-a2,-(sp)						; Move a0, a1 and a2 onto stack
 		lea     (v_player).w,a0					; Load Sonic to a0
@@ -181,9 +182,28 @@ Pow_Rings:
 ; ===========================================================================
 
 Pow_S: ; Will make character Super
-Pow_Goggles: ; Temporary drowning protection
-Pow_Clock: ; Used in Time Attack OR used to freeze objects
+Pow_Goggles: ; Longer air time
+Pow_Clock: ; Used in the new Bonus Stage
+		rts
+
 Pow_SlowShoes: ; Used to slow down the player
+		bset	#stsShoes,(v_status_secondary).w	; set shoes flag
+		clr.b	(v_player+obShoes).w
+		move.b	#$96,(v_player+obSShoes).w		; time limit for the power-up
+		movem.l a0-a2,-(sp)						; Move a0, a1 and a2 onto stack
+		lea     (v_player).w,a0					; Load Sonic to a0
+		lea		(v_sonspeedmax).w,a2			; Load Sonic_top_speed into a2
+		jsr		ApplySpeedSettings				; Fetch Speed settings
+		movem.l (sp)+,a0-a2						; Move a0, a1 and a2 from stack
+		btst  	#stsSuper,(v_status_secondary).w	; Is Sonic in his Super form?
+		bne.s	@nomusic							; if yes, branch
+		tst.b	(f_lockscreen).w		; is boss mode on?
+		bne.s	@nomusic				; if yes, branch
+		cmpi.w	#$C,(v_air).w			; is drowning countdown active?
+		bls.s	@nomusic				; if yes, branch
+		music	bgm_Speedup,1,0,0		; speed	up the music
+
+	@nomusic:
 		rts
 ; ===========================================================================
 
