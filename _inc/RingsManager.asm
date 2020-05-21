@@ -304,26 +304,16 @@ loc_31343C:					  ; Clear positions table
 		dbf	d1,@RMS_2
 		moveq	#0,d5
 		moveq	#0,d0
-
-		move.w	(v_zone).w,d0
-		lsl.b	#6,d0
-		lsr.w	#4,d0
-;		move.b	(v_zone).w,d0
-;		lsl.l	#6,d0					; zones are separated in multiples of $80
-;		move.b	(v_act).w,d1
-;		lsl.b	#4,d1					; acts are separated in multiples of $20
-;		add.b	d1,d0
-;		move.b	(v_difficulty).w,d1
-;		lsl.b	#2,d1					; difficulties are separated in multiples of 8
-;		add.b	d1,d0
+		move.b	(v_zone).w,d0
+		lsl.l	#6,d0					; zones are separated in multiples of $80
+		move.b	(v_act).w,d1
+		lsl.b	#4,d1					; acts are separated in multiples of $20
+		add.b	d1,d0
+		move.b	(v_difficulty).w,d1
+		lsl.b	#2,d1					; difficulties are separated in multiples of 8
+		add.b	d1,d0
 		lea	(RingPos_Index).l,a1
-		move.w	(a1,d0.w),d0
-		lea	(a1,d0.w),a1
-
-
-;		movea.l	(a1,d0.w),a1
-			;lea	d0,a1
-			;lea	(a1,d0.w),a1
+		movea.l	(a1,d0.w),a1
 		lea	(v_ringpos+6).w,a2	; first ring is left blank
 ; loc_172E0:
 RingsMgr_NextRowOrCol:

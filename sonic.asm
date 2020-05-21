@@ -94,8 +94,8 @@ Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 
 Hardware:		dc.b "SEGA MEGA DRIVE " ; Hardware system ID (Console name)
 Date:			dc.b "(C)SEGA 1991.APR" ; Copyright holder and release date (generally year)
-Title_Local:	dc.b "SONIC THE               HEDGEHOG                " ; Domestic name
-Title_Int:		dc.b "SONIC THE               HEDGEHOG                " ; International name
+Title_Local:	dc.b "SONIC THE HEDGEHOG: 8x16                        " ; Domestic name
+Title_Int:		dc.b "SONIC 1: 8x16                                   " ; International name
 Serial:			dc.b "GM 00004049-01" ; Serial/version number (Rev non-0)
 Checksum: 		dc.w $0
 				dc.b "J               " ; I/O support
@@ -2727,7 +2727,6 @@ Level_TtlCardLoop:
 		bset	#2,(v_fg_scroll_flags).w
 		bsr.w	LevelDataLoad ; load block mappings and palettes
 		bsr.w	LoadTilesFromStart
-		jsr	(FloorLog_Unk).l
 		bsr.w	ColIndexLoad
 		bsr.w	LZWaterFeatures
 		move.b	#id_SonicPlayer,(v_player).w ; load Sonic object
@@ -4961,6 +4960,7 @@ LevelDataLoad:
 	@skipPLC:
 		rts	
 ; End of function LevelDataLoad
+; ===========================================================================
 
 ; ---------------------------------------------------------------------------
 ; Level	layout loading subroutine
@@ -4970,9 +4970,14 @@ LevelDataLoad:
 ; This method now releases free ram space from A408 - A7FF
 
 LevelLayoutLoad:
-		move.w	(v_zone).w,d0
-		lsl.b	#6,d0
-		lsr.w	#4,d0
+		move.b	(v_zone).w,d0
+		lsl.l	#6,d0					; zones are separated in multiples of $80
+		move.b	(v_act).w,d1
+		lsl.b	#4,d1					; acts are separated in multiples of $20
+		add.b	d1,d0
+		move.b	(v_difficulty).w,d1
+		lsl.b	#2,d1					; difficulties are separated in multiples of 8
+		add.b	d1,d0
 		lea	(Level_Index).l,a1
 		movea.l	(a1,d0.w),a1		; MJ: moving the address strait to a1 rather than adding a word to an address
 		move.l	a1,(v_lvllayoutfg).w	; MJ: save location of layout to $FFFFA400
@@ -6390,12 +6395,17 @@ OPL_Index:
 
 OPL_Main:
 		addq.b	#2,(v_opl_routine).w
-		move.w	(v_zone).w,d0
-		lsl.b	#6,d0
-		lsr.w	#4,d0
+		move.b	(v_zone).w,d0
+		lsl.l	#6,d0					; zones are separated in multiples of $80
+		move.b	(v_act).w,d1
+		lsl.b	#4,d1					; acts are separated in multiples of $20
+		add.b	d1,d0
+		move.b	(v_difficulty).w,d1
+		lsl.b	#2,d1					; difficulties are separated in multiples of 8
+		add.b	d1,d0
 		lea		(ObjPos_Index).l,a0	; Next, we load the first pointer in the object layout list pointer index,
 		movea.l	a0,a1				; then copy it for quicker use later.
-		adda.w	(a0,d0.w),a0		; (Point1 * 2) + d0
+		movea.l (a0,d0.w),a0			; Changed from adda.w to movea.l for new object layout pointers
 		; initialize each object load address with the first object in the layout
 		move.l	a0,(v_opl_data).w
 		move.l	a0,(v_opl_data+4).w
@@ -6845,102 +6855,6 @@ Map_Splash:	include	"_maps\Water Splash.asm"
 		include	"_incObj\sub FindFloor.asm"
 		include	"_incObj\sub FindWall.asm"
 
-; ---------------------------------------------------------------------------
-; Unused floor/wall subroutine - logs something	to do with collision
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-FloorLog_Unk:
-		rts	
-
-		lea	(CollArray1).l,a1
-		lea	(CollArray1).l,a2
-		move.w	#$FF,d3
-
-loc_14C5E:
-		moveq	#$10,d5
-		move.w	#$F,d2
-
-loc_14C64:
-		moveq	#0,d4
-		move.w	#$F,d1
-
-loc_14C6A:
-		move.w	(a1)+,d0
-		lsr.l	d5,d0
-		addx.w	d4,d4
-		dbf	d1,loc_14C6A
-
-		move.w	d4,(a2)+
-		suba.w	#$20,a1
-		subq.w	#1,d5
-		dbf	d2,loc_14C64
-
-		adda.w	#$20,a1
-		dbf	d3,loc_14C5E
-
-		lea	(CollArray1).l,a1
-		lea	(CollArray2).l,a2
-		bsr.s	FloorLog_Unk2
-		lea	(CollArray1).l,a1
-		lea	(CollArray1).l,a2
-
-; End of function FloorLog_Unk
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-FloorLog_Unk2:
-		move.w	#$FFF,d3
-
-loc_14CA6:
-		moveq	#0,d2
-		move.w	#$F,d1
-		move.w	(a1)+,d0
-		beq.s	loc_14CD4
-		bmi.s	loc_14CBE
-
-loc_14CB2:
-		lsr.w	#1,d0
-		bhs.s	loc_14CB8
-		addq.b	#1,d2
-
-loc_14CB8:
-		dbf	d1,loc_14CB2
-
-		bra.s	loc_14CD6
-; ===========================================================================
-
-loc_14CBE:
-		cmpi.w	#-1,d0
-		beq.s	loc_14CD0
-
-loc_14CC4:
-		lsl.w	#1,d0
-		bhs.s	loc_14CCA
-		subq.b	#1,d2
-
-loc_14CCA:
-		dbf	d1,loc_14CC4
-
-		bra.s	loc_14CD6
-; ===========================================================================
-
-loc_14CD0:
-		move.w	#$10,d0
-
-loc_14CD4:
-		move.w	d0,d2
-
-loc_14CD6:
-		move.b	d2,(a2)+
-		dbf	d3,loc_14CA6
-
-		rts	
-
-; End of function FloorLog_Unk2
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to calculate how much space is in front of the player on the ground
@@ -8750,129 +8664,276 @@ Art_SbzSmoke:	incbin	"artunc\SBZ Background Smoke.bin"
 
 ; ---------------------------------------------------------------------------
 ; Level	layout index
+; Added chunk layout locations for each difficulty
+; Every difficulty is 4 bytes apart
+; Every act is now $10 bytes apart
+; Every zone is $40 bytes apart
 ; ---------------------------------------------------------------------------
-Level_Index:	dc.l Level_GHZ1	; MJ: unused data and BG data have been stripped out
-		dc.l Level_GHZ2
-		dc.l Level_GHZ3
-		dc.l Level_Null
-		dc.l Level_LZ1
-		dc.l Level_LZ2
-		dc.l Level_LZ3
-		dc.l Level_SBZ3
-		dc.l Level_MZ1
-		dc.l Level_MZ2
-		dc.l Level_MZ3
-		dc.l Level_Null
-		dc.l Level_SLZ1
-		dc.l Level_SLZ2
-		dc.l Level_SLZ3
-		dc.l Level_Null
-		dc.l Level_SYZ1
-		dc.l Level_SYZ2
-		dc.l Level_SYZ3
-		dc.l Level_Null
-		dc.l Level_SBZ1
-		dc.l Level_SBZ2
-		dc.l Level_SBZ2
-		dc.l Level_Null
-		zonewarning Level_Index,16
-		dc.l Level_End
-		dc.l Level_End
-		dc.l Level_Null
-		dc.l Level_Null
+
+Level_Index:
+		dc.l Level_GHZ1, Level_GHZ1E, Level_GHZ1H, Level_Null
+		dc.l Level_GHZ2, Level_GHZ2E, Level_GHZ2H, Level_Null
+		dc.l Level_GHZ3, Level_GHZ2E, Level_GHZ3H, Level_Null
+		dc.l Level_GHZ1, Level_GHZ1E, Level_GHZ1H, Level_Null
+
+		dc.l Level_LZ1, Level_LZ1E, Level_LZ1H, Level_Null
+		dc.l Level_LZ2, Level_LZ2E, Level_LZ2H, Level_Null
+		dc.l Level_LZ3, Level_LZ2E, Level_LZ3H, Level_Null
+		dc.l Level_SBZ3, Level_SBZ3, Level_SBZ3H, Level_Null
+
+		dc.l Level_MZ1, Level_MZ1E, Level_MZ1H, Level_Null
+		dc.l Level_MZ2, Level_MZ2E, Level_MZ2H, Level_Null
+		dc.l Level_MZ3, Level_MZ2E, Level_MZ3H, Level_Null
+		dc.l Level_MZ1, Level_MZ1E, Level_MZ1H, Level_Null
+
+		dc.l Level_SLZ1, Level_SLZ1E, Level_SLZ1H, Level_Null
+		dc.l Level_SLZ2, Level_SLZ2E, Level_SLZ2H, Level_Null
+		dc.l Level_SLZ3, Level_SLZ2E, Level_SLZ3H, Level_Null
+		dc.l Level_SLZ1, Level_SLZ1E, Level_SLZ1H, Level_Null
+
+		dc.l Level_SYZ1, Level_SYZ1E, Level_SYZ1H, Level_Null
+		dc.l Level_SYZ2, Level_SYZ2E, Level_SYZ2H, Level_Null
+		dc.l Level_SYZ3, Level_SYZ2E, Level_SYZ3H, Level_Null
+		dc.l Level_SYZ1, Level_SYZ1E, Level_SYZ1H, Level_Null
+
+		dc.l Level_SBZ1, Level_SBZ1E, Level_SBZ1H, Level_Null
+		dc.l Level_SBZ2, Level_SBZ2E, Level_SBZ2H, Level_Null
+		dc.l Level_SBZ2, Level_SBZ2E, Level_SBZ2H, Level_Null
+		dc.l Level_SBZ1, Level_SBZ1E, Level_SBZ1H, Level_Null
+
+		dc.l Level_End, Level_End, Level_End, Level_Null
+		dc.l Level_End, Level_End, Level_End, Level_Null
+		dc.l Level_Null, Level_Null, Level_Null, Level_Null
+		dc.l Level_Null, Level_Null, Level_Null, Level_Null
+
+		dc.l Level_BZ1, Level_BZ1E, Level_BZ1H, Level_Null
+		dc.l Level_BZ2, Level_BZ2E, Level_BZ2H, Level_Null
+		dc.l Level_BZ3, Level_BZ2E, Level_BZ3H, Level_Null
+		dc.l Level_BZ1, Level_BZ1E, Level_BZ1H, Level_Null
+
+		dc.l Level_JZ1, Level_JZ1E, Level_JZ1H, Level_Null
+		dc.l Level_JZ2, Level_JZ2E, Level_JZ2H, Level_Null
+		dc.l Level_JZ3, Level_JZ2E, Level_JZ3H, Level_Null
+		dc.l Level_JZ1, Level_JZ1E, Level_JZ1H, Level_Null
+
+		dc.l Level_SKBZ1, Level_SKBZ1E, Level_SKBZ1H, Level_Null
+		dc.l Level_SKBZ2, Level_SKBZ2E, Level_SKBZ2H, Level_Null
+		dc.l Level_SKBZ3, Level_SKBZ2E, Level_SKBZ3H, Level_Null
+		dc.l Level_SKBZ1, Level_SKBZ1E, Level_SKBZ1H, Level_Null
 
 Level_Null:
 
-Level_GHZ1:	incbin	"levels\ghz1.bin"
+Level_GHZ1:	incbin	levels\ghz1.bin
 		even
-Level_GHZ2:	incbin	"levels\ghz2.bin"
+Level_GHZ1E:	incbin	levels\ghz1e.bin
 		even
-Level_GHZ3:	incbin	"levels\ghz3.bin"
+Level_GHZ1H:	incbin	levels\ghz1h.bin
 		even
-
-Level_LZ1:	incbin	"levels\lz1.bin"
+Level_GHZ2:	incbin	levels\ghz2.bin
 		even
-Level_LZ2:	incbin	"levels\lz2.bin"
+Level_GHZ2E:	incbin	levels\ghz2e.bin
 		even
-Level_LZ3:	incbin	"levels\lz3.bin"
+Level_GHZ2H:	incbin	levels\ghz2h.bin
 		even
-Level_LZ3NoWall: incbin	"levels\lz3_nowall.bin"
+Level_GHZ3:	incbin	levels\ghz3.bin
 		even
-Level_SBZ3:	incbin	"levels\sbz3.bin"
+Level_GHZ3H:	incbin	levels\ghz3h.bin
 		even
-
-Level_MZ1:	incbin	"levels\mz1.bin"
+Level_LZ1:	incbin	levels\lz1.bin
 		even
-Level_MZ2:	incbin	"levels\mz2.bin"
+Level_LZ1E:	incbin	levels\lz1e.bin
 		even
-Level_MZ3:	incbin	"levels\mz3.bin"
+Level_LZ1H:	incbin	levels\lz1h.bin
 		even
-
-Level_SLZ1:	incbin	"levels\slz1.bin"
+Level_LZ2:	incbin	levels\lz2.bin
 		even
-Level_SLZ2:	incbin	"levels\slz2.bin"
+Level_LZ2E:	incbin	levels\lz2e.bin
 		even
-Level_SLZ3:	incbin	"levels\slz3.bin"
+Level_LZ2H:	incbin	levels\lz2h.bin
 		even
-
-Level_SYZ1:	incbin	"levels\syz1.bin"
+Level_LZ3NoWall:	incbin	levels\lz3_nowall.bin
 		even
-Level_SYZ2:	incbin	"levels\syz2.bin"
+Level_LZ3HNoWall:	incbin	levels\lz3h_nowall.bin
 		even
-Level_SYZ3:	incbin	"levels\syz3.bin"
+Level_LZ3:	incbin	levels\lz3_wall.bin
 		even
-
-Level_SBZ1:	incbin	"levels\sbz1.bin"
+Level_LZ3H:	incbin	levels\lz3h_wall.bin
 		even
-Level_SBZ2:	incbin	"levels\sbz2.bin"
+Level_SBZ3:	incbin	levels\sbz3.bin
 		even
-
-Level_End:	incbin	"levels\ending.bin"
+Level_SBZ3H:	incbin	levels\sbz3h.bin
 		even
-Level_EndGood:	incbin	"levels\ending_good.bin"
+Level_MZ1:	incbin	levels\mz1.bin
+		even
+Level_MZ1E:	incbin	levels\mz1e.bin
+		even
+Level_MZ1H:	incbin	levels\mz1h.bin
+		even
+Level_MZ2:	incbin	levels\mz2.bin
+		even
+Level_MZ2E:	incbin	levels\mz2e.bin
+		even
+Level_MZ2H:	incbin	levels\mz2h.bin
+		even
+Level_MZ3:	incbin	levels\mz3.bin
+		even
+Level_MZ3H:	incbin	levels\mz3h.bin
+		even
+Level_SLZ1:	incbin	levels\slz1.bin
+		even
+Level_SLZ1E:	incbin	levels\slz1e.bin
+		even
+Level_SLZ1H:	incbin	levels\slz1h.bin
+		even
+Level_SLZ2:	incbin	levels\slz2.bin
+		even
+Level_SLZ2E:	incbin	levels\slz2e.bin
+		even
+Level_SLZ2H:	incbin	levels\slz2h.bin
+		even
+Level_SLZ3:	incbin	levels\slz3.bin
+		even
+Level_SLZ3H:	incbin	levels\slz3h.bin
+		even
+Level_SYZ1:	incbin	levels\syz1.bin
+		even
+Level_SYZ1E:	incbin	levels\syz1e.bin
+		even
+Level_SYZ1H:	incbin	levels\syz1h.bin
+		even
+Level_SYZ2:	incbin	levels\syz2.bin
+		even
+Level_SYZ2E:	incbin	levels\syz2e.bin
+		even
+Level_SYZ2H:	incbin	levels\syz2h.bin
+		even
+Level_SYZ3:	incbin	levels\syz3.bin
+		even
+Level_SYZ3H:	incbin	levels\syz3h.bin
+		even
+Level_SBZ1:	incbin	levels\sbz1.bin
+		even
+Level_SBZ1E:	incbin	levels\sbz1e.bin
+		even
+Level_SBZ1H:	incbin	levels\sbz1h.bin
+		even
+Level_SBZ2:	incbin	levels\sbz2.bin
+		even
+Level_SBZ2E:	incbin	levels\sbz2e.bin
+		even
+Level_SBZ2H:	incbin	levels\sbz2h.bin
+		even
+Level_End:	incbin	levels\ending.bin
+		even
+Level_EndGood:	incbin	levels\ending_good.bin
+		even
+Level_BZ1:	incbin	levels\bz1.bin
+		even
+Level_BZ1E:	incbin	levels\bz1e.bin
+		even
+Level_BZ1H:	incbin	levels\bz1h.bin
+		even
+Level_BZ2:	incbin	levels\bz2.bin
+		even
+Level_BZ2E:	incbin	levels\bz2e.bin
+		even
+Level_BZ2H:	incbin	levels\bz2h.bin
+		even
+Level_BZ3:	incbin	levels\bz3.bin
+		even
+Level_BZ3H:	incbin	levels\bz3h.bin
+		even
+Level_JZ1:	incbin	levels\jz1.bin
+		even
+Level_JZ1E:	incbin	levels\jz1e.bin
+		even
+Level_JZ1H:	incbin	levels\jz1h.bin
+		even
+Level_JZ2:	incbin	levels\jz2.bin
+		even
+Level_JZ2E:	incbin	levels\jz2e.bin
+		even
+Level_JZ2H:	incbin	levels\jz2h.bin
+		even
+Level_JZ3:	incbin	levels\jz3.bin
+		even
+Level_JZ3H:	incbin	levels\jz3h.bin
+		even
+Level_SKBZ1:	incbin	levels\skbz1.bin
+		even
+Level_SKBZ1E:	incbin	levels\skbz1e.bin
+		even
+Level_SKBZ1H:	incbin	levels\skbz1h.bin
+		even
+Level_SKBZ2:	incbin	levels\skbz2.bin
+		even
+Level_SKBZ2E:	incbin	levels\skbz2e.bin
+		even
+Level_SKBZ2H:	incbin	levels\skbz2h.bin
+		even
+Level_SKBZ3:	incbin	levels\skbz3.bin
+		even
+Level_SKBZ3H:	incbin	levels\skbz3h.bin
 		even
 
 		align	$100,$FF
 
 ; ---------------------------------------------------------------------------
-; Sprite locations index
+; Object locations index
+; Added object locations for each difficulty
+; Every difficulty is 4 bytes apart
+; Every act is now $10 bytes apart
+; Every zone is $40 bytes apart
 ; ---------------------------------------------------------------------------
 ObjPos_Index:
-		; GHZ
-		dc.w ObjPos_GHZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_GHZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_GHZ3-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_GHZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; LZ
-		dc.w ObjPos_LZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_LZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_LZ3-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SBZ3-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; MZ
-		dc.w ObjPos_MZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_MZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_MZ3-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_MZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; SLZ
-		dc.w ObjPos_SLZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SLZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SLZ3-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SLZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; SYZ
-		dc.w ObjPos_SYZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SYZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SYZ3-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SYZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; SBZ
-		dc.w ObjPos_SBZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SBZ2-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_FZ-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_SBZ1-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		; Ending
-		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
-		dc.w ObjPos_End-ObjPos_Index, ObjPos_Null-ObjPos_Index
+		dc.l ObjPos_GHZ1, ObjPos_GHZ1E, ObjPos_GHZ1H, ObjPos_Null
+		dc.l ObjPos_GHZ2, ObjPos_GHZ2E, ObjPos_GHZ2H, ObjPos_Null
+		dc.l ObjPos_GHZ3, ObjPos_GHZ2E, ObjPos_GHZ3H, ObjPos_Null
+		dc.l ObjPos_GHZ1, ObjPos_GHZ1E, ObjPos_GHZ1H, ObjPos_Null
+
+		dc.l ObjPos_LZ1, ObjPos_LZ1E, ObjPos_LZ1H, ObjPos_Null
+		dc.l ObjPos_LZ2, ObjPos_LZ2E, ObjPos_LZ2H, ObjPos_Null
+		dc.l ObjPos_LZ3, ObjPos_LZ2E, ObjPos_LZ3H, ObjPos_Null
+		dc.l ObjPos_SBZ3, ObjPos_SBZ3, ObjPos_SBZ3H, ObjPos_Null
+
+		dc.l ObjPos_MZ1, ObjPos_MZ1E, ObjPos_MZ1H, ObjPos_Null
+		dc.l ObjPos_MZ2, ObjPos_MZ2E, ObjPos_MZ2H, ObjPos_Null
+		dc.l ObjPos_MZ3, ObjPos_MZ2E, ObjPos_MZ3H, ObjPos_Null
+		dc.l ObjPos_MZ1, ObjPos_MZ1E, ObjPos_MZ1H, ObjPos_Null
+
+		dc.l ObjPos_SLZ1, ObjPos_SLZ1E, ObjPos_SLZ1H, ObjPos_Null
+		dc.l ObjPos_SLZ2, ObjPos_SLZ2E, ObjPos_SLZ2H, ObjPos_Null
+		dc.l ObjPos_SLZ3, ObjPos_SLZ2E, ObjPos_SLZ3H, ObjPos_Null
+		dc.l ObjPos_SLZ1, ObjPos_SLZ1E, ObjPos_SLZ1H, ObjPos_Null
+
+		dc.l ObjPos_SYZ1, ObjPos_SYZ1E, ObjPos_SYZ1H, ObjPos_Null
+		dc.l ObjPos_SYZ2, ObjPos_SYZ2E, ObjPos_SYZ2H, ObjPos_Null
+		dc.l ObjPos_SYZ3, ObjPos_SYZ2E, ObjPos_SYZ3H, ObjPos_Null
+		dc.l ObjPos_SYZ1, ObjPos_SYZ1E, ObjPos_SYZ1H, ObjPos_Null
+
+		dc.l ObjPos_SBZ1, ObjPos_SBZ1E, ObjPos_SBZ1H, ObjPos_Null
+		dc.l ObjPos_SBZ2, ObjPos_SBZ2E, ObjPos_SBZ2H, ObjPos_Null
+		dc.l ObjPos_FZ, ObjPos_FZ, ObjPos_FZ, ObjPos_Null
+		dc.l ObjPos_SBZ1, ObjPos_SBZ1E, ObjPos_SBZ1H, ObjPos_Null
+
+		dc.l ObjPos_End, ObjPos_End, ObjPos_End, ObjPos_Null
+		dc.l ObjPos_End, ObjPos_End, ObjPos_End, ObjPos_Null
+		dc.l ObjPos_End, ObjPos_End, ObjPos_End, ObjPos_Null
+		dc.l ObjPos_End, ObjPos_End, ObjPos_End, ObjPos_Null
+
+		; NEW OBJECT LAYOUTS HERE
+;		dc.l ObjPos_BZ1, ObjPos_BZ1E, ObjPos_BZ1H, ObjPos_Null
+;		dc.l ObjPos_BZ2, ObjPos_BZ2E, ObjPos_BZ2H, ObjPos_Null
+;		dc.l ObjPos_BZ3, ObjPos_BZ2E, ObjPos_BZ3H, ObjPos_Null
+;		dc.l ObjPos_BZ1, ObjPos_BZ1E, ObjPos_BZ1H, ObjPos_Null
+;		dc.l ObjPos_JZ1, ObjPos_JZ1E, ObjPos_JZ1H, ObjPos_Null
+;		dc.l ObjPos_JZ2, ObjPos_JZ2E, ObjPos_JZ2H, ObjPos_Null
+;		dc.l ObjPos_JZ3, ObjPos_JZ2E, ObjPos_JZ3H, ObjPos_Null
+;		dc.l ObjPos_JZ1, ObjPos_JZ1E, ObjPos_JZ1H, ObjPos_Null
+;		dc.l ObjPos_SKBZ1, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
+;		dc.l ObjPos_SKBZ2, ObjPos_SKBZ2E, ObjPos_SKBZ2H, ObjPos_Null
+;		dc.l ObjPos_SKBZ3, ObjPos_SKBZ2E, ObjPos_SKBZ3H, ObjPos_Null
+;		dc.l ObjPos_SKBZ2, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
 		; --- Put extra object data here. ---
 ObjPosLZPlatform_Index:
 		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
@@ -8887,17 +8948,39 @@ ObjPosSBZPlatform_Index:
 		dc.b $FF, $FF, 0, 0, 0,	0
 ObjPos_GHZ1:	incbin	"objpos\ghz1.bin"
 		even
+ObjPos_GHZ1E:	incbin	"objpos\ghz1e.bin"
+		even
+ObjPos_GHZ1H:	incbin	"objpos\ghz1h.bin"
+		even
 ObjPos_GHZ2:	incbin	"objpos\ghz2.bin"
+		even
+ObjPos_GHZ2E:	incbin	"objpos\ghz2e.bin"
+		even
+ObjPos_GHZ2H:	incbin	"objpos\ghz2h.bin"
 		even
 ObjPos_GHZ3:	incbin	"objpos\ghz3.bin"
 		even
+ObjPos_GHZ3H:	incbin	"objpos\ghz3h.bin"
+		even
 ObjPos_LZ1:		incbin	"objpos\lz1.bin"
+		even
+ObjPos_LZ1E:	incbin	"objpos\lz1e.bin"
+		even
+ObjPos_LZ1H:	incbin	"objpos\lz1h.bin"
 		even
 ObjPos_LZ2:		incbin	"objpos\lz2.bin"
 		even
+ObjPos_LZ2E:	incbin	"objpos\lz2e.bin"
+		even
+ObjPos_LZ2H:	incbin	"objpos\lz2h.bin"
+		even
 ObjPos_LZ3:		incbin	"objpos\lz3.bin"
 		even
+ObjPos_LZ3H:	incbin	"objpos\lz3h.bin"
+		even
 ObjPos_SBZ3:	incbin	"objpos\sbz3.bin"
+		even
+ObjPos_SBZ3H:	incbin	"objpos\sbz3h.bin"
 		even
 ObjPos_LZ1pf1:	incbin	"objpos\lz1pf1.bin"
 		even
@@ -8913,27 +8996,65 @@ ObjPos_LZ3pf2:	incbin	"objpos\lz3pf2.bin"
 		even
 ObjPos_MZ1:		incbin	"objpos\mz1.bin"
 		even
+ObjPos_MZ1E:	incbin	"objpos\mz1e.bin"
+		even
+ObjPos_MZ1H:	incbin	"objpos\mz1h.bin"
+		even
 ObjPos_MZ2:		incbin	"objpos\mz2.bin"
+		even
+ObjPos_MZ2E:	incbin	"objpos\mz2e.bin"
+		even
+ObjPos_MZ2H:	incbin	"objpos\mz2h.bin"
 		even
 ObjPos_MZ3:		incbin	"objpos\mz3.bin"
 		even
-ObjPos_SLZ1:	incbin	"objpos\slz1.bin"
+ObjPos_MZ3H:	incbin	"objpos\mz3h.bin"
 		even
-ObjPos_SLZ2:	incbin	"objpos\slz2.bin"
+ObjPos_SLZ1:	incbin	objpos\slz1.bin
 		even
-ObjPos_SLZ3:	incbin	"objpos\slz3.bin"
+ObjPos_SLZ1E:	incbin	objpos\slz1e.bin
 		even
-ObjPos_SYZ1:	incbin	"objpos\syz1.bin"
+ObjPos_SLZ1H:	incbin	objpos\slz1h.bin
 		even
-ObjPos_SYZ2:	incbin	"objpos\syz2.bin"
+ObjPos_SLZ2:	incbin	objpos\slz2.bin
+		even
+ObjPos_SLZ2E:	incbin	objpos\slz2e.bin
+		even
+ObjPos_SLZ2H:	incbin	objpos\slz2h.bin
+		even
+ObjPos_SLZ3:	incbin	objpos\slz3.bin
+		even
+ObjPos_SLZ3H:	incbin	objpos\slz3h.bin
+		even
+ObjPos_SYZ1:	incbin	objpos\syz1.bin
+		even
+ObjPos_SYZ1E:	incbin	objpos\syz1e.bin
+		even
+ObjPos_SYZ1H:	incbin	objpos\syz1h.bin
+		even
+ObjPos_SYZ2:	incbin	objpos\syz2.bin
+		even
+ObjPos_SYZ2E:	incbin	objpos\syz2e.bin
+		even
+ObjPos_SYZ2H:	incbin	objpos\syz2h.bin
 		even
 ObjPos_SYZ3:	incbin	"objpos\syz3.bin"
 		even
+ObjPos_SYZ3H:	incbin	"objpos\syz3h.bin"
+		even
 ObjPos_SBZ1:	incbin	"objpos\sbz1.bin"
 		even
-ObjPos_SBZ2:	incbin	"objpos\sbz2.bin"
+ObjPos_SBZ1E:	incbin	"objpos\sbz1e.bin"
 		even
-ObjPos_FZ:		incbin	"objpos\fz.bin"
+ObjPos_SBZ1H:	incbin	"objpos\sbz1h.bin"
+		even
+ObjPos_SBZ2:	incbin	objpos\sbz2.bin
+		even
+ObjPos_SBZ2E:	incbin	objpos\sbz2e.bin
+		even
+ObjPos_SBZ2H:	incbin	objpos\sbz2h.bin
+		even
+ObjPos_FZ:	incbin	objpos\fz.bin
 		even
 ObjPos_SBZ1pf1:	incbin	"objpos\sbz1pf1.bin"
 		even
@@ -8947,50 +9068,63 @@ ObjPos_SBZ1pf5:	incbin	"objpos\sbz1pf5.bin"
 		even
 ObjPos_SBZ1pf6:	incbin	"objpos\sbz1pf6.bin"
 		even
-ObjPos_End:	incbin	"objpos\ending.bin"
+ObjPos_End:		incbin	"objpos\ending.bin"
 		even
 ObjPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
 
 ; --------------------------------------------------------------------------------------
-; Offset index of ring locations - REV C EDIT - RING MANAGER RELATED
+; Offset index of ring locations
 ; --------------------------------------------------------------------------------------
 RingPos_Index:
-		; GHZ
-		dc.w RingPos_GHZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_GHZ2-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_GHZ3-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_GHZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		; LZ
-		dc.w RingPos_LZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_LZ2-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_LZ3-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SBZ3-RingPos_Index, RingPos_Null-RingPos_Index
-		; MZ
-		dc.w RingPos_MZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_MZ2-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_MZ3-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_MZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		; SLZ
-		dc.w RingPos_SLZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SLZ2-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SLZ3-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SLZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		; SYZ
-		dc.w RingPos_SYZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SYZ2-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SYZ3-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SYZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		; SBZ
-		dc.w RingPos_SBZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SBZ2-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_SBZ1-RingPos_Index, RingPos_Null-RingPos_Index
-		; Ending
-		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
-		dc.w RingPos_Null-RingPos_Index, RingPos_Null-RingPos_Index
-		;dc.b $FF, $FF, 0, 0, 0,	0
+		dc.l RingPos_GHZ1, RingPos_GHZ1E, RingPos_GHZ1H, RingPos_Null
+		dc.l RingPos_GHZ2, RingPos_GHZ2E, RingPos_GHZ2H, RingPos_Null
+		dc.l RingPos_GHZ3, RingPos_GHZ2E, RingPos_GHZ3H, RingPos_Null
+		dc.l RingPos_GHZ1, RingPos_GHZ1E, RingPos_GHZ1H, RingPos_Null
+
+		dc.l RingPos_LZ1, RingPos_LZ1E, RingPos_LZ1H, RingPos_Null
+		dc.l RingPos_LZ2, RingPos_LZ2E, RingPos_LZ2H, RingPos_Null
+		dc.l RingPos_LZ3, RingPos_LZ2E, RingPos_LZ3H, RingPos_Null
+		dc.l RingPos_SBZ3, RingPos_SBZ3, RingPos_SBZ3H, RingPos_Null
+
+		dc.l RingPos_MZ1, RingPos_MZ1E, RingPos_MZ1H, RingPos_Null
+		dc.l RingPos_MZ2, RingPos_MZ2E, RingPos_MZ2H, RingPos_Null
+		dc.l RingPos_MZ3, RingPos_MZ2E, RingPos_MZ3H, RingPos_Null
+		dc.l RingPos_MZ1, RingPos_MZ1E, RingPos_MZ1H, RingPos_Null
+
+		dc.l RingPos_SLZ1, RingPos_SLZ1E, RingPos_SLZ1H, RingPos_Null
+		dc.l RingPos_SLZ2, RingPos_SLZ2E, RingPos_SLZ2H, RingPos_Null
+		dc.l RingPos_SLZ3, RingPos_SLZ2E, RingPos_SLZ3H, RingPos_Null
+		dc.l RingPos_SLZ1, RingPos_SLZ1E, RingPos_SLZ1H, RingPos_Null
+
+		dc.l RingPos_SYZ1, RingPos_SYZ1E, RingPos_SYZ1H, RingPos_Null
+		dc.l RingPos_SYZ2, RingPos_SYZ2E, RingPos_SYZ2H, RingPos_Null
+		dc.l RingPos_SYZ3, RingPos_SYZ2E, RingPos_SYZ3H, RingPos_Null
+		dc.l RingPos_SYZ1, RingPos_SYZ1E, RingPos_SYZ1H, RingPos_Null
+
+		dc.l RingPos_SBZ1, RingPos_SBZ1E, RingPos_SBZ1H, RingPos_Null
+		dc.l RingPos_SBZ2, RingPos_SBZ2E, RingPos_SBZ2H, RingPos_Null
+		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null	; Final Zone... will have 3 rings in easy mode.
+		dc.l RingPos_SBZ1, RingPos_SBZ1E, RingPos_SBZ1H, RingPos_Null
+
+		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null
+		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null
+		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null
+		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null
+
+;		dc.l RingPos_BZ1, RingPos_BZ1E, RingPos_BZ1H, RingPos_Null
+;		dc.l RingPos_BZ2, RingPos_BZ2E, RingPos_BZ2H, RingPos_Null
+;		dc.l RingPos_BZ3, RingPos_BZ2E, RingPos_BZ3H, RingPos_Null
+;		dc.l RingPos_BZ1, RingPos_BZ1E, RingPos_BZ1H, RingPos_Null
+
+;		dc.l RingPos_JZ1, RingPos_JZ1E, RingPos_JZ1H, RingPos_Null
+;		dc.l RingPos_JZ2, RingPos_JZ2E, RingPos_JZ2H, RingPos_Null
+;		dc.l RingPos_JZ3, RingPos_JZ2E, RingPos_JZ3H, RingPos_Null
+;		dc.l RingPos_JZ1, RingPos_JZ1E, RingPos_JZ1H, RingPos_Null
+
+;		dc.l RingPos_SKBZ1, RingPos_SKBZ1E, RingPos_SKBZ1H, RingPos_Null
+;		dc.l RingPos_SKBZ2, RingPos_SKBZ2E, RingPos_SKBZ2H, RingPos_Null
+;		dc.l RingPos_SKBZ3, RingPos_SKBZ2E, RingPos_SKBZ3H, RingPos_Null
+;		dc.l RingPos_SKBZ2, RingPos_SKBZ1E, RingPos_SKBZ1H, RingPos_Null
 
 RingPos_GHZ1:	incbin	ringpos\ghz1.bin
 		even
@@ -9082,11 +9216,11 @@ RingPos_SBZ1E:	incbin	"ringpos\sbz1e.bin"
 		even
 RingPos_SBZ1H:	incbin	"ringpos\sbz1h.bin"
 		even
-RingPos_SBZ2:	incbin	ringpos\sbz2.bin
+RingPos_SBZ2:	incbin	"ringpos\sbz2.bin"
 		even
-RingPos_SBZ2E:	incbin	ringpos\sbz2e.bin
+RingPos_SBZ2E:	incbin	"ringpos\sbz2e.bin"
 		even
-RingPos_SBZ2H:	incbin	ringpos\sbz2h.bin
+RingPos_SBZ2H:	incbin	"ringpos\sbz2h.bin"
 		even
 RingPos_BZ1:	incbin	"ringpos\bz1.bin"
 		even
