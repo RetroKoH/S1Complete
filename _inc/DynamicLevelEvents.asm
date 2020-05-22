@@ -56,7 +56,8 @@ loc_6DC4:
 ; ---------------------------------------------------------------------------
 ; Offset index for dynamic level events
 ; ---------------------------------------------------------------------------
-DLE_Index:	dc.w DLE_GHZ-DLE_Index, DLE_LZ-DLE_Index
+DLE_Index:
+		dc.w DLE_GHZ-DLE_Index, DLE_LZ-DLE_Index
 		dc.w DLE_MZ-DLE_Index, DLE_SLZ-DLE_Index
 		dc.w DLE_SYZ-DLE_Index, DLE_SBZ-DLE_Index
 		zonewarning DLE_Index,2
@@ -68,54 +69,69 @@ DLE_Index:	dc.w DLE_GHZ-DLE_Index, DLE_LZ-DLE_Index
 
 DLE_GHZ:
 		moveq	#0,d0
-		move.b	(v_act).w,d0
+		move.b	(v_difficulty).w,d0
 		add.w	d0,d0
 		move.w	DLE_GHZx(pc,d0.w),d0
 		jmp	DLE_GHZx(pc,d0.w)
 ; ===========================================================================
-DLE_GHZx:	dc.w DLE_GHZ1-DLE_GHZx
-		dc.w DLE_GHZ2-DLE_GHZx
-		dc.w DLE_GHZ3-DLE_GHZx
+DLE_GHZx:
+		dc.w DLE_GHZN-DLE_GHZx
+		dc.w DLE_GHZE-DLE_GHZx
+		dc.w DLE_GHZN-DLE_GHZx ; For now, Hard shares with Normal
 ; ===========================================================================
 
-DLE_GHZ1:
+DLE_GHZN: ; Normal Difficulty
+		moveq	#0,d0
+		move.b	(v_act).w,d0
+		add.w	d0,d0
+		move.w	DLE_GHZNx(pc,d0.w),d0
+		jmp		DLE_GHZNx(pc,d0.w)
+; ===========================================================================
+DLE_GHZNx:
+		dc.w DLE_GHZN1-DLE_GHZNx
+		dc.w DLE_GHZN2-DLE_GHZNx
+		dc.w DLE_GHZN3-DLE_GHZNx
+; ===========================================================================
+
+DLE_GHZN1:
 		move.w	#$300,(v_limitbtm1).w ; set lower y-boundary
 		cmpi.w	#$1780,(v_screenposx).w ; has the camera reached $1780 on x-axis?
-		bcs.s	locret_6E08	; if not, branch
+		bcs.s	@ret	; if not, branch
 		move.w	#$400,(v_limitbtm1).w ; set lower y-boundary
 
-locret_6E08:
+	@ret:
 		rts	
 ; ===========================================================================
 
-DLE_GHZ2:
+DLE_GHZN2:
 		move.w	#$300,(v_limitbtm1).w
 		cmpi.w	#$ED0,(v_screenposx).w
-		bcs.s	locret_6E3A
+		bcs.s	@ret
 		move.w	#$200,(v_limitbtm1).w
 		cmpi.w	#$1600,(v_screenposx).w
-		bcs.s	locret_6E3A
+		bcs.s	@ret
 		move.w	#$400,(v_limitbtm1).w
 		cmpi.w	#$1D60,(v_screenposx).w
-		bcs.s	locret_6E3A
+		bcs.s	@ret
 		move.w	#$300,(v_limitbtm1).w
 
-locret_6E3A:
-		rts	
+	@ret:
+		rts
 ; ===========================================================================
 
-DLE_GHZ3:
+DLE_GHZN3:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
-		move.w	off_6E4A(pc,d0.w),d0
-		jmp	off_6E4A(pc,d0.w)
+		move.w	DLE_GHZN3sub(pc,d0.w),d0
+		jmp		DLE_GHZN3sub(pc,d0.w)
 ; ===========================================================================
-off_6E4A:	dc.w DLE_GHZ3main-off_6E4A
-		dc.w DLE_GHZ3boss-off_6E4A
-		dc.w DLE_GHZ3end-off_6E4A
+DLE_GHZN3sub:
+		dc.w DLE_GHZ3Nmain-DLE_GHZN3sub
+		dc.w DLE_GHZ3Nboss-DLE_GHZN3sub
+		dc.w DLE_GHZ3Nend-DLE_GHZN3sub
 ; ===========================================================================
 
-DLE_GHZ3main:
+DLE_GHZ3Nmain:
 		move.w	#$300,(v_limitbtm1).w
 		cmpi.w	#$380,(v_screenposx).w
 		bcs.s	locret_6E96
@@ -144,7 +160,7 @@ loc_6E98:
 		rts	
 ; ===========================================================================
 
-DLE_GHZ3boss:
+DLE_GHZ3Nboss:
 		cmpi.w	#$960,(v_screenposx).w
 		bcc.s	loc_6EB0
 		subq.b	#2,(v_dle_routine).w
@@ -170,10 +186,50 @@ locret_6EE8:
 		rts	
 ; ===========================================================================
 
-DLE_GHZ3end:
+DLE_GHZ3Nend:
 		move.w	(v_screenposx).w,(v_limitleft2).w
 		rts	
 ; ===========================================================================
+
+
+DLE_GHZE: ; Easy Difficulty
+		moveq	#0,d0
+		move.b	(v_act).w,d0
+		add.w	d0,d0
+		move.w	DLE_GHZEx(pc,d0.w),d0
+		jmp		DLE_GHZEx(pc,d0.w)
+; ===========================================================================
+DLE_GHZEx:
+		dc.w DLE_GHZE1-DLE_GHZEx
+		dc.w DLE_GHZE2-DLE_GHZEx
+; ===========================================================================
+
+DLE_GHZE1:
+		move.w	#$300,(v_limitbtm1).w ; set lower y-boundary
+		cmpi.w	#$1780,(v_screenposx).w ; has the camera reached $1780 on x-axis?
+		bcs.s	@ret	; if not, branch
+		move.w	#$400,(v_limitbtm1).w ; set lower y-boundary
+
+	@ret:
+		rts	
+; ===========================================================================
+
+DLE_GHZE2:
+		move.w	#$300,(v_limitbtm1).w
+		cmpi.w	#$ED0,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$200,(v_limitbtm1).w
+		cmpi.w	#$1600,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$400,(v_limitbtm1).w
+		cmpi.w	#$1D60,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$300,(v_limitbtm1).w
+
+	@ret:
+		rts
+; ===========================================================================
+
 ; ---------------------------------------------------------------------------
 ; Labyrinth Zone dynamic level events
 ; ---------------------------------------------------------------------------

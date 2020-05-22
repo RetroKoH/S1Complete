@@ -23,7 +23,7 @@ SpinC_Act1or2:
 		move.b	$2F(a0),d0
 		bpl.s	SpinC_Delete
 		andi.w	#$7F,d0
-		lea	(v_obj63).w,a2
+		lea		(v_obj63).w,a2
 		bclr	#0,(a2,d0.w)
 
 SpinC_Delete:
@@ -104,10 +104,10 @@ loc_16380:
 
 loc_1639A:
 		add.w	d0,d0
+		add.w	d0,d0
 		andi.w	#$1E,d0
-		addi.w	#ObjPosSBZPlatform_Index-ObjPos_Index,d0
-		lea	(ObjPos_Index).l,a2
-		adda.w	(a2,d0.w),a2
+		lea		(ObjPosSBZPlatform_Index).l,a2	; Next, we load the first pointer in the object layout list pointer index,
+		movea.l (a2,d0.w),a2		; Changed from adda.w to movea.l for new object layout pointers
 		move.w	(a2)+,d1
 		movea.l	a0,a1
 		bra.s	SpinC_LoadPform
@@ -118,7 +118,7 @@ SpinC_Loop:
 		bne.s	loc_163D0
 
 SpinC_LoadPform:
-		move.b	#id_SpinConvey,0(a1)
+		move.b	#id_SpinConvey,obID(a1)
 		move.w	(a2)+,obX(a1)
 		move.w	(a2)+,obY(a1)
 		move.w	(a2)+,d0

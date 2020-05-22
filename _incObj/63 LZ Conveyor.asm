@@ -6,7 +6,7 @@ LabyrinthConvey:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	LCon_Index(pc,d0.w),d1
-		jsr	LCon_Index(pc,d1.w)
+		jsr		LCon_Index(pc,d1.w)
 		out_of_range.s	loc_1236A,$30(a0)
 
 LCon_Display:
@@ -23,19 +23,20 @@ loc_12378:
 		move.b	$2F(a0),d0
 		bpl.w	DeleteObject
 		andi.w	#$7F,d0
-		lea	(v_obj63).w,a2
+		lea		(v_obj63).w,a2
 		bclr	#0,(a2,d0.w)
 		bra.w	DeleteObject
 ; ===========================================================================
-LCon_Index:	dc.w LCon_Main-LCon_Index
+LCon_Index:
+		dc.w LCon_Main-LCon_Index
 		dc.w loc_124B2-LCon_Index
 		dc.w loc_124C2-LCon_Index
 		dc.w loc_124DE-LCon_Index
 ; ===========================================================================
 
 LCon_Main:	; Routine 0
-		move.b	obSubtype(a0),d0
-		bmi.w	loc_12460
+		move.b	obSubtype(a0),d0	; $7F is the wheel. $80+ spawn platforms
+		bmi.w	LCon_PlatformsInit
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_LConv,obMap(a0)
 		move.w	#ArtNem_LZWheel2,obGfx(a0)
@@ -92,17 +93,19 @@ loc_1244C:
 		bra.w	loc_124B2
 ; ===========================================================================
 
-loc_12460:
-		move.b	d0,$2F(a0)
-		andi.w	#$7F,d0
-		lea	(v_obj63).w,a2
-		bset	#0,(a2,d0.w)
-		bne.w	DeleteObject
+LCon_PlatformsInit:
+		move.b	d0,$2F(a0)		; Move subtype to $2F
+		andi.w	#$7F,d0			; Clear most significant bit
+		lea		(v_obj63).w,a2
+		bset	#0,(a2,d0.w)	; Set the corresponding byte to 1: This set of platforms is active
+		bne.w	DeleteObject	; if this byte was already set, delete the object
 		add.w	d0,d0
+		add.w	d0,d0			; multiply by 4
 		andi.w	#$1E,d0
-		addi.w	#ObjPosLZPlatform_Index-ObjPos_Index,d0
-		lea	(ObjPos_Index).l,a2
-		adda.w	(a2,d0.w),a2
+
+		lea		(ObjPosLZPlatform_Index).l,a2	; Next, we load the first pointer in the object layout list pointer index,
+		movea.l (a2,d0.w),a2					; Changed from adda.w to movea.l for new object layout pointers
+
 		move.w	(a2)+,d1
 		movea.l	a0,a1
 		bra.s	LCon_MakePtfms
@@ -113,7 +116,7 @@ LCon_Loop:
 		bne.s	loc_124AA
 
 LCon_MakePtfms:
-		move.b	#id_LabyrinthConvey,0(a1)
+		move.b	#id_LabyrinthConvey,obID(a1)
 		move.w	(a2)+,obX(a1)
 		move.w	(a2)+,obY(a1)
 		move.w	(a2)+,d0

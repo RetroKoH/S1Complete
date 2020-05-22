@@ -160,7 +160,12 @@ Got_NextLevel:	; Routine $A
 		andi.w	#3,d1
 		add.w	d1,d1
 		add.w	d1,d0
-		move.w	LevelOrder(pc,d0.w),d0 ; load level from level order array
+		move.w	LevelOrder(pc,d0.w),d1 ; load level from level order array
+		cmpi.b	#difEasy,(v_difficulty).w	; is the game set on Easy?
+		bne.s	@skip
+		move.w	LevelOrderEasy(pc,d0.w),d1 ; load level from easy mode level order array
+	@skip:
+		move.w	d1,d0 ; load level from level order array
 		move.w	d0,(v_zone).w	; set level number
 		tst.w	d0
 		bne.s	Got_ChkSS
@@ -222,7 +227,45 @@ LevelOrder:
 		dc.b 0, 0	; Final Zone
 		dc.b 0, 0
 		even
-		zonewarning LevelOrder,8
+; ===========================================================================
+LevelOrderEasy:
+		; Green Hill Zone
+		dc.b id_GHZ, 1	; Act 1
+		dc.b id_MZ, 0	; Act 2
+		dc.b id_MZ, 0	; Act 3
+		dc.b 0, 0
+
+		; Labyrinth Zone
+		dc.b id_LZ, 1	; Act 1
+		dc.b id_SLZ, 0	; Act 2
+		dc.b id_SLZ, 0	; Act 3
+		dc.b id_SBZ, 2	; Scrap Brain Zone Act 3
+
+		; Marble Zone
+		dc.b id_MZ, 1	; Act 1
+		dc.b id_SYZ, 0	; Act 2
+		dc.b id_SYZ, 0	; Act 3
+		dc.b 0, 0
+
+		; Star Light Zone
+		dc.b id_SLZ, 1	; Act 1
+		dc.b id_SBZ, 0	; Act 2
+		dc.b id_SBZ, 0	; Act 3
+		dc.b 0, 0
+
+		; Spring Yard Zone
+		dc.b id_SYZ, 1	; Act 1
+		dc.b id_LZ, 0	; Act 2
+		dc.b id_LZ, 0	; Act 3
+		dc.b 0, 0
+
+		; Scrap Brain Zone
+		dc.b id_SBZ, 1	; Act 1
+		dc.b id_SBZ, 2	; Act 2
+		dc.b 0, 0	; Final Zone
+		dc.b 0, 0
+		even
+
 ; ===========================================================================
 
 Got_Move2:	; Routine $E

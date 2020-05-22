@@ -1921,7 +1921,7 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
-		move.b	#difHard,(v_difficulty).w
+		move.b	#difNormal,(v_difficulty).w
 
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
@@ -8936,15 +8936,16 @@ ObjPos_Index:
 ;		dc.l ObjPos_SKBZ2, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
 		; --- Put extra object data here. ---
 ObjPosLZPlatform_Index:
-		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
-		dc.w ObjPos_LZ2pf1-ObjPos_Index, ObjPos_LZ2pf2-ObjPos_Index
-		dc.w ObjPos_LZ3pf1-ObjPos_Index, ObjPos_LZ3pf2-ObjPos_Index
-		dc.w ObjPos_LZ1pf1-ObjPos_Index, ObjPos_LZ1pf2-ObjPos_Index
+		dc.l ObjPos_LZ1pf1, ObjPos_LZ1pf2
+		dc.l ObjPos_LZ2pf1, ObjPos_LZ2pf2
+		dc.l ObjPos_LZ3pf1, ObjPos_LZ3pf2
+		dc.l ObjPos_LZ1pf1, ObjPos_LZ1pf2
 ObjPosSBZPlatform_Index:
-		dc.w ObjPos_SBZ1pf1-ObjPos_Index, ObjPos_SBZ1pf2-ObjPos_Index
-		dc.w ObjPos_SBZ1pf3-ObjPos_Index, ObjPos_SBZ1pf4-ObjPos_Index
-		dc.w ObjPos_SBZ1pf5-ObjPos_Index, ObjPos_SBZ1pf6-ObjPos_Index
-		dc.w ObjPos_SBZ1pf1-ObjPos_Index, ObjPos_SBZ1pf2-ObjPos_Index
+		dc.l ObjPos_SBZ1pf1, ObjPos_SBZ1pf2
+		dc.l ObjPos_SBZ1pf3, ObjPos_SBZ1pf4
+		dc.l ObjPos_SBZ1pf5, ObjPos_SBZ1pf6
+		dc.l ObjPos_SBZ1pf1, ObjPos_SBZ1pf2
+
 		dc.b $FF, $FF, 0, 0, 0,	0
 ObjPos_GHZ1:	incbin	"objpos\ghz1.bin"
 		even
