@@ -1921,7 +1921,7 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
-		move.b	#difNormal,(v_difficulty).w
+		move.b	#difEasy,(v_difficulty).w
 
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
@@ -2812,6 +2812,7 @@ Level_ChkWaterPal:
 		moveq	#palid_SBZ3Water,d0 ; palette $D (SBZ3 underwater)
 
 	Level_WtrNotSbz:
+		add.b	(v_difficulty),d0
 		bsr.w	PalLoad4_Water
 
 Level_Delay:
@@ -6403,8 +6404,8 @@ OPL_Main:
 		move.b	(v_difficulty).w,d1
 		lsl.b	#2,d1					; difficulties are separated in multiples of 8
 		add.b	d1,d0
-		lea		(ObjPos_Index).l,a0	; Next, we load the first pointer in the object layout list pointer index,
-		movea.l	a0,a1				; then copy it for quicker use later.
+		lea		(ObjPos_Index).l,a0		; Next, we load the first pointer in the object layout list pointer index,
+		movea.l	a0,a1					; then copy it for quicker use later.
 		movea.l (a0,d0.w),a0			; Changed from adda.w to movea.l for new object layout pointers
 		; initialize each object load address with the first object in the layout
 		move.l	a0,(v_opl_data).w
@@ -8888,8 +8889,8 @@ Level_SKBZ3H:	incbin	levels\skbz3h.bin
 ObjPos_Index:
 		dc.l ObjPos_GHZ1, ObjPos_GHZ1E, ObjPos_GHZ1H, ObjPos_Null
 		dc.l ObjPos_GHZ2, ObjPos_GHZ2E, ObjPos_GHZ2H, ObjPos_Null
-		dc.l ObjPos_GHZ3, ObjPos_GHZ2E, ObjPos_GHZ3H, ObjPos_Null
-		dc.l ObjPos_GHZ1, ObjPos_GHZ1E, ObjPos_GHZ1H, ObjPos_Null
+		dc.l ObjPos_GHZ3, ObjPos_GHZ1E, ObjPos_GHZ3H, ObjPos_Null
+		dc.l ObjPos_GHZ1, ObjPos_GHZ2E, ObjPos_GHZ1H, ObjPos_Null
 
 		dc.l ObjPos_LZ1, ObjPos_LZ1E, ObjPos_LZ1H, ObjPos_Null
 		dc.l ObjPos_LZ2, ObjPos_LZ2E, ObjPos_LZ2H, ObjPos_Null

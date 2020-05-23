@@ -14,18 +14,21 @@ GlassBlock:
 Glass_Delete:
 		bra.w	DeleteObject
 ; ===========================================================================
-Glass_Index:	dc.w Glass_Main-Glass_Index
+Glass_Index:
+		dc.w Glass_Main-Glass_Index
 		dc.w Glass_Block012-Glass_Index
 		dc.w Glass_Reflect012-Glass_Index
 		dc.w Glass_Block34-Glass_Index
 		dc.w Glass_Reflect34-Glass_Index
 
-glass_dist:	equ $32		; distance block moves when switch is pressed
+glass_dist:		equ $32		; distance block moves when switch is pressed
 glass_parent:	equ $3C		; address of parent object
 
-Glass_Vars1:	dc.b 2,	0, 0	; routine num, y-axis dist from	origin,	frame num
+Glass_Vars1:
+		dc.b 2,	0, 0	; routine num, y-axis dist from	origin,	frame num
 		dc.b 4,	0, 1
-Glass_Vars2:	dc.b 6,	0, 2
+Glass_Vars2:
+		dc.b 6,	0, 2
 		dc.b 8,	0, 1
 ; ===========================================================================
 
@@ -122,7 +125,8 @@ Glass_Types:
 ; End of function Glass_Types
 
 ; ===========================================================================
-Glass_TypeIndex:dc.w Glass_Type00-Glass_TypeIndex
+Glass_TypeIndex:
+		dc.w Glass_Type00-Glass_TypeIndex
 		dc.w Glass_Type01-Glass_TypeIndex
 		dc.w Glass_Type02-Glass_TypeIndex
 		dc.w Glass_Type03-Glass_TypeIndex
