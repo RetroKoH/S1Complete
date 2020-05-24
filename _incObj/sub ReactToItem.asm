@@ -299,7 +299,17 @@ React_ChkHurt:
 
 	@chkInv:
 		btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
-		beq.s	HurtSonic							; if not, branch
+		bne.s	@ret								; if yes, branch
+		cmpi.b	#$54,obID(a1)						; iis this the lava tag?
+		bne.s	HurtSonic 							; Branch to standard HurtSonic
+		cmpi.b	#difHard,(v_difficulty).w			; is this hard difficulty?
+		beq.s	HurtSonic2							; if yes, enable spike bug behavior
+		tst.b	(v_player+obInvuln).w				; +++ is Sonic invulnerable?
+		bne.s	@ret								; +++ if yes, branch
+		bra.s	HurtSonic							; if not, branch to standard routine
+
+		;btst	#stsInvinc,(v_status_secondary).w	; does Sonic have invincibility?
+		;beq.s	HurtSonic							; if not, branch
 
 	@ret:
 		moveq	#-1,d0

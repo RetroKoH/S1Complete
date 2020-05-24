@@ -19,7 +19,7 @@ saw_here:	equ $3D		; flag set when the ground saw appears
 Saw_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Saw,obMap(a0)
-		move.w	#$43B5,obGfx(a0)
+		move.w	#ArtNem_SBZCutter,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$200,obPriority(a0)
 		move.b	#$20,obActWid(a0)

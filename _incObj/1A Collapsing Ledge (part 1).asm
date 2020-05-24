@@ -37,9 +37,9 @@ Ledge_Touch:	; Routine 2
 
 	@slope:
 		move.w	#$30,d1
-		lea	(Ledge_SlopeData).l,a2
+		lea		(Ledge_SlopeData).l,a2
 		bsr.w	SlopeObject
-		bra.w	RememberState
+		jmp		RememberState
 ; ===========================================================================
 
 Ledge_Collapse:	; Routine 4
