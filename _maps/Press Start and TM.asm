@@ -1,49 +1,86 @@
 ; ---------------------------------------------------------------------------
 ; Sprite mappings - "PRESS START BUTTON" and "TM" from title screen
+; Now includes menu
 ; ---------------------------------------------------------------------------
-Map_PSB_internal:
-		dc.w byte_A7CD-Map_PSB_internal
-		dc.w M_PSB_PSB-Map_PSB_internal
-		dc.w M_PSB_Limiter-Map_PSB_internal
-		dc.w M_PSB_TM-Map_PSB_internal
-M_PSB_PSB:	dc.b 6			; "PRESS START BUTTON"
-byte_A7CD:	dc.b 0,	$C, 0, $F0, 0
-		dc.b 0,	0, 0, $F3, $20
-		dc.b 0,	0, 0, $F3, $30
-		dc.b 0,	$C, 0, $F4, $38
-		dc.b 0,	8, 0, $F8, $60
-		dc.b 0,	8, 0, $FB, $78
-M_PSB_Limiter:	dc.b $1E		; sprite line limiter
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $B8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $D8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-		dc.b $F8, $F, 0, 0, $80
-M_PSB_TM:	dc.b 1			; "TM"
-		dc.b $FC, 4, 0,	0, $F8
-		even
+Map_PSB:	mappingsTable
+	mappingsTableEntry.w	byte_A7CD
+	mappingsTableEntry.w	M_PSB_PSB
+	mappingsTableEntry.w	M_PSB_Limiter
+	mappingsTableEntry.w	M_PSB_TM
+	mappingsTableEntry.w	M_PSB_STARTGAME
+	mappingsTableEntry.w	M_PSB_OPTIONS
+	mappingsTableEntry.w	M_PSB_LEVELSELECT
+
+M_PSB_PSB:	spriteHeader
+byte_A7CD:spritePiece	0, 0, 4, 1, $F0, 0, 0, 0, 0
+	spritePiece	$20, 0, 1, 1, $F3, 0, 0, 0, 0
+	spritePiece	$30, 0, 1, 1, $F3, 0, 0, 0, 0
+	spritePiece	$38, 0, 4, 1, $F4, 0, 0, 0, 0
+	spritePiece	$60, 0, 3, 1, $F8, 0, 0, 0, 0
+	spritePiece	$78, 0, 3, 1, $FB, 0, 0, 0, 0
+M_PSB_PSB_End
+
+M_PSB_Limiter:	spriteHeader
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$48, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -$28, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+	spritePiece	-$80, -8, 4, 4, 0, 0, 0, 0, 0
+M_PSB_Limiter_End
+
+M_PSB_TM:	spriteHeader
+	spritePiece	-8, -4, 2, 1, 0, 0, 0, 0, 0
+M_PSB_TM_End
+
+M_PSB_STARTGAME:	spriteHeader ; $4C
+        spritePiece	$10, -8, 2, 1, $348, 0, 0, 0, 0
+        spritePiece	$28, -8, 1, 1, $F3, 0, 0, 0, 0
+	spritePiece	$30, -8, 4, 1, $F4, 0, 0, 0, 0
+	spritePiece	$58, -8, 4, 1, $333, 0, 0, 0, 0
+	spritePiece	$28, 8, 4, 1, $337, 0, 0, 0, 0
+	spritePiece	$43, 8, 3, 1, $33B, 0, 0, 0, 0
+M_PSB_STARTGAME_End
+
+M_PSB_OPTIONS:	spriteHeader
+        spritePiece	$10, 8, 2, 1, $348, 0, 0, 0, 0
+        spritePiece	$28, -8, 1, 1, $F3, 0, 0, 0, 0
+	spritePiece	$30, -8, 4, 1, $F4, 0, 0, 0, 0
+	spritePiece	$58, -8, 4, 1, $333, 0, 0, 0, 0
+	spritePiece	$28, 8, 4, 1, $337, 0, 0, 0, 0
+	spritePiece	$43, 8, 3, 1, $33B, 0, 0, 0, 0
+M_PSB_OPTIONS_End
+
+M_PSB_LEVELSELECT:	spriteHeader
+        spritePiece	$10, -8, 2, 1, $348, 0, 0, 0, 0
+        spritePiece	$28, -8, 4, 1, $33E, 0, 0, 0, 0
+	spritePiece	$48, -8, 1, 1, $33E, 0, 0, 0, 0
+	spritePiece	$58, -8, 4, 1, $342, 0, 0, 0, 0
+	spritePiece	$78,-8, 2, 1, $346, 0, 0, 0, 0
+M_PSB_LEVELSELECT_End
+
+	even

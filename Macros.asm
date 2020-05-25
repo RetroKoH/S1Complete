@@ -324,3 +324,9 @@ zonewarning:	macro loc,elementsize
 		inform 1,"Size of \loc ($%h) does not match ZoneCount ($\#ZoneCount).",(@end-loc)/elementsize
 		endc
 		endm
+
+; Menu text
+menutxt:	macro	text
+	dc.b	strlen(text)-1
+	dc.b	text
+	endm

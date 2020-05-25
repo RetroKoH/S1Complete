@@ -335,8 +335,9 @@ GameInit:
 
 MainGameLoop:
 		move.b	(v_gamemode).w,d0		; load Game Mode
-		andi.w	#$1C,d0					; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
-		jsr		GameModeArray(pc,d0.w)	; jump to apt location in ROM
+		andi.w	#$7C,d0					; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
+		movea.l	GameModeArray(pc,d0.w),a0
+		jsr		(a0)					; jump to apt location in ROM
 		bra.s	MainGameLoop			; loop indefinitely
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -345,23 +346,16 @@ MainGameLoop:
 
 GameModeArray:
 
-ptr_GM_Sega:	bra.w	GM_Sega		; Sega Screen ($00)
-
-ptr_GM_Title:	bra.w	GM_Title	; Title	Screen ($04)
-
-ptr_GM_Demo:	bra.w	GM_Level	; Demo Mode ($08)
-
-ptr_GM_Level:	bra.w	GM_Level	; Normal Level ($0C)
-
-ptr_GM_Special:	bra.w	GM_Special	; Special Stage	($10)
-
-ptr_GM_Cont:	bra.w	GM_Continue	; Continue Screen ($14)
-
-ptr_GM_Ending:	bra.w	GM_Ending	; End of game sequence ($18)
-
-ptr_GM_Credits:	bra.w	GM_Credits	; Credits ($1C)
-
-		rts	
+ptr_GM_Sega:		dc.l	GM_Sega			; Sega Screen ($00)
+ptr_GM_Title:		dc.l	GM_Title		; Title	Screen ($04)
+ptr_GM_Demo:		dc.l	GM_Level		; Demo Mode ($08)
+ptr_GM_Level:		dc.l	GM_Level		; Normal Level ($0C)
+ptr_GM_Special:		dc.l	GM_Special		; Special Stage	($10)
+ptr_GM_Cont:		dc.l	GM_Continue		; Continue Screen ($14)
+ptr_GM_Ending:		dc.l	GM_Ending		; End of game sequence ($18)
+ptr_GM_Credits:		dc.l	GM_Credits		; Credits ($1C)
+ptr_GM_BonusStage:	dc.l	GM_Level		; Bonus Stage ($20)
+ptr_GM_MenuScreen:	dc.l	GM_Title		; NEW Sonic 2 style Level Select or Time Attack ($24)
 ; ===========================================================================
 
 CheckSumError:
@@ -1921,7 +1915,7 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
-		move.b	#difHard,(v_difficulty).w
+		;move.b	#difHard,(v_difficulty).w
 
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
@@ -1993,6 +1987,9 @@ GM_Title:
 		locVRAM	$A200
 		lea	(Nem_TitleTM).l,a0 ; load "TM" patterns
 		bsr.w	NemDec
+		locVRAM	$A660
+		lea	(Nem_TitleMenu).l,a0 ; load Title Menu patterns
+		bsr.w	NemDec
 		lea	(vdp_data_port).l,a6
 		locVRAM	$D000,4(a6)
 		lea	(Art_Text).l,a5	; load level select font
@@ -2035,7 +2032,7 @@ GM_Title:
 		bsr.w	PalLoad1
 		moveq	#palid_Title,d0	; load title screen palette
 		bsr.w	PalLoad1
-		sfx	bgm_Title,0,1,1	; play title screen music
+		sfx		bgm_Title,0,1,1	; play title screen music
 		move.b	#0,(f_debugmode).w ; disable debug mode
 		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
 
@@ -2067,80 +2064,53 @@ GM_Title:
 Tit_MainLoop:
 		move.b	#4,(v_vbla_routine).w
 		bsr.w	WaitForVBla
-		jsr	(ExecuteObjects).l
+		jsr		(ExecuteObjects).l
 		bsr.w	DeformLayers
-		jsr	(BuildSprites).l
+		jsr		(BuildSprites).l
 		bsr.w	PCycle_Title
 		bsr.w	RunPLC
 		move.w	(v_objspace+obX).w,d0
 		addq.w	#2,d0
 		move.w	d0,(v_objspace+obX).w ; move Sonic to the right
-		cmpi.w	#$1C00,d0	; has Sonic object passed $1C00 on x-axis?
-		blo.s	Tit_EnterCheat	; if not, branch
 
-		move.b	#id_Sega,(v_gamemode).w ; go to Sega screen
-		rts	
-; ===========================================================================
+		cmpi.b	#4,(v_objspace+$80+obRoutine).w
+		beq.s	@nodemo
 
-Tit_EnterCheat:
-		lea		(LevSelCode).l,a0 ; load US code
-		move.w	(v_title_dcount).w,d0
-		adda.w	d0,a0
-		move.b	(v_jpadpress1).w,d0 ; get button press
-		andi.b	#btnDir,d0	; read only UDLR buttons
-		cmp.b	(a0),d0		; does button press match the cheat code?
-		bne.s	Tit_ResetCheat	; if not, branch
-		addq.w	#1,(v_title_dcount).w ; next button press
-		tst.b	d0
-		bne.s	Tit_CountC
-		lea	(f_levselcheat).w,a0
-		move.w	(v_title_ccount).w,d1
-		lsr.w	#1,d1
-		andi.w	#3,d1
-		beq.s	Tit_PlayRing
-		tst.b	(v_megadrive).w
-		bpl.s	Tit_PlayRing
-		moveq	#1,d1
-		move.b	d1,1(a0,d1.w)	; cheat depends on how many times C is pressed
+		tst.w	(v_demolength).w	; has the timer counted down to 0?
+		beq.w	GotoDemo		; if yes, go to the demo
 
-	Tit_PlayRing:
-		move.b	#1,(a0,d1.w)	; activate cheat
-		sfx	sfx_Ring,0,1,1	; play ring sound when code is entered
-		bra.s	Tit_CountC
-; ===========================================================================
-
-Tit_ResetCheat:
-		tst.b	d0
-		beq.s	Tit_CountC
-		cmpi.w	#9,(v_title_dcount).w
-		beq.s	Tit_CountC
-		move.w	#0,(v_title_dcount).w ; reset UDLR counter
-
-Tit_CountC:
-		move.b	(v_jpadpress1).w,d0
-		andi.b	#btnC,d0	; is C button pressed?
-		beq.s	loc_3230	; if not, branch
-		addq.w	#1,(v_title_ccount).w ; increment C counter
-
-loc_3230:
-		tst.w	(v_demolength).w
-		beq.w	GotoDemo
+	@nodemo:
 		andi.b	#btnStart,(v_jpadpress1).w ; check if Start is pressed
 		beq.w	Tit_MainLoop	; if not, branch
 
-Tit_ChkLevSel:
-		tst.b	(f_levselcheat).w ; check if level select code is on
-		beq.w	PlayLevel	; if not, play level
-		btst	#bitA,(v_jpadhold1).w ; check if A is pressed
-		beq.w	PlayLevel	; if not, play level
+Tit_ChkMenu:
+		cmpi.b	#1,(v_objspace+$80+obFrame).w
+		bgt.w	Tit_MenuChoice
+		move.b	#4,(v_objspace+$80+obRoutine).w
+		moveq	#sfx_Lamppost,d0
+		jsr		PlaySound
+		bra.s	Tit_MainLoop
 
+Tit_MenuChoice:
+		moveq	#0,d0
+		move.b	(v_objspace+$80+obTitleOption).w,d0
+		bne.s	Tit_ChkOptions
+		bra.w	PlayLevel	; if not, play level
+
+Tit_ChkOptions:
+		subq	#1,d0
+		beq.s	Tit_GoToOptions
+		move.b	#id_MenuScreen,(v_gamemode).w
+		jmp		MainGameLoop
+
+Tit_GoToOptions:
 		moveq	#palid_LevelSel,d0
 		bsr.w	PalLoad2	; load level select palette
 		lea	(v_hscrolltablebuffer).w,a1
 		moveq	#0,d0
 		move.w	#$DF,d1
 
-	Tit_ClrScroll1:
+Tit_ClrScroll1:
 		move.l	d0,(a1)+
 		dbf	d1,Tit_ClrScroll1 ; clear scroll data (in RAM)
 
@@ -2150,116 +2120,62 @@ Tit_ChkLevSel:
 		locVRAM	$E000
 		move.w	#$3FF,d1
 
-	Tit_ClrScroll2:
+Tit_ClrScroll2:
 		move.l	d0,(a6)
-		dbf	d1,Tit_ClrScroll2 ; clear scroll data (in VRAM)
-
-		bsr.w	LevSelTextLoad
+		dbf	d1,Tit_ClrScroll2	; clear scroll data (in VRAM)
+		move.b  #$81,d0			; Play music during the Level Select Screen
+		jsr 	PlaySound
+		bsr.w	OptionsTextLoad
 
 ; ---------------------------------------------------------------------------
-; Level	Select
+; Options Menu - Replacing the previous Level Select Menu
 ; ---------------------------------------------------------------------------
 
-LevelSelect:
-		move.b	#2,(v_vbla_routine).w ; Fix Level Select Screen
+OptionMenu:
+		move.b	#2,(v_vbla_routine).w	; Fix Level Select/Option Screen
 		bsr.w	WaitForVBla
-		bsr.w	LevSelControls
+		bsr.w	OptionControls
 		bsr.w	RunPLC
 		tst.l	(v_plc_buffer).w
-		bne.s	LevelSelect
-		andi.b	#btnABC+btnStart,(v_jpadpress1).w ; is A, B, C, or Start pressed?
-		beq.s	LevelSelect	; if not, branch
+		bne.s	OptionMenu
+; New code starts
 		move.w	(v_levselitem).w,d0
-		cmpi.w	#$14,d0		; have you selected item $14 (sound test)?
-		bne.s	LevSel_Level_SS	; if not, go to	Level/SS subroutine
+		cmpi.b	#$12,d0					; have you selected either item $12 or $14 (START or RESET)?
+		bge.s	Option_CheckBack		; if yes, go to	check start button subroutine
+		cmpi.b	#$10,d0					; Are you on the sound test menu?
+		bne.s	OptionMenu				; if not, do nothing.
+		cmpi.b	#btnB,(v_jpadpress1).w 	; is B pressed?
+		beq.s	Option_BCPress			; if not, branch
+		cmpi.b	#btnC,(v_jpadpress1).w	; is C pressed?
+		beq.s	Option_BCPress			; if not, branch
+		bra.s	OptionMenu
+; ===========================================================================
+
+Option_CheckBack:			; XREF: OptionMenu
+		andi.b	#btnStart,(v_jpadpress1).w	; is Start pressed?
+		beq.s	OptionMenu			; if not, branch and go back
+		cmpi.b	#$12,d0
+		bne.s	@reset
+		bra.w	PlayLevel
+
+	@reset:
+		clr.b	(v_gamemode).w
+		jmp		MainGameLoop			; go to sega screen
+
+Option_BCPress:				; XREF: OptionMenu
 		move.w	(v_levselsound).w,d0
 		addi.w	#$80,d0
-		tst.b	(f_creditscheat).w ; is Japanese Credits cheat on?
-		beq.s	LevSel_NoCheat	; if not, branch
-		cmpi.w	#$9F,d0		; is sound $9F being played?
-		beq.s	LevSel_Ending	; if yes, branch
-		cmpi.w	#$9E,d0		; is sound $9E being played?
-		beq.s	LevSel_Credits	; if yes, branch
-
-LevSel_NoCheat:
 		; This is a workaround for a bug, see Sound_ChkValue for more.
 		; Once you've fixed the bugs there, comment these four instructions out
 		cmpi.w	#bgm__Last+1,d0	; is sound $80-$93 being played?
-		blo.s	LevSel_PlaySnd	; if yes, branch
+		blo.s	Option_PlaySnd	; if yes, branch
 		cmpi.w	#sfx__First,d0	; is sound $94-$9F being played?
-		blo.s	LevelSelect	; if yes, branch
+		blo.s	OptionMenu	; if yes, branch
 
-LevSel_PlaySnd:
+Option_PlaySnd:
 		bsr.w	PlaySound_Special
-		bra.s	LevelSelect
+		bra.s	OptionMenu
 ; ===========================================================================
-
-LevSel_Ending:
-		move.b	#id_Ending,(v_gamemode).w ; set screen mode to $18 (Ending)
-		move.w	#(id_EndZ<<8),(v_zone).w ; set level to 0600 (Ending)
-		rts	
-; ===========================================================================
-
-LevSel_Credits:
-		move.b	#id_Credits,(v_gamemode).w ; set screen mode to $1C (Credits)
-		sfx	bgm_Credits,0,1,1 ; play credits music
-		move.w	#0,(v_creditsnum).w
-		rts	
-; ===========================================================================
-
-LevSel_Level_SS:
-		add.w	d0,d0
-		move.w	LevSel_Ptrs(pc,d0.w),d0 ; load level number
-
-		bmi.w	LevelSelect
-		cmpi.w	#id_SS*$100,d0	; check	if level is 0700 (Special Stage)
-		bne.s	LevSel_Level	; if not, branch
-		move.b	#id_Special,(v_gamemode).w ; set screen mode to $10 (Special Stage)
-		clr.w	(v_zone).w	; clear	level
-		move.b	#3,(v_lives).w	; set lives to 3
-		cmpi.b	#difEasy,(v_difficulty).w
-		bne.s	@clear
-		move.b	#5,(v_lives).w	; set lives to 5
-	@clear:
-		moveq	#0,d0
-		move.w	d0,(v_rings).w	; clear rings
-		move.l	d0,(v_time).w	; clear time
-		move.l	d0,(v_score).w	; clear score
-		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		rts	
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Level	select - level pointers
-; ---------------------------------------------------------------------------
-LevSel_Ptrs:
-		; correct level order
-		dc.b id_GHZ, 0
-		dc.b id_GHZ, 1
-		dc.b id_GHZ, 2
-		dc.b id_MZ, 0
-		dc.b id_MZ, 1
-		dc.b id_MZ, 2
-		dc.b id_SYZ, 0
-		dc.b id_SYZ, 1
-		dc.b id_SYZ, 2
-		dc.b id_LZ, 0
-		dc.b id_LZ, 1
-		dc.b id_LZ, 2
-		dc.b id_SLZ, 0
-		dc.b id_SLZ, 1
-		dc.b id_SLZ, 2
-		dc.b id_SBZ, 0
-		dc.b id_SBZ, 1
-		dc.b id_LZ, 3
-		dc.b id_SBZ, 2
-		dc.b id_SS, 0		; Special Stage
-		dc.w $8000		; Sound Test
-		even
-; ===========================================================================
-
-LevSel_Level:
-		andi.w	#$3FFF,d0
-		move.w	d0,(v_zone).w	; set level number
 
 PlayLevel:
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
@@ -2267,6 +2183,7 @@ PlayLevel:
 		cmpi.b	#difEasy,(v_difficulty).w
 		bne.s	@clear
 		move.b	#5,(v_lives).w	; set lives to 5
+
 	@clear:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
@@ -2313,7 +2230,7 @@ loc_33B6:
 
 loc_33E4:
 		andi.b	#btnStart,(v_jpadpress1).w ; is Start button pressed?
-		bne.w	Tit_ChkLevSel	; if yes, branch
+		bne.w	Tit_ChkMenu	; if yes, branch
 		tst.w	(v_demolength).w
 		bne.w	loc_33B6
 		sfx	bgm_Fade,0,1,1 ; fade out music
@@ -2341,6 +2258,7 @@ Demo_Level:
 		cmpi.b	#difEasy,(v_difficulty).w
 		bne.s	@clear
 		move.b	#5,(v_lives).w	; set lives to 5
+
 	@clear:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
@@ -2356,98 +2274,174 @@ Demo_Levels:	incbin	"misc\Demo Level Order - Intro.bin"
 		even
 
 ; ---------------------------------------------------------------------------
-; Subroutine to	change what you're selecting in the level select
+; Subroutine to	change what you're selecting in the options menu
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-LevSelControls:
+OptionControls:
 		move.b	(v_jpadpress1).w,d1
-		andi.b	#btnUp+btnDn,d1	; is up/down pressed and held?
-		bne.s	LevSel_UpDown	; if yes, branch
-		subq.w	#1,(v_levseldelay).w ; subtract 1 from time to next move
-		bpl.s	LevSel_SndTest	; if time remains, branch
+		andi.b	#btnUp+btnDn,d1			; is up/down pressed and held?
+		bne.s	@upDown					; if yes, branch
+		subq.w	#1,(v_levseldelay).w	; subtract 1 from time to next move
+		bpl.s	Option_GameMode			; if time remains, branch
 
-LevSel_UpDown:
+	@upDown:
 		move.w	#$B,(v_levseldelay).w ; reset time delay
 		move.b	(v_jpadhold1).w,d1
-		andi.b	#btnUp+btnDn,d1	; is up/down pressed?
-		beq.s	LevSel_SndTest	; if not, branch
+		andi.b	#btnUp+btnDn,d1		; is up/down pressed?
+		beq.s	Option_GameMode		; if not, branch
 		move.w	(v_levselitem).w,d0
-		btst	#bitUp,d1	; is up	pressed?
-		beq.s	LevSel_Down	; if not, branch
-		subq.w	#1,d0		; move up 1 selection
-		bhs.s	LevSel_Down
-		moveq	#$14,d0		; if selection moves below 0, jump to selection	$14
+		btst	#bitUp,d1			; is up	pressed?
+		beq.s	@down				; if not, branch
+		subq.w	#2,d0				; move up 1 selection
+		bhs.s	@down
+		moveq	#$14,d0				; if selection moves below 0, jump to selection	$14
 
-LevSel_Down:
-		btst	#bitDn,d1	; is down pressed?
-		beq.s	LevSel_Refresh	; if not, branch
-		addq.w	#1,d0		; move down 1 selection
+	@down:
+		btst	#bitDn,d1			; is down pressed?
+		beq.s	@refresh			; if not, branch
+		addq.w	#2,d0				; move down 1 selection
 		cmpi.w	#$15,d0
-		blo.s	LevSel_Refresh
-		moveq	#0,d0		; if selection moves above $14,	jump to	selection 0
+		blo.s	@refresh
+		moveq	#0,d0				; if selection moves above $14,	jump to	selection 0
 
-LevSel_Refresh:
+	@refresh:
 		move.w	d0,(v_levselitem).w ; set new selection
-		bsr.w	LevSelTextLoad	; refresh text
-		rts	
+		bra.w	OptionsTextLoad		; refresh text	
 ; ===========================================================================
 
-LevSel_SndTest:
-		cmpi.w	#$14,(v_levselitem).w ; is item $14 selected?
-		bne.s	LevSel_NoMove	; if not, branch
+Option_GameMode:
+		tst.w	(v_levselitem).w	; is item 0 selected? (Game Mode)
+		bne.s	Option_Difficulty	; if not, branch
 		move.b	(v_jpadpress1).w,d1
-		andi.b	#btnR+btnL,d1	; is left/right	pressed?
-		beq.s	LevSel_NoMove	; if not, branch
+		andi.b	#btnR+btnL,d1		; is left/right pressed?
+		beq.s	@ret
+
+		move.b	(v_optgamemode).w,d0
+		btst	#bitL,d1			; is left pressed?
+		beq.s	@right				; if not, branch
+		subq.b	#1,d0				; subtract 1
+		bcc.s	@right				; if act is above, or equal to 0, branch and skip.
+		moveq	#3,d0				; if selection moves below 0, set to 3 (COMPLETE)
+
+	@right:
+		btst	#bitR,d1			; is right pressed?
+		beq.s	@refresh			; if not, branch
+		addq.b	#1,d0				; add 1	to sound test
+		cmpi.b	#4,d0
+		bcs.s	@refresh
+		moveq	#0,d0				; if value moves above 3, set to 0
+
+	@refresh:
+		move.b	d0,(v_optgamemode).w	; set value
+		bsr.w	OptionsTextLoad			; refresh text
+
+	@ret:
+		rts
+; ===========================================================================
+
+Option_Difficulty:
+		cmpi.w	#6,(v_levselitem).w	; is Difficulty Options selected?
+		bne.s	Option_Monitors		; if not, branch
+		move.b	(v_jpadpress1).w,d1
+		andi.b	#btnR+btnL,d1		; is left/right pressed?
+		beq.s	@ret				; if not, branch
+
+		move.b	(v_difficulty).w,d0
+		btst	#bitL,d1			; is left pressed?
+		beq.s	@right				; if not, branch
+		subq.b	#1,d0				; subtract 1 from difficulty setting
+		bcc.s	@right				; if act is above, or equal to 0, branch and skip.
+		moveq	#2,d0				; if selection moves below 0, set to 2 (HARD)
+
+	@right:
+		btst	#bitR,d1			; is right pressed?
+		beq.s	@refresh			; if not, branch
+		addq.b	#1,d0				; add 1	to difficulty setting
+		cmpi.b	#3,d0
+		bcs.s	@refresh
+		moveq	#0,d0				; if value moves above 2, set to 0 (NORMAL)
+
+	@refresh:
+		move.b	d0,(v_difficulty).w	; set value
+		bra.w	OptionsTextLoad		; refresh text
+
+	@ret:
+		rts
+; ===========================================================================
+
+Option_Monitors:
+		cmpi.w	#8,(v_levselitem).w	; is Monitor Options selected?
+		bne.s	Option_SndTest		; if not, branch
+		move.b	(v_jpadpress1).w,d1
+		andi.b	#btnR+btnL,d1		; is left/right pressed?
+		beq.s	@ret				; if not, branch
+		move.b  (f_optmonitor).w,d0	; load monitor variable
+		eori.b	#1,d0				; toggle monitor flag
+		move.b  d0,(f_optmonitor).w	; set variable
+		bra.w	OptionsTextLoad		; refresh text
+
+	@ret:
+		rts
+; ===========================================================================
+
+Option_SndTest:
+		cmpi.w	#$10,(v_levselitem).w	; is item $14 selected?
+		bne.s	@ret					; if not, branch
+		move.b	(v_jpadpress1).w,d1
+		andi.b	#btnR+btnL,d1			; is left/right	pressed?
+		beq.s	@ret					; if not, branch
 		move.w	(v_levselsound).w,d0
-		btst	#bitL,d1	; is left pressed?
-		beq.s	LevSel_Right	; if not, branch
-		subq.w	#1,d0		; subtract 1 from sound	test
-		bhs.s	LevSel_Right
-		moveq	#$4F,d0		; if sound test	moves below 0, set to $4F
+		btst	#bitL,d1				; is left pressed?
+		beq.s	@right					; if not, branch
+		subq.w	#1,d0					; subtract 1 from sound	test
+		bhs.s	@right
+		moveq	#$4F,d0					; if sound test	moves below 0, set to $4F
 
-LevSel_Right:
-		btst	#bitR,d1	; is right pressed?
-		beq.s	LevSel_Refresh2	; if not, branch
-		addq.w	#1,d0		; add 1	to sound test
+	@right:
+		btst	#bitR,d1		; is right pressed?
+		beq.s	@refresh		; if not, branch
+		addq.w	#1,d0			; add 1	to sound test
 		cmpi.w	#$50,d0
-		blo.s	LevSel_Refresh2
-		moveq	#0,d0		; if sound test	moves above $4F, set to	0
+		blo.s	@refresh
+		moveq	#0,d0			; if sound test	moves above $4F, set to	0
 
-LevSel_Refresh2:
-		move.w	d0,(v_levselsound).w ; set sound test number
-		bsr.w	LevSelTextLoad	; refresh text
+	@refresh:
+		move.w	d0,(v_levselsound).w	; set sound test number
+		bsr.w	OptionsTextLoad			; refresh text
 
-LevSel_NoMove:
+	@ret:
 		rts	
-; End of function LevSelControls
+; End of function OptionControls
 
 ; ---------------------------------------------------------------------------
-; Subroutine to load level select text
+; Subroutine to load Option Menu Text
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-LevSelTextLoad:
+OptionsTextLoad:
 
-	textpos:	= ($40000000+(($E210&$3FFF)<<16)+(($E210&$C000)>>14))
+		textpos:	= ($40000000+(($E210&$3FFF)<<16)+(($E210&$C000)>>14))
 					; $E210 is a VRAM address
 
-		lea	(LevelMenuText).l,a1
-		lea	(vdp_data_port).l,a6
+		lea		(OptionMenuText).l,a1
+		lea		(vdp_data_port).l,a6
 		move.l	#textpos,d4	; text position on screen
 		move.w	#$E680,d3	; VRAM setting (4th palette, $680th tile)
 		moveq	#$14,d1		; number of lines of text
 
-	LevSel_DrawAll:
+; DRAW STATIC TEXT LOADED FROM ROM. NEED TO ADD DYNAMIC TEXT HERE, AND HIGHLIGHT LATER BELOW
+Options_DrawAll:
 		move.l	d4,4(a6)
-		bsr.w	LevSel_ChgLine	; draw line of text
+		bsr.w	Options_ChgLine	; draw line of text
 		addi.l	#$800000,d4	; jump to next line
-		dbf	d1,LevSel_DrawAll
+		dbf		d1,Options_DrawAll
 
+; AFTER MAIN LINES ARE DRAWN, CONTINUE HIGHLIGHTING THE SELECTED LINE YELLOW
 		moveq	#0,d0
 		move.w	(v_levselitem).w,d0
 		move.w	d0,d1
@@ -2455,7 +2449,7 @@ LevSelTextLoad:
 		lsl.w	#7,d0
 		swap	d0
 		add.l	d0,d4
-		lea	(LevelMenuText).l,a1
+		lea		(OptionMenuText).l,a1
 		lsl.w	#3,d1
 		move.w	d1,d0
 		add.w	d1,d1
@@ -2463,70 +2457,195 @@ LevSelTextLoad:
 		adda.w	d1,a1
 		move.w	#$C680,d3	; VRAM setting (3rd palette, $680th tile)
 		move.l	d4,4(a6)
-		bsr.w	LevSel_ChgLine	; recolour selected line
-		move.w	#$E680,d3
-		cmpi.w	#$14,(v_levselitem).w
-		bne.s	LevSel_DrawSnd
-		move.w	#$C680,d3
+		bsr.w	Options_ChgLine	; recolour selected line
 
-LevSel_DrawSnd:
-		locVRAM	$EC30		; sound test position on screen
+; Add options text dynamically
+
+; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+
+Options_DrawMode:
+		locVRAM	$E230			; Game Mode Text position
+		moveq	#0,d0
+		move.b	(v_optgamemode).w,d0
+		lsl.w	#2,d0
+		lea 	(ModeText).l,a2
+		adda.l	d0,a2
+		movea.l (a2),a1
+		moveq 	#7,d2
+		bsr.w	Options_LineLoop	; draw letters
+
+Options_DrawPlayer:
+		locVRAM	$E330			; Player Mode Text position
+		moveq	#0,d0
+		move.b	(v_playermode).w,d0
+		lsl.w	#2,d0
+		lea 	(CharText).l,a2
+		adda.l	d0,a2
+		movea.l (a2),a1
+		moveq 	#6,d2
+		bsr.w	Options_LineLoop	; draw letters
+
+Options_DrawDifficulty:
+		locVRAM	$E530			; Difficulty Text position
+		moveq	#0,d0
+		move.b	(v_difficulty).w,d0
+		lsl.w	#2,d0
+		lea 	(DifficultyText).l,a2
+		adda.l	d0,a2
+		movea.l (a2),a1
+		moveq 	#5,d2
+		bsr.w	Options_LineLoop	; draw letters
+
+Options_DrawMonitors:
+		locVRAM	$E630			; Monitor Text position
+		moveq	#0,d0
+		move.b	(f_optmonitor).w,d0
+		lsl.w	#2,d0
+		lea 	(MonitorText).l,a2
+		adda.l	d0,a2
+		movea.l (a2),a1
+		moveq 	#7,d2
+		bsr.w	Options_LineLoop	; draw letters
+
+Options_DrawSnd: ; Dynamically draw the sound ID
+		locVRAM	$EA30		; sound test position on screen
 		move.w	(v_levselsound).w,d0
-		addi.w	#$80,d0
 		move.b	d0,d2
 		lsr.b	#4,d0
-		bsr.w	LevSel_ChgSnd	; draw 1st digit
+		bsr.s	Options_ChgSnd	; draw 1st digit
 		move.b	d2,d0
-		bsr.w	LevSel_ChgSnd	; draw 2nd digit
-		rts	
-; End of function LevSelTextLoad
+		;bsr.s	Options_ChgSnd	; draw 2nd digit
+		;rts
+; End of function OptionsTextLoad
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-LevSel_ChgSnd:
+Options_ChgSnd:
 		andi.w	#$F,d0
 		cmpi.b	#$A,d0		; is digit $A-$F?
-		blo.s	LevSel_Numb	; if not, branch
-		addi.b	#7,d0		; use alpha characters
+		blo.s	@number		; if not, branch
+		addi.b	#4,d0		; use alpha characters
 
-	LevSel_Numb:
+	@number:
 		add.w	d3,d0
 		move.w	d0,(a6)
 		rts	
-; End of function LevSel_ChgSnd
+; End of function Options_ChgSnd
 
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 
-LevSel_ChgLine:
+Options_ChgLine:
 		moveq	#$17,d2		; number of characters per line
 
-	LevSel_LineLoop:
+Options_LineLoop: ; THIS IS MERELY CHANGED TO ACCOMODATE FOR THE NEW ASCII SETUP BY SOULLESSSENTINEL
 		moveq	#0,d0
 		move.b	(a1)+,d0	; get character
-		bpl.s	LevSel_CharOk	; branch if valid
+		bpl.s	Options_CharOk	; branch if valid
 		move.w	#0,(a6)		; use blank character
-		dbf	d2,LevSel_LineLoop
-		rts	
+		dbf	d2,Options_LineLoop
+		rts
 
+Options_CharOk:
+		cmp.w	#$40,d0		; Check for $40 (End of ASCII number area)
+		blt.s	@notText	; If this is not an ASCII text character, branch
+		sub.w	#$3,d0		; Subtract an extra 3 (Compensate for missing characters in the font)
 
-	LevSel_CharOk:
+	@notText:
+		sub.w	#$30,d0		; Subtract #$33 (Convert to S2 font from ASCII)
 		add.w	d3,d0		; combine char with VRAM setting
 		move.w	d0,(a6)		; send to VRAM
-		dbf	d2,LevSel_LineLoop
-		rts	
-; End of function LevSel_ChgLine
+		dbf		d2,Options_LineLoop
+		rts
+; End of function Options_ChgLine
 
 ; ===========================================================================
+
+OptionsTextData:
+
+ModeText:
+		dc.l	ModeText_Classic
+		dc.l	ModeText_Original
+		dc.l	ModeText_Handheld
+		dc.l	ModeText_Complete
+CharText:
+		dc.l	CharText_Sonic
+		dc.l	CharText_Tails
+DifficultyText:
+		dc.l	DifficultyText_Norm
+		dc.l	DifficultyText_Easy
+		dc.l	DifficultyText_Hard
+MonitorText:
+		dc.l	MonitorText_S1
+		dc.l	MonitorText_S3K
+
 ; ---------------------------------------------------------------------------
-; Level	select menu text
+; Level	select menu text - Easier editing thanks to SoullessSentinel
 ; ---------------------------------------------------------------------------
-LevelMenuText:
-		incbin	"misc\Level Select Text.bin"
+OptionMenuText:
+		;incbin	"misc\Level Select Text.bin"
+		dc.b "GAME MODE               " ; Dictates levels, emeralds... etc.
+		dc.b "                        " ; ORIGINAL, MASTER SYSTEM, COMPLETE
+		dc.b "CHARACTER               "
+		dc.b "                        " ; SONIC, TAILS, KNUCKLES, MIGHTY, AMY, METAL
+		dc.b "ABILITES                "
+		dc.b "                        " ; BASIC, COMPLETE
+		dc.b "DIFFICULTY              " ; LAYOUTS AND GAMEPLAY
+		dc.b "                        " ; CASUAL, NORMAL, EXPERT
+		dc.b "MONITORS                " ; SHIELD MONITOR SETTING
+		dc.b "                        " ; CLASSIC, SONIC 3K, RANDOM
+		dc.b "EMERALD COUNT           " ; TOTAL EMERALD SETTING
+		dc.b "                        " ; 6 EMERALDS/7 EMERALDS - 7 EMERALDS=SUPER SONIC
+		dc.b "ZONE MUSIC              "
+		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
+		dc.b "SUPER MUSIC             "
+		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
+		dc.b "SOUND TEST              "
+		dc.b "                        " ; FAST ZONE MUSIC, INVINCIBILITY, SONIC 2 JINGLE
+		dc.b "START GAME              "
+		dc.b "                        "
+		dc.b "RESET TO TITLE SCREEN   "
 		even
+
+; ---------------------------------------------------------------------------
+; Mode select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+ModeText_Classic:	dc.b "CLASSIC " ; Normal Sonic 1
+ModeText_Original:	dc.b "ORIGINAL" ; Original (Beta) Sonic 1
+ModeText_Handheld:	dc.b "HANDHELD" ; 8-bit Sonic 1
+ModeText_Complete:	dc.b "COMPLETE" ; 8x16 (Complete)
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Player select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+CharText_Sonic:		dc.b "SONIC   "
+CharText_Tails:		dc.b "TAILS   "
+CharText_Knuckles:	dc.b "KNUCKLES"
+CharText_Mighty:	dc.b "MIGHTY  "
+CharText_Ray:		dc.b "RAY     "
+CharText_Amy:		dc.b "AMY     "
+CharText_Metal:		dc.b "METAL   "
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Difficulty select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+DifficultyText_Norm:	dc.b "NORMAL"
+DifficultyText_Easy:	dc.b "CASUAL"
+DifficultyText_Hard:	dc.b "EXPERT"
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Difficulty select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+MonitorText_S1:		dc.b "ORIGINAL"
+MonitorText_S3K:	dc.b "S1/S3K  "
+; ===========================================================================
+
 ; ---------------------------------------------------------------------------
 ; Music	playlist
 ; ---------------------------------------------------------------------------
@@ -8179,14 +8298,24 @@ Nem_TitleSonic:	incbin	"artnem\Title Screen Sonic.bin"
 		even
 Nem_TitleTM:	incbin	"artnem\Title Screen TM.bin"
 		even
+Nem_TitleMenu:	incbin	"artnem\Title Screen Menu.bin"
+		even
 Eni_JapNames:	incbin	"tilemaps\Hidden Japanese Credits.bin" ; Japanese credits (mappings)
 		even
 Nem_JapNames:	incbin	"artnem\Hidden Japanese Credits.bin"
 		even
-
-
-
-
+Eni_MenuBack:	incbin	"tilemaps\SONIC MILES animated background.bin"
+		even
+Art_MenuBack:	incbin	"artunc\SONIC MILES background art.bin"
+		even
+Nem_MenuStuff:	incbin	"artnem\Level Select Font.bin"
+		even
+Eni_LevSel:		incbin	"tilemaps\Level Select.bin"
+		even
+Eni_LevSelIcons:	incbin	"tilemaps\Level Select Icons.bin"
+		even
+Nem_LevSelIcons:	incbin	"artnem\Level Select Icons.bin"
+		even
 
 ; ---------------------------------------------------------------------------
 ; Sprite Mappings
