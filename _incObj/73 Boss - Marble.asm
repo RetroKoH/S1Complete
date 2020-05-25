@@ -6,9 +6,10 @@ BossMarble:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Obj73_Index(pc,d0.w),d1
-		jmp	Obj73_Index(pc,d1.w)
+		jmp		Obj73_Index(pc,d1.w)
 ; ===========================================================================
-Obj73_Index:	dc.w Obj73_Main-Obj73_Index
+Obj73_Index:
+		dc.w Obj73_Main-Obj73_Index
 		dc.w Obj73_ShipMain-Obj73_Index
 		dc.w Obj73_FaceMain-Obj73_Index
 		dc.w Obj73_FlameMain-Obj73_Index
@@ -31,25 +32,29 @@ Obj73_ObjData:	; routine number, animation
 ; ===========================================================================
 
 Obj73_Main:	; Routine 0
-		move.w	obX(a0),$30(a0)
-		move.w	obY(a0),$38(a0)
+		move.w	obX(a0),obBossBufferX(a0)
+		move.w	obY(a0),obBossBufferY(a0)
 		move.b	#$F,obColType(a0)
 		move.b	#8,obColProp(a0) ; set number of hits to 8
-		lea	Obj73_ObjData(pc),a2
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@notEasy
+		move.b	#6,obColProp(a0)			; set number of hits to 6 for Easy Mode
+	@notEasy:
+		lea		Obj73_ObjData(pc),a2
 		movea.l	a0,a1
 		moveq	#3,d1
 		bra.s	Obj73_LoadBoss
 ; ===========================================================================
 
 Obj73_Loop:
-		jsr	(FindNextFreeObj).l
+		jsr		(FindNextFreeObj).l
 		bne.s	Obj73_ShipMain
 		move.b	#id_BossMarble,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
 Obj73_LoadBoss:
-		bclr	#0,obStatus(a0)
+		bclr	#staFacing,obStatus(a0)
 		clr.b	ob2ndRout(a1)
 		move.b	(a2)+,obRoutine(a1)
 		move.b	(a2)+,obAnim(a1)
@@ -58,83 +63,103 @@ Obj73_LoadBoss:
 		move.w	#ArtNem_Eggman,obGfx(a1)
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
-		move.l	a0,$34(a1)
-		dbf	d1,Obj73_Loop	; repeat sequence 3 more times
+		move.l	a0,obBossParent(a1)
+		dbf		d1,Obj73_Loop	; repeat sequence 3 more times
 
 Obj73_ShipMain:	; Routine 2
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
 		move.w	Obj73_ShipIndex(pc,d0.w),d1
-		jsr	Obj73_ShipIndex(pc,d1.w)
-		lea	(Ani_Eggman).l,a1
-		jsr	(AnimateSprite).l
+		jsr		Obj73_ShipIndex(pc,d1.w)
+		lea		(Ani_Eggman).l,a1
+		jsr		(AnimateSprite).l
 		moveq	#3,d0
 		and.b	obStatus(a0),d0
 		andi.b	#$FC,obRender(a0)
 		or.b	d0,obRender(a0)
-		jmp	(DisplaySprite).l
+		jmp		(DisplaySprite).l
 ; ===========================================================================
-Obj73_ShipIndex:dc.w loc_18302-Obj73_ShipIndex
-		dc.w loc_183AA-Obj73_ShipIndex
-		dc.w loc_184F6-Obj73_ShipIndex
-		dc.w loc_1852C-Obj73_ShipIndex
-		dc.w loc_18582-Obj73_ShipIndex
+Obj73_ShipIndex:
+					dc.w BMZ_ShipStart-Obj73_ShipIndex
+					dc.w loc_183AA-Obj73_ShipIndex
+ptr_BMZ_Defeat:		dc.w BMZ_ShipExplode-Obj73_ShipIndex
+					dc.w BMZ_AfterExplosions-Obj73_ShipIndex
+					dc.w BMZ_Retreat-Obj73_ShipIndex
+
+id_BMZDefeated: 	equ ptr_BMZ_Defeat-Obj73_ShipIndex
 ; ===========================================================================
 
-loc_18302:
-		move.b	$3F(a0),d0
-		addq.b	#2,$3F(a0)
-		jsr	(CalcSine).l
+BMZ_ShipStart:
+		move.b	obBossHoverValue(a0),d0
+		addq.b	#2,obBossHoverValue(a0)
+		jsr		(CalcSine).l
 		asr.w	#2,d0
 		move.w	d0,obVelY(a0)
 		move.w	#-$100,obVelX(a0)
 		bsr.w	BossMove
-		cmpi.w	#$1910,$30(a0)
+		cmpi.w	#$1910,obBossBufferX(a0)
 		bne.s	loc_18334
 		addq.b	#2,ob2ndRout(a0)
 		clr.b	obSubtype(a0)
 		clr.l	obVelX(a0)
 
 loc_18334:
-		jsr	(RandomNumber).l
+		jsr		(RandomNumber).l
 		move.b	d0,$34(a0)
 
 loc_1833E:
-		move.w	$38(a0),obY(a0)
-		move.w	$30(a0),obX(a0)
-		cmpi.b	#4,ob2ndRout(a0)
-		bcc.s	locret_18390
-		tst.b	obStatus(a0)
-		bmi.s	loc_18392
-		tst.b	obColType(a0)
-		bne.s	locret_18390
-		tst.b	$3E(a0)
-		bne.s	loc_18374
-		move.b	#$28,$3E(a0)
-		sfx	sfx_HitBoss,0,0,0	; play boss damage sound
+		move.w	obBossBufferY(a0),obY(a0)
+		move.w	obBossBufferX(a0),obX(a0)
 
-loc_18374:
-		lea	(v_pal_dry+$22).w,a1
-		moveq	#0,d0
+		cmpi.b	#id_BMZDefeated,ob2ndRout(a0)	; Has Eggman already been defeated?
+		bcc.s	locret_18390					; if yes, branch
+		tst.b	obStatus(a0)					; Did Eggman take the final hit?
+		bmi.s	BMZ_Defeat						; if yes, branch to adding points and setting routine
+		tst.b	obColType(a0)					; can the boss be hit?
+		bne.s	locret_18390					; if yes, branch
+		tst.b	obBossFlashTime(a0)				; if not, is the boss flashing?
+		bne.s	BMZ_ShipFlash					; if yes, branch
+		move.b	#$28,obBossFlashTime(a0)		; set number of	frames for ship to flash
+		sfx		sfx_HitBoss,0,0,0				; play boss damage sound
+
+BMZ_ShipFlash:
+		lea		(v_pal_dry+$22).w,a1		; load 2nd pallet, 2nd entry
+		moveq	#0,d0						; move 0 (black) to d0
 		tst.w	(a1)
 		bne.s	loc_18382
-		move.w	#cWhite,d0
+		move.w	#cWhite,d0					; move 0EEE (white) to d0
 
 loc_18382:
-		move.w	d0,(a1)
-		subq.b	#1,$3E(a0)
-		bne.s	locret_18390
-		move.b	#$F,obColType(a0)
+		move.w	d0,(a1)						; load colour stored in	d0
+		subq.b	#1,obBossFlashTime(a0)		; decrement flash timer
+		bne.s	locret_18390				; if time remains, branch
+		move.b	#$F,obColType(a0)			; otherwise, make the boss vulnerable to damage again
 
 locret_18390:
 		rts	
 ; ===========================================================================
 
-loc_18392:
+BMZ_Defeat:
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@noPinchMode
+		tst.b	obBossPinchMode(a0)
+		bne.s	@noPinchMode
+		bclr	#7,obStatus(a0)
+		bset	#0,obBossPinchMode(a0)
+		move.b	#4,obColProp(a0)
+		music	bgm_Speedup,0,0,0		; speed	up the music
+		rts
+
+	@noPinchMode:
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@skipMusic
+		music	bgm_Slowdown,0,0,0		; slow down the music
+
+	@skipMusic:
 		moveq	#100,d0
 		bsr.w	AddPoints
 		move.b	#4,ob2ndRout(a0)
-		move.w	#$B4,$3C(a0)
+		move.w	#$B4,obBossDelayTimer(a0)
 		clr.w	obVelX(a0)
 		rts	
 ; ===========================================================================
@@ -143,7 +168,7 @@ loc_183AA:
 		moveq	#0,d0
 		move.b	obSubtype(a0),d0
 		move.w	off_183C2(pc,d0.w),d0
-		jsr	off_183C2(pc,d0.w)
+		jsr		off_183C2(pc,d0.w)
 		andi.b	#6,obSubtype(a0)
 		bra.w	loc_1833E
 ; ===========================================================================
@@ -157,7 +182,7 @@ loc_183CA:
 		tst.w	obVelX(a0)
 		bne.s	loc_183FE
 		moveq	#$40,d0
-		cmpi.w	#$22C,$38(a0)
+		cmpi.w	#$22C,obBossBufferY(a0)
 		beq.s	loc_183E6
 		bcs.s	loc_183DE
 		neg.w	d0
@@ -205,21 +230,21 @@ loc_1844A:
 loc_1845C:
 		btst	#0,obStatus(a0)
 		beq.s	loc_18474
-		cmpi.w	#$1910,$30(a0)
+		cmpi.w	#$1910,obBossBufferX(a0)
 		blt.s	locret_1849C
-		move.w	#$1910,$30(a0)
+		move.w	#$1910,obBossBufferX(a0)
 		bra.s	loc_18482
 ; ===========================================================================
 
 loc_18474:
-		cmpi.w	#$1830,$30(a0)
+		cmpi.w	#$1830,obBossBufferX(a0)
 		bgt.s	locret_1849C
-		move.w	#$1830,$30(a0)
+		move.w	#$1830,obBossBufferX(a0)
 
 loc_18482:
 		clr.w	obVelX(a0)
 		move.w	#-$180,obVelY(a0)
-		cmpi.w	#$22C,$38(a0)
+		cmpi.w	#$22C,obBossBufferY(a0)
 		bcc.s	loc_18498
 		neg.w	obVelY(a0)
 
@@ -232,25 +257,25 @@ locret_1849C:
 
 Obj73_MakeLava2:
 		bsr.w	BossMove
-		move.w	$38(a0),d0
+		move.w	obBossBufferY(a0),d0
 		subi.w	#$22C,d0
 		bgt.s	locret_184F4
 		move.w	#$22C,d0
 		tst.w	obVelY(a0)
 		beq.s	loc_184EA
 		clr.w	obVelY(a0)
-		move.w	#$50,$3C(a0)
+		move.w	#$50,obBossDelayTimer(a0)
 		bchg	#0,obStatus(a0)
 		jsr	(FindFreeObj).l
 		bne.s	loc_184EA
-		move.w	$30(a0),obX(a1)
-		move.w	$38(a0),obY(a1)
+		move.w	obBossBufferX(a0),obX(a1)
+		move.w	obBossBufferY(a0),obY(a1)
 		addi.w	#$18,obY(a1)
 		move.b	#id_BossFire,obID(a1)	; load lava ball object
 		move.b	#1,obSubtype(a1)
 
 loc_184EA:
-		subq.w	#1,$3C(a0)
+		subq.w	#1,obBossDelayTimer(a0)
 		bne.s	locret_184F4
 		addq.b	#2,obSubtype(a0)
 
@@ -258,18 +283,18 @@ locret_184F4:
 		rts	
 ; ===========================================================================
 
-loc_184F6:
-		subq.w	#1,$3C(a0)
+BMZ_ShipExplode:
+		subq.w	#1,obBossDelayTimer(a0)
 		bmi.s	loc_18500
 		bra.w	BossDefeated
 ; ===========================================================================
 
 loc_18500:
-		bset	#0,obStatus(a0)
+		bset	#staFacing,obStatus(a0)
 		bclr	#7,obStatus(a0)
 		clr.w	obVelX(a0)
 		addq.b	#2,ob2ndRout(a0)
-		move.w	#-$26,$3C(a0)
+		move.w	#-$26,obBossDelayTimer(a0)
 		tst.b	(v_bossstatus).w
 		bne.s	locret_1852A
 		move.b	#1,(v_bossstatus).w
@@ -279,11 +304,11 @@ locret_1852A:
 		rts	
 ; ===========================================================================
 
-loc_1852C:
-		addq.w	#1,$3C(a0)
+BMZ_AfterExplosions:
+		addq.w	#1,obBossDelayTimer(a0)
 		beq.s	loc_18544
 		bpl.s	loc_1854E
-		cmpi.w	#$270,$38(a0)
+		cmpi.w	#$270,obBossBufferY(a0)
 		bcc.s	loc_18544
 		addi.w	#$18,obVelY(a0)
 		bra.s	loc_1857A
@@ -291,15 +316,15 @@ loc_1852C:
 
 loc_18544:
 		clr.w	obVelY(a0)
-		clr.w	$3C(a0)
+		clr.w	obBossDelayTimer(a0)
 		bra.s	loc_1857A
 ; ===========================================================================
 
 loc_1854E:
-		cmpi.w	#$30,$3C(a0)
+		cmpi.w	#$30,obBossDelayTimer(a0)
 		bcs.s	loc_18566
 		beq.s	loc_1856C
-		cmpi.w	#$38,$3C(a0)
+		cmpi.w	#$38,obBossDelayTimer(a0)
 		bcs.s	loc_1857A
 		addq.b	#2,ob2ndRout(a0)
 		bra.s	loc_1857A
@@ -319,7 +344,8 @@ loc_1857A:
 		bra.w	loc_1833E
 ; ===========================================================================
 
-loc_18582:
+BMZ_Retreat:
+;		move.b	#$F,obColType(a0)			; make the boss vulnerable to damage again
 		move.w	#$500,obVelX(a0)
 		move.w	#-$40,obVelY(a0)
 		cmpi.w	#$1960,(v_limitright2).w

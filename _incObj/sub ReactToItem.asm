@@ -214,8 +214,8 @@ React_Enemy:
 
 		neg.w	obVelX(a0)	; repel Sonic
 		neg.w	obVelY(a0)
-		asr	obVelX(a0)
-		asr	obVelY(a0)
+		asr		obVelX(a0)
+		asr		obVelY(a0)
 		clr.b	obColType(a1)
 		subq.b	#1,obColProp(a1)
 		bne.s	@flagnotclear

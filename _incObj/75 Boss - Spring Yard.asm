@@ -6,9 +6,10 @@ BossSpringYard:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Obj75_Index(pc,d0.w),d1
-		jmp	Obj75_Index(pc,d1.w)
+		jmp		Obj75_Index(pc,d1.w)
 ; ===========================================================================
-Obj75_Index:	dc.w Obj75_Main-Obj75_Index
+Obj75_Index:
+		dc.w Obj75_Main-Obj75_Index
 		dc.w Obj75_ShipMain-Obj75_Index
 		dc.w Obj75_FaceMain-Obj75_Index
 		dc.w Obj75_FlameMain-Obj75_Index
@@ -35,17 +36,22 @@ Obj75_Main:	; Routine 0
 		move.w	obX(a0),$30(a0)
 		move.w	obY(a0),$38(a0)
 		move.b	#$F,obColType(a0)
-		move.b	#8,obColProp(a0) ; set number of hits to 8
-		lea	Obj75_ObjData(pc),a2
+		move.b	#8,obColProp(a0)	; set number of hits to 8
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@notEasy
+		move.b	#6,obColProp(a0)	; set number of hits to 6 for Easy Mode
+
+	@notEasy:
+		lea		Obj75_ObjData(pc),a2
 		movea.l	a0,a1
 		moveq	#3,d1
 		bra.s	Obj75_LoadBoss
 ; ===========================================================================
 
 Obj75_Loop:
-		jsr	(FindNextFreeObj).l
+		jsr		(FindNextFreeObj).l
 		bne.s	Obj75_ShipMain
-		move.b	#id_BossSpringYard,(a1)
+		move.b	#id_BossSpringYard,obID(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 
@@ -60,27 +66,31 @@ Obj75_LoadBoss:
 		move.b	#4,obRender(a1)
 		move.b	#$20,obActWid(a1)
 		move.l	a0,$34(a1)
-		dbf	d1,Obj75_Loop	; repeat sequence 3 more times
+		dbf		d1,Obj75_Loop	; repeat sequence 3 more times
 
 Obj75_ShipMain:	; Routine 2
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
 		move.w	Obj75_ShipIndex(pc,d0.w),d1
-		jsr	Obj75_ShipIndex(pc,d1.w)
-		lea	(Ani_Eggman).l,a1
-		jsr	(AnimateSprite).l
+		jsr		Obj75_ShipIndex(pc,d1.w)
+		lea		(Ani_Eggman).l,a1
+		jsr		(AnimateSprite).l
 		moveq	#3,d0
 		and.b	obStatus(a0),d0
 		andi.b	#$FC,obRender(a0)
 		or.b	d0,obRender(a0)
-		jmp	(DisplaySprite).l
+		jmp		(DisplaySprite).l
 ; ===========================================================================
-Obj75_ShipIndex:dc.w loc_191CC-Obj75_ShipIndex,	loc_19270-Obj75_ShipIndex
-		dc.w loc_192EC-Obj75_ShipIndex,	loc_19474-Obj75_ShipIndex
-		dc.w loc_194AC-Obj75_ShipIndex,	loc_194F2-Obj75_ShipIndex
+Obj75_ShipIndex:
+		dc.w BSYZ_ShipStart-Obj75_ShipIndex
+		dc.w loc_19270-Obj75_ShipIndex
+		dc.w loc_192EC-Obj75_ShipIndex
+		dc.w BSYZ_ShipExplode-Obj75_ShipIndex
+		dc.w BSYZ_AfterExplosions-Obj75_ShipIndex
+		dc.w BSYZ_Retreat-Obj75_ShipIndex
 ; ===========================================================================
 
-loc_191CC:
+BSYZ_ShipStart:
 		move.w	#-$100,obVelX(a0)
 		cmpi.w	#$2D38,$30(a0)
 		bcc.s	loc_191DE
@@ -106,7 +116,7 @@ loc_19202:
 		cmpi.b	#6,ob2ndRout(a0)
 		bcc.s	locret_19256
 		tst.b	obStatus(a0)
-		bmi.s	loc_19258
+		bmi.s	BSYZ_Defeat
 		tst.b	obColType(a0)
 		bne.s	locret_19256
 		tst.b	$3E(a0)
@@ -131,11 +141,27 @@ locret_19256:
 		rts	
 ; ===========================================================================
 
-loc_19258:
+BSYZ_Defeat:
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@noPinchMode
+		tst.b	obBossPinchMode(a0)
+		bne.s	@noPinchMode
+		bclr	#7,obStatus(a0)
+		bset	#0,obBossPinchMode(a0)
+		move.b	#4,obColProp(a0)
+		music	bgm_Speedup,0,0,0		; speed	up the music
+		rts
+
+	@noPinchMode:
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@skipMusic
+		music	bgm_Slowdown,0,0,0		; slow down the music
+
+	@skipMusic:
 		moveq	#100,d0
 		bsr.w	AddPoints
 		move.b	#6,ob2ndRout(a0)
-		move.w	#$B4,$3C(a0)
+		move.w	#$B4,obBossDelayTimer(a0)
 		clr.w	obVelX(a0)
 		rts	
 ; ===========================================================================
@@ -371,8 +397,8 @@ locret_19472:
 
 ; ===========================================================================
 
-loc_19474:
-		subq.w	#1,$3C(a0)
+BSYZ_ShipExplode:
+		subq.w	#1,obBossDelayTimer(a0)
 		bmi.s	loc_1947E
 		bra.w	BossDefeated
 ; ===========================================================================
@@ -380,10 +406,10 @@ loc_19474:
 loc_1947E:
 		addq.b	#2,ob2ndRout(a0)
 		clr.w	obVelY(a0)
-		bset	#0,obStatus(a0)
+		bset	#staFacing,obStatus(a0)
 		bclr	#7,obStatus(a0)
 		clr.w	obVelX(a0)
-		move.w	#-1,$3C(a0)
+		move.w	#-1,obBossDelayTimer(a0)
 		tst.b	(v_bossstatus).w
 		bne.s	loc_194A8
 		move.b	#1,(v_bossstatus).w
@@ -392,8 +418,8 @@ loc_194A8:
 		bra.w	loc_19202
 ; ===========================================================================
 
-loc_194AC:
-		addq.w	#1,$3C(a0)
+BSYZ_AfterExplosions:
+		addq.w	#1,obBossDelayTimer(a0)
 		beq.s	loc_194BC
 		bpl.s	loc_194C2
 		addi.w	#$18,obVelY(a0)
@@ -428,7 +454,8 @@ loc_194EE:
 		bra.w	loc_191F2
 ; ===========================================================================
 
-loc_194F2:
+BSYZ_Retreat:
+;		move.b	#$F,obColType(a0)			; make the boss vulnerable to damage again
 		move.w	#$400,obVelX(a0)
 		move.w	#-$40,obVelY(a0)
 		cmpi.w	#$2D40,(v_limitright2).w

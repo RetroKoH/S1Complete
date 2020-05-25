@@ -173,6 +173,16 @@ obPlatformID:	equ $3D	; ost slot of the object Sonic's on top of
 obLRLock:		equ $3E	; flag for preventing left and right input
 obSize:			equ $40
 
+; Object Variables used by bosses
+obSLZBossPinchMode:	equ $29
+obBossPinchMode:	equ $2E
+obBossBufferX:		equ $30
+obBossParent:		equ $34
+obBossBufferY:		equ $38
+obBossDelayTimer:	equ $3C
+obBossFlashTime:	equ $3E
+obBossHoverValue:	equ $3F
+
 ; Ralakimus Subsprite SSTs
 mainspr_mapframe = $B
 mainspr_width = $E

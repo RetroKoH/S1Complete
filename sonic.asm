@@ -7390,12 +7390,12 @@ BossDefeated:
 		move.b	(v_vbla_byte).w,d0
 		andi.b	#7,d0
 		bne.s	locret_178A2
-		jsr	(FindFreeObj).l
+		jsr		(FindFreeObj).l
 		bne.s	locret_178A2
-		move.b	#id_ExplosionBomb,0(a1)	; load explosion object
+		move.b	#id_ExplosionBomb,obID(a1)	; load explosion object
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
-		jsr	(RandomNumber).l
+		jsr		(RandomNumber).l
 		move.w	d0,d1
 		moveq	#0,d1
 		move.b	d0,d1
@@ -7411,25 +7411,21 @@ locret_178A2:
 ; End of function BossDefeated
 
 ; ---------------------------------------------------------------------------
-; Subroutine to	move a boss
+; Subroutine to	move a boss (Similar to SpeedToPos, but for boss' buffer variables)
+; Optimized by applying speed to the pos directly, instead of to d2 and d3.
 ; ---------------------------------------------------------------------------
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
-
 BossMove:
-		move.l	$30(a0),d2
-		move.l	$38(a0),d3
-		move.w	obVelX(a0),d0
+		move.w	obVelX(a0),d0			; load horizontal speed
 		ext.l	d0
-		asl.l	#8,d0
-		add.l	d0,d2
-		move.w	obVelY(a0),d0
+		lsl.l	#8,d0					; multiply speed by $100
+		add.l	d0,obBossBufferX(a0)	; add to buffer x-position
+		move.w	obVelY(a0),d0			; load vertical	speed
 		ext.l	d0
-		asl.l	#8,d0
-		add.l	d0,d3
-		move.l	d2,$30(a0)
-		move.l	d3,$38(a0)
+		lsl.l	#8,d0					; multiply by $100
+		add.l	d0,obBossBufferY(a0)	; add to buffer y-position
 		rts	
 ; End of function BossMove
 
@@ -8078,6 +8074,10 @@ AddPoints:
 		cmp.l   (a3),d1 ; is score below 999999?
 		bhi.s   @belowmax ; if yes, branch
 		move.l  d1,(a3) ; reset score to 999999
+
+		cmpi.b	#difHard,(v_difficulty).w
+		beq.s	@noextralife
+
 	@belowmax:
 		move.l  (a3),d0
 		cmp.l   (v_scorelife).w,d0 ; has Sonic got 50000+ points?

@@ -8,7 +8,8 @@ BossStarLight:
 		move.w	Obj7A_Index(pc,d0.w),d1
 		jmp	Obj7A_Index(pc,d1.w)
 ; ===========================================================================
-Obj7A_Index:	dc.w Obj7A_Main-Obj7A_Index
+Obj7A_Index:
+		dc.w Obj7A_Main-Obj7A_Index
 		dc.w Obj7A_ShipMain-Obj7A_Index
 		dc.w Obj7A_FaceMain-Obj7A_Index
 		dc.w Obj7A_FlameMain-Obj7A_Index
@@ -27,7 +28,12 @@ Obj7A_Main:
 		move.w	obX(a0),$30(a0)
 		move.w	obY(a0),$38(a0)
 		move.b	#$F,obColType(a0)
-		move.b	#8,obColProp(a0) ; set number of hits to 8
+		move.b	#8,obColProp(a0)	; set number of hits to 8
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@notEasy
+		move.b	#6,obColProp(a0)	; set number of hits to 6 for Easy Mode
+
+	@notEasy:
 		lea	Obj7A_ObjData(pc),a2
 		movea.l	a0,a1
 		moveq	#3,d1
@@ -125,7 +131,7 @@ loc_189FE:
 		cmpi.b	#6,ob2ndRout(a0)
 		bcc.s	locret_18A44
 		tst.b	obStatus(a0)
-		bmi.s	loc_18A46
+		bmi.s	BSLZ_Defeat
 		tst.b	obColType(a0)
 		bne.s	locret_18A44
 		tst.b	$3E(a0)
@@ -150,11 +156,27 @@ locret_18A44:
 		rts	
 ; ===========================================================================
 
-loc_18A46:
+BSLZ_Defeat:
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@noPinchMode
+		tst.b	obSLZBossPinchMode(a0)
+		bne.s	@noPinchMode
+		bclr	#7,obStatus(a0)
+		bset	#0,obSLZBossPinchMode(a0)
+		move.b	#4,obColProp(a0)
+		music	bgm_Speedup,0,0,0		; speed	up the music
+		rts
+
+	@noPinchMode:
+		cmpi.b	#difHard,(v_difficulty).w
+		bne.s	@skipMusic
+		music	bgm_Slowdown,0,0,0		; slow down the music
+
+	@skipMusic:
 		moveq	#100,d0
 		bsr.w	AddPoints
 		move.b	#6,ob2ndRout(a0)
-		move.b	#$78,$3C(a0)
+		move.b	#$78,obBossDelayTimer(a0)
 		clr.w	obVelX(a0)
 		rts	
 ; ===========================================================================
@@ -181,7 +203,7 @@ loc_18A88:
 		move.w	8(a0),d0
 		moveq	#-1,d1
 		moveq	#2,d2
-		lea	$2A(a0),a2
+		lea		$2A(a0),a2
 		moveq	#$28,d4
 		tst.w	obVelX(a0)
 		bpl.s	loc_18A9E
