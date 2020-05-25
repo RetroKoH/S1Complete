@@ -206,7 +206,7 @@ Touch_Rings_Done:
 
 Touch_Ring_AttractRing:
 		movea.l	a1,a3
-		jsr	FindFreeObj
+		jsr		FindFreeObj
 		bne.w	@noring
 		move.b	#id_RingLoss,obID(a1)	; Create attracted ring in the location of the ring in the Ring Manager
 		move.b	#$A,obRoutine(a1)		; Set routine to Attracted Ring
