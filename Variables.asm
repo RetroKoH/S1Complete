@@ -24,6 +24,8 @@ VDP_Command_Buffer:			equ $FFFFC800	; Buffer for DMA Queue replacing the old art
 VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slot for a queued VDP command
 
 ; $FFFFC900-CAFF - UNUSED
+v_boss_start_x:			equ $FFFFCA00
+v_boss_start_y:			equ $FFFFCA04
 
 v_tracksonic:			equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)

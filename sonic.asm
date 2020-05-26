@@ -1917,7 +1917,7 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
-		;move.b	#difHard,(v_difficulty).w
+		move.b	#difEasy,(v_difficulty).w
 
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
@@ -3547,6 +3547,7 @@ Level_StartGame:
 		move.b	#1,(f_level_started).w ; LEVEL START FLAG
 	@demo:
 		bclr	#7,(v_gamemode).w ; subtract $80 from mode to end pre-level stuff
+		move.b	#1,(f_debugmode).w ; enable debug mode
 
 ; ---------------------------------------------------------------------------
 ; Main level loop (when	all title card and loading sequences are finished)
@@ -3732,10 +3733,15 @@ SyncEnd:
 
 
 EndofActLoad:			; XREF: GM_Level
-		cmpi.b	#2,(v_act).w	; is act number 02 (act 3)?
-		beq.s	@exit		; if yes, branch
-		tst.w	(v_debuguse).w	; is debug mode	being used?
-		bne.w	@exit		; if yes, branch
+		cmpi.b	#2,(v_act).w				; is act number 02 (act 3)?
+		beq.s	@exit						; if yes, branch
+		cmpi.b	#difEasy,(v_difficulty).w	; is this easy mode?
+		bne.s	@notEasy
+		cmpi.b	#1,(v_act).w				; is act number 01 (act 2)?
+		beq.s	@exit						; if yes, branch
+	@notEasy:
+		tst.w	(v_debuguse).w		; is debug mode	being used?
+		bne.w	@exit				; if yes, branch
 		move.w	(v_screenposx).w,d0
 		move.w	(v_limitright2).w,d1
 		subi.w	#$100,d1
@@ -3842,7 +3848,7 @@ GM_Special:
 		subq.b	#1,(v_btnpushtime2).w
 		clr.w	(v_rings).w
 		clr.b	(v_lifecount).w
-		move.w	#0,(v_debuguse).w
+		clr.w	(v_debuguse).w
 		move.w	#1800,(v_demolength).w
 		tst.b	(f_debugcheat).w ; has debug cheat been entered?
 		beq.s	SS_NoDebug	; if not, branch

@@ -50,7 +50,9 @@ BGHZ_LoadBoss:
 
 BGHZ_InitVars:
 		move.w	obX(a0),obBossBufferX(a0)	; set starting x-pos to $30
+		move.w	obX(a0),(v_boss_start_x).w	; new variable for positioning purposes between layouts (Difficulties, Boss Rush, etc.)
 		move.w	obY(a0),obBossBufferY(a0)	; set starting y-pos to $38
+		move.w	obY(a0),(v_boss_start_y).w	; new variable for positioning purposes between layouts (Difficulties, Boss Rush, etc.)
 		move.b	#$F,obColType(a0)
 		move.b	#8,obColProp(a0)			; set number of hits to 8
 		cmpi.b	#difEasy,(v_difficulty).w
@@ -86,7 +88,10 @@ id_BGHZDefeated: 	equ ptr_BGHZ_Defeat-BGHZ_ShipIndex
 BGHZ_ShipStart:		; Sub-Routine 0
 		move.w	#$100,obVelY(a0)			; move ship down
 		bsr.w	BossMove
-		cmpi.w	#$338,obBossBufferY(a0)		; has the ship lowered all the way down to the arena?
+		move.w	(v_boss_start_y).w,d0
+		addi.w	#$B8,d0
+		move.w	obBossBufferY(a0),d1
+		cmp.w	d0,d1						; has the ship lowered all the way down to the arena?
 		bne.s	loc_177E6					; if not, branch
 		clr.w	obVelY(a0)					; stop ship
 		addq.b	#2,ob2ndRout(a0)			; goto next routine
@@ -150,4 +155,4 @@ BGHZ_Defeat:
 		bsr.w	AddPoints
 		move.b	#id_BGHZDefeated,ob2ndRout(a0)
 		move.w	#$B3,obBossDelayTimer(a0)
-		rts	
+		rts

@@ -3,7 +3,12 @@ BGHZ_MakeBall: 	; Sub-Routine 0
 		move.w	#-$100,obVelX(a0)
 		move.w	#-$40,obVelY(a0)
 		bsr.w	BossMove
-		cmpi.w	#$2A00,obBossBufferX(a0)	; has Eggman reached the center of the arena? 
+
+		move.w	(v_boss_start_x),d0
+		subi.w	#$60,d0
+		move.w	obBossBufferX(a0),d1
+		cmp.w	d0,d1						; has Eggman reached the center of the arena? 
+
 		bne.w	loc_177E6					; if not, branch
 		clr.w	obVelX(a0)
 		clr.w	obVelY(a0)					; stop all movement
@@ -26,7 +31,12 @@ BGHZ_ShipSetDirection:	; Sub-Routine 4
 		addq.b	#2,ob2ndRout(a0)			; BGHZ_ShipMove
 		move.w	#$3F,obBossDelayTimer(a0)	; Eggman moves for $3F frames again after turning
 		move.w	#$100,obVelX(a0)			; move the ship sideways
-		cmpi.w	#$2A00,obBossBufferX(a0)	; is Eggman in the center of the arena?
+
+		move.w	(v_boss_start_x),d0
+		subi.w	#$60,d0
+		move.w	obBossBufferX(a0),d1
+		cmp.w	d0,d1						; has Eggman reached the center of the arena? 
+
 		bne.s	BGHZ_Reverse				; if not, branch
 		move.w	#$7F,obBossDelayTimer(a0)	; Eggman takes more time to move...
 		move.w	#$40,obVelX(a0)				; ...and moves slower
@@ -114,7 +124,12 @@ BGHZ_Retreat:	; Sub-Routine C
 ;		move.b	#$F,obColType(a0)			; make the boss vulnerable to damage again
 		move.w	#$400,obVelX(a0)
 		move.w	#-$40,obVelY(a0)
-		cmpi.w	#$2AC0,(v_limitright2).w
+
+		move.w	(v_boss_start_x).w,d0
+		addi.w	#$60,d0
+		move.w	(v_limitright2).w,d1
+		cmp.w	d0,d1						; limitright2 should advance only $60 pixels ahead
+
 		beq.s	loc_17A10
 		addq.w	#2,(v_limitright2).w
 		bra.s	loc_17A16
@@ -141,7 +156,12 @@ BGHZ_FaceMain:	; Routine 4
 		move.b	ob2ndRout(a1),d0
 		subq.b	#4,d0
 		bne.s	loc_17A3E
-		cmpi.w	#$2A00,$30(a1)
+
+		move.w	(v_boss_start_x),d2
+		subi.w	#$60,d2
+		move.w	obBossBufferX(a1),d3
+		cmp.w	d2,d3						; has Eggman reached the center of the arena? 
+
 		bne.s	loc_17A46
 		moveq	#4,d1
 

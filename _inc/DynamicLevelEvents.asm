@@ -170,7 +170,7 @@ loc_6EB0:
 		bcs.s	locret_6EE8
 		bsr.w	FindFreeObj
 		bne.s	loc_6ED0
-		move.b	#id_BossGreenHill,0(a1) ; load GHZ boss	object
+		move.b	#id_BossGreenHill,obID(a1) ; load GHZ boss object
 		move.w	#$2A60,obX(a1)
 		move.w	#$280,obY(a1)
 
@@ -215,19 +215,69 @@ DLE_GHZE1:
 ; ===========================================================================
 
 DLE_GHZE2:
-		move.w	#$300,(v_limitbtm1).w
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_GHZ2Esub(pc,d0.w),d0
+		jmp		DLE_GHZ2Esub(pc,d0.w)
+; ===========================================================================
+DLE_GHZ2Esub:
+		dc.w DLE_GHZ2Emain-DLE_GHZ2Esub
+		dc.w DLE_GHZ2Eboss-DLE_GHZ2Esub
+		dc.w DLE_GHZ2Eend-DLE_GHZ2Esub
+; ===========================================================================
+
+DLE_GHZ2Emain:
+		move.w	#$300,(v_limitbtm1).w	; starting bottom limit
+; Move the death plane up just before the platforms section
 		cmpi.w	#$ED0,(v_screenposx).w
 		bcs.s	@ret
 		move.w	#$200,(v_limitbtm1).w
-		cmpi.w	#$1600,(v_screenposx).w
+; Move the death plane back down AFTER the platforms section
+		cmpi.w	#$1480,(v_screenposx).w
 		bcs.s	@ret
 		move.w	#$400,(v_limitbtm1).w
-		cmpi.w	#$1D60,(v_screenposx).w
-		bcs.s	@ret
-		move.w	#$300,(v_limitbtm1).w
+; Move death plane back to the default state leading to the boss arena
+		cmpi.w	#$1BE0,(v_screenposx).w
+		bcc.s	@gotoBoss_GHZ2E
 
 	@ret:
 		rts
+; ===========================================================================
+	@gotoBoss_GHZ2E:
+		move.w	#$300,(v_limitbtm1).w
+		addq.b	#2,(v_dle_routine).w
+		rts
+; ===========================================================================
+
+DLE_GHZ2Eboss:
+		cmpi.w	#$1E0,(v_screenposx).w
+		bcc.s	BGHZ2E_Cont
+		subq.b	#2,(v_dle_routine).w
+
+BGHZ2E_Cont:
+		cmpi.w	#$21E0,(v_screenposx).w
+		bcs.s	BGHZ2E_End
+		bsr.w	FindFreeObj
+		bne.s	BGHZ2E_Music
+		move.b	#id_BossGreenHill,obID(a1) ; load GHZ boss object
+		move.w	#$22E0,obX(a1)
+		move.w	#$280,obY(a1)
+
+BGHZ2E_Music:
+		music	bgm_Boss,0,1,0	; play boss music
+		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
+		moveq	#plcid_Boss,d0
+		bra.w	AddPLC		; load boss patterns
+; ===========================================================================
+
+BGHZ2E_End:
+		rts	
+; ===========================================================================
+
+DLE_GHZ2Eend:
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts	
 ; ===========================================================================
 
 ; ---------------------------------------------------------------------------
