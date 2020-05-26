@@ -66,10 +66,10 @@ SEgg_Eggman:	; Routine 2
 		moveq	#0,d0
 		move.b	ob2ndRout(a0),d0
 		move.w	SEgg_EggIndex(pc,d0.w),d1
-		jsr	SEgg_EggIndex(pc,d1.w)
-		lea	Ani_SEgg(pc),a1
-		jsr	(AnimateSprite).l
-		jmp	(DisplaySprite).l
+		jsr		SEgg_EggIndex(pc,d1.w)
+		lea		Ani_SEgg,a1
+		jsr		(AnimateSprite).l
+		jmp		(DisplaySprite).l
 ; ===========================================================================
 SEgg_EggIndex:	dc.w SEgg_ChkSonic-SEgg_EggIndex
 		dc.w SEgg_PreLeap-SEgg_EggIndex

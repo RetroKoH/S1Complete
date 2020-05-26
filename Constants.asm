@@ -104,15 +104,17 @@ cMagenta:	equ cBlue+cRed		; colour magenta
 
 ; Joypad input
 btnStart:	equ %10000000 ; Start button	($80)
-btnA:		equ %01000000 ; A		($40)
-btnC:		equ %00100000 ; C		($20)
-btnB:		equ %00010000 ; B		($10)
-btnR:		equ %00001000 ; Right		($08)
-btnL:		equ %00000100 ; Left		($04)
-btnDn:		equ %00000010 ; Down		($02)
-btnUp:		equ %00000001 ; Up		($01)
+btnA:		equ %01000000 ; A				($40)
+btnC:		equ %00100000 ; C				($20)
+btnB:		equ %00010000 ; B				($10)
+btnR:		equ %00001000 ; Right			($08)
+btnL:		equ %00000100 ; Left			($04)
+btnDn:		equ %00000010 ; Down			($02)
+btnUp:		equ %00000001 ; Up				($01)
 btnDir:		equ %00001111 ; Any direction	($0F)
-btnABC:		equ %01110000 ; A, B or C	($70)
+btnBC:		equ %00110000 ; B and C			($30)
+btnABC:		equ %01110000 ; A, B or C		($70)
+
 bitStart:	equ 7
 bitA:		equ 6
 bitC:		equ 5

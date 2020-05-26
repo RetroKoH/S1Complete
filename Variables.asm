@@ -377,6 +377,10 @@ f_optmonitor:	equ $FFFFFF89	; Flag triggering monitor settings. (Sonic 1, Sonic 
 f_supermusic:	equ $FFFFFF8A	; Flag toggling Super Music. (0-Invincibility. 1-S2 Super Music. 2-Sped up level music.)
 v_levselzone:	equ $FFFFFF8C	; Selected zone and act in level select (2 bytes)
 
+v_menuanimtimer: = $FFFFFF90
+v_menuanimcounter: = $FFFFFF91
+                 ;$FFFFFF92-BF  ; ***UNUSED***
+
 f_level_started: 	equ $FFFFFF98	; Level started. Rings and HUD can be drawn
 v_hudscrollpos:		equ $FFFFFF99	; Scrolling x-position for the HUD.
 

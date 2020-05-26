@@ -12,8 +12,9 @@ PalPointers:
 ; palette address, RAM address, colours
 
 ptr_Pal_Title:		palp	Pal_Title,v_pal_dry,$20			; 1 - title screen
-ptr_Pal_LevelSel:	palp	Pal_LevelSel,v_pal_dry,$40		; 2 - level select
+ptr_Pal_Options:	palp	Pal_Options,v_pal_dry,$40		; 2 - Options
 ptr_Pal_Sonic:		palp	Pal_Sonic,v_pal_dry,$10			; 3 - Sonic
+
 Pal_Levels:
 ptr_Pal_GHZ:		palp	Pal_GHZ,v_pal_dry+$20, $30		; 4 - GHZ
 ptr_Pal_GHZ_Easy:	palp	Pal_GHZ_Easy,v_pal_dry+$20, $30		; 7 - GHZ - Easy Mode
@@ -52,11 +53,14 @@ ptr_Pal_SBZ3SonWat:	palp	Pal_SBZ3SonWat,v_pal_dry,$10		; $10 (16) - SBZ3 Sonic u
 ptr_Pal_SSResult:	palp	Pal_SSResult,v_pal_dry,$40			; $11 (17) - special stage results
 ptr_Pal_Continue:	palp	Pal_Continue,v_pal_dry,$20			; $12 (18) - special stage results continue
 ptr_Pal_Ending:		palp	Pal_Ending,v_pal_dry,$40			; $13 (19) - ending sequence
+
+ptr_Pal_Menu:			palp	Pal_Menu,$FB00,$40			; S2 Menu Screen (Level Select/Time Attack)
+ptr_Pal_LevSelIcons:	palp	Pal_LevSelIcons,$FB40,$10	; Level Select Icons
 			even
 
 
 palid_Title:		equ (ptr_Pal_Title-PalPointers)/8
-palid_LevelSel:		equ (ptr_Pal_LevelSel-PalPointers)/8
+palid_Options:		equ (ptr_Pal_Options-PalPointers)/8
 palid_Sonic:		equ (ptr_Pal_Sonic-PalPointers)/8
 
 palid_GHZ:			equ (ptr_Pal_GHZ-PalPointers)/8
@@ -105,3 +109,5 @@ palid_SBZ3SonWat:	equ (ptr_Pal_SBZ3SonWat-PalPointers)/8
 palid_SSResult:		equ (ptr_Pal_SSResult-PalPointers)/8
 palid_Continue:		equ (ptr_Pal_Continue-PalPointers)/8
 palid_Ending:		equ (ptr_Pal_Ending-PalPointers)/8
+palid_Menu:		equ (ptr_Pal_Menu-PalPointers)/8
+palid_LevSelIcons:	equ (ptr_Pal_LevSelIcons-PalPointers)/8

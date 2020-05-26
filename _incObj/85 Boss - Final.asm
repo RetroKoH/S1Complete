@@ -213,7 +213,7 @@ loc_19F96:
 		move.b	#1,obAnim(a0)
 
 loc_19F9C:
-		lea	Ani_SEgg(pc),a1
+		lea	Ani_SEgg,a1
 		jmp	(AnimateSprite).l
 ; ===========================================================================
 
@@ -362,7 +362,7 @@ loc_1A142:
 		move.b	#1,obColProp(a0)
 
 loc_1A15C:
-		lea	Ani_SEgg(pc),a1
+		lea	Ani_SEgg,a1
 		jsr	(AnimateSprite).l
 
 loc_1A166:
@@ -469,7 +469,7 @@ loc_1A280:
 		move.b	#$B,obAnim(a0)
 
 loc_1A28C:
-		lea	Ani_Eggman(pc),a1
+		lea	Ani_Eggman,a1
 		jsr	(AnimateSprite).l
 
 loc_1A296:
@@ -505,7 +505,7 @@ loc_1A2E4:
 		move.b	#6,obAnim(a0)
 		move.l	#Map_Eggman,obMap(a0)
 		move.w	#$400,obGfx(a0)
-		lea	Ani_Eggman(pc),a1
+		lea	Ani_Eggman,a1
 		jsr	(AnimateSprite).l
 		bra.w	loc_1A296
 ; ===========================================================================
@@ -518,7 +518,7 @@ loc_1A312:
 		move.b	#0,obAnim(a0)
 		move.l	#Map_FZDamaged,obMap(a0)
 		move.w	#$3A0,obGfx(a0)
-		lea	Ani_FZEgg(pc),a1
+		lea	Ani_FZEgg,a1
 		jsr	(AnimateSprite).l
 		bra.w	loc_1A296
 ; ===========================================================================

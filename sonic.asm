@@ -355,7 +355,7 @@ ptr_GM_Cont:		dc.l	GM_Continue		; Continue Screen ($14)
 ptr_GM_Ending:		dc.l	GM_Ending		; End of game sequence ($18)
 ptr_GM_Credits:		dc.l	GM_Credits		; Credits ($1C)
 ptr_GM_BonusStage:	dc.l	GM_Level		; Bonus Stage ($20)
-ptr_GM_MenuScreen:	dc.l	GM_Title		; NEW Sonic 2 style Level Select or Time Attack ($24)
+ptr_GM_MenuScreen:	dc.l	GM_MenuScreen	; NEW Sonic 2 style Level Select or Time Attack ($24)
 ; ===========================================================================
 
 CheckSumError:
@@ -1771,7 +1771,7 @@ PalLoad4_Water:
 ; Palette data
 ; ---------------------------------------------------------------------------
 Pal_Title:		incbin	"palette\Title Screen.bin"
-Pal_LevelSel:	incbin	"palette\Level Select.bin"
+Pal_Options:	incbin	"palette\Options.bin"
 Pal_Sonic:		incbin	"palette\Sonic.bin"
 
 
@@ -1813,6 +1813,8 @@ Pal_SBZ3SonWat:	incbin	"palette\Sonic - SBZ3 Underwater.bin"
 Pal_SSResult:	incbin	"palette\Special Stage Results.bin"
 Pal_Continue:	incbin	"palette\Special Stage Continue Bonus.bin"
 Pal_Ending:		incbin	"palette\Ending.bin"
+Pal_Menu:		incbin	"palette\Menu.bin"
+Pal_LevSelIcons: incbin "palette\Level Select Icons.bin"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	wait for VBlank routines to complete
@@ -2104,8 +2106,8 @@ Tit_ChkOptions:
 		jmp		MainGameLoop
 
 Tit_GoToOptions:
-		moveq	#palid_LevelSel,d0
-		bsr.w	PalLoad2	; load level select palette
+		moveq	#palid_Options,d0
+		bsr.w	PalLoad2	; load options screen palette
 		lea	(v_hscrolltablebuffer).w,a1
 		moveq	#0,d0
 		move.w	#$DF,d1
@@ -2204,6 +2206,583 @@ PlayLevel:
 ; ---------------------------------------------------------------------------
 LevSelCode:	dc.b btnUp,btnDn,btnL,btnR,0,$FF
 		even
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; NEW Menu Screen for S2 Level Select
+; ---------------------------------------------------------------------------
+GM_MenuScreen:
+		bsr.w	PaletteFadeOut
+		move	#$2700,sr
+		move.w	(v_vdp_buffer1).w,d0
+		andi.b	#$BF,d0
+		move.w	d0,(vdp_control_port).l
+		bsr.w	ClearScreen
+		lea		(vdp_control_port).l,a6
+		move.w	#$8004,(a6)		; H-INT disabled
+		move.w	#$8230,(a6)		; PNT A base: $C000
+		move.w	#$8407,(a6)		; PNT B base: $E000
+		move.w	#$8230,(a6)		; PNT A base: $C000
+		move.w	#$8700,(a6)		; Background palette/color: 0/0
+		move.w	#$8C81,(a6)		; H res 40 cells, no interlace, S/H disabled
+		move.w	#$9001,(a6)		; Scroll table size: 64x32
+
+; RAM CLEARING
+		clr.w	(VDP_Command_Buffer).w
+		move.w	#VDP_Command_Buffer,(VDP_Command_Buffer_Slot).w
+
+		; Level Select Menu Font and other related art
+		locVRAM	$200
+		lea	(Nem_MenuStuff).l,a0
+		bsr.w	NemDec
+
+		; Sonic 2 Menu Boxes (MAYBE USE THIS FOR TIME ATTACK???
+		;locVRAM	$E00
+		;lea	(Nem_MenuBox).l,a0
+		;bsr.w	NemDec
+
+        ; Level Select Icons - Custom for Sonic 1 and SMS Levels
+		locVRAM	$1200
+		lea	(Nem_LevSelIcons).l,a0
+		bsr.w	NemDec
+
+		; Background - Load mappings first, tiles will be dynamically loaded
+		lea	($FF0000).l,a1
+		lea	(Eni_MenuBack).l,a0 ; load SONIC/MILES mappings
+		move.w	#$6000,d0
+		bsr.w	EniDec
+
+		copyTilemap	$FF0000,$E000,$27,$1B
+
+		;cmpi.b	#id_TimeAttackMenu,(v_gamemode).w	; time attack menu?
+		;beq.w	MenuScreen_TimeAttack	; if yes, branch
+
+		lea	($FF0000).l,a1
+		lea	(Eni_LevSel).l,a0	; Level Select mappings, 2 bytes per tile
+		moveq	#0,d0
+		bsr.w	EniDec
+
+		copyTilemap	$FF0000,$C000,$27,$1B
+
+		moveq	#0,d3
+		bsr.w	LevelSelect_DrawSoundNumber
+		lea		($FF08C0).l,a1
+		lea		(Eni_LevSelIcons).l,a0	; Level Select Icon Mappings
+		move.w	#$90,d0			; Art Location of Level Select Icons
+		bsr.w	EniDec
+		bsr.w	LevelSelect_DrawIcon
+		clr.b	(v_playermode).w
+		clr.w	(v_menuanimtimer).w
+		lea		(Anim_SonicMilesBG).l,a2
+		jsr		Dynamic_Menu	; background
+		moveq	#palid_Menu,d0
+		bsr.w	PalLoad1
+		lea		(v_pal_dry+$40).w,a1
+		lea		(v_pal_dry_dup+$40).w,a2
+
+		moveq	#7,d1
+	@loop:
+		move.l	(a1),(a2)+
+		clr.l	(a1)+
+		dbf		d1,@loop
+
+		move.b	#bgm_MZ,d0
+		bsr.w	PlaySound				; play Level Select Menu sound
+
+		move.b	#$16,(v_vbla_routine).w
+		bsr.w	WaitForVBla
+		move.w	(v_vdp_buffer1).w,d0
+		ori.b	#$40,d0
+		move.w	d0,(vdp_control_port).l
+		bsr.w	PaletteFadeIn
+
+LevelSelect_MainLoop:
+		move.b	#$16,(v_vbla_routine).w
+		bsr.w	WaitForVBla
+		move	#$2700,sr
+		moveq	#0,d3			; palette line << 13
+		bsr.w	LevelSelect_MarkFields	; unmark fields
+		bsr.w	LevSelControls		; Check to change between items
+		move.w	#$6000,d3		; palette line << 13
+		bsr.w	LevelSelect_MarkFields	; mark fields
+		bsr.w	LevelSelect_DrawIcon
+		move	#$2300,sr
+		lea		(Anim_SonicMilesBG).l,a2
+		jsr		Dynamic_Menu	; background
+		move.b	(v_jpadpress1).w,d0
+;		or.b	(Ctrl_2_Press).w,d0
+		andi.b	#btnStart,d0	; start pressed?
+		bne.s	LevelSelect_PressStart	; yes
+		bra.w	LevelSelect_MainLoop	; no
+
+LevelSelect_PressStart:
+		move.w	(v_levselzone).w,d0
+		add.w	d0,d0
+		move.w	LevelSelect_Order(pc,d0.w),d0
+		bmi.w	LevelSelect_Return	; sound test
+		cmpi.w	#$4000,d0
+		bne.w	LevelSelect_StartZone
+
+		move.b	#id_Special,(v_gamemode).w ; => SpecialStage
+		clr.w	(v_zone).w
+		move.b	#3,(v_lives).w	; set lives to 3
+		clr.w	(v_rings).w	; clear rings
+		clr.l	(v_time).w	; clear time
+		clr.l	(v_score).w	; clear score
+;		clr.l	(v_startscore).w ; clear starting score
+		clr.b	(v_lastspecial).w ; clear special stage number
+		clr.b	(v_emeralds).w ; clear emeralds
+;		clr.b	(v_emeraldlist).w ; clear emeralds
+		clr.b	(v_continues).w ; clear continues
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
+		;move.w	(Player_option).w,(Player_mode).w
+		rts
+; ===========================================================================
+
+LevelSelect_Return:
+		move.b	#id_Sega,(v_gamemode).w ; => SegaScreen
+		rts
+; ===========================================================================
+
+; -----------------------------------------------------------------------------
+; Level Select Level Order
+; -----------------------------------------------------------------------------
+;Misc_9454:
+LevelSelect_Order:
+		dc.w	$0000	; GHZ 1
+		dc.w	$0001	; GHZ 2
+		dc.w	$0002	; GHZ 3
+		dc.w	$0700	; BZ 1
+		dc.w	$0701	; BZ 2
+		dc.w	$0702	; BZ 3
+		dc.w	$0200	; MZ 1
+		dc.w	$0201	; MZ 2
+		dc.w	$0202	; MZ 3
+		dc.w	$0800	; JZ 1
+		dc.w	$0801	; JZ 2
+		dc.w	$0802	; JZ 3
+		dc.w	$0400	; SYZ 1
+		dc.w	$0401	; SYZ 2
+		dc.w	$0402	; SYZ 3
+		dc.w	$0100	; LZ 1
+		dc.w	$0101	; LZ 2
+		dc.w	$0102	; LZ 3
+		dc.w	$0300	; SLZ 1
+		dc.w	$0301	; SLZ 2
+		dc.w	$0302	; SLZ 3
+		dc.w	$0500	; SBZ 1
+		dc.w	$0501	; SBZ 2
+		dc.w	$0103	; SBZ 3
+		dc.w	$0502	; Final Zone
+		dc.w	$0900	; SKBZ 1
+		dc.w	$0901	; SKBZ 2
+		dc.w	$0902	; SKBZ 3
+		dc.w	$0000	; GHZ 1 (WILL BE CCZ)
+		dc.w	$4000	; 20 - special stage - WILL BE BONUS STAGE
+		dc.w	$4000	; 20 - special stage
+		dc.w	$0000	; GHZ 1 (CHAR SELECT)
+		dc.w	$FFFF	; 21 - sound test
+; ===========================================================================
+
+LevelSelect_StartZone:
+		andi.w	#$3FFF,d0
+		move.w	d0,(v_zone).w
+		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
+		move.b	#3,(v_lives).w		; set lives to 3
+		clr.w	(v_rings).w		; clear rings
+		clr.l	(v_time).w		; clear time
+		clr.l	(v_score).w		; clear score
+;		clr.l	(v_startscore).w	; clear start score <- KingofHarts Level Select Mod (REV C EDIT)
+		clr.b	(v_lastspecial).w	; clear special stage number
+		clr.b	(v_emeralds).w		; clear emeralds
+;		clr.b	(v_emeraldlist).w	; clear emeralds list
+		clr.b	(v_continues).w		; clear continues
+		move.l	#5000,(v_scorelife).w	; extra life is awarded at 50000 points
+		move.b	#$E0,d0
+		bsr.w	PlaySound_Special	; fade out music
+		rts
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Change what you're selecting in the level select
+; ---------------------------------------------------------------------------
+; loc_94DC:
+LevSelControls:
+		move.b	(v_jpadpress1).w,d1
+		andi.b	#btnUp|btnDn,d1
+		bne.s	@ChkUpDown	; up/down pressed
+		subq.w	#1,(v_levseldelay).w
+		bpl.s	LevSelControls_CheckLR
+	@ChkUpDown:
+		move.w	#$B,(v_levseldelay).w
+		move.b	(v_jpadhold1).w,d1
+		andi.b	#btnUp|btnDn,d1
+		beq.s	LevSelControls_CheckLR	; up/down not pressed, check for left & right
+		move.w	(v_levselzone).w,d0
+		btst	#bitUp,d1
+		beq.s	@ChkDown
+		subq.w	#1,d0	; decrease by 1
+		bcc.s	@ChkDown; >= 0?
+		moveq	#$20,d0 ; set to sound test
+	@ChkDown:
+		btst	#bitDn,d1
+		beq.s	@ChkUp
+		addq.w	#1,d0	; yes, add 1
+		cmpi.w	#$21,d0
+		blo.s	@ChkUp	; smaller than $20?
+		moveq	#0,d0	; if not, set to 0
+
+	@ChkUp:
+		move.w	d0,(v_levselzone).w
+		rts
+; ===========================================================================
+
+LevSelControls_CheckLR:
+		cmpi.w	#$20,(v_levselzone).w	; are we in the sound test?
+		bne.s	LevSelControls_SwitchSide	; no
+		move.w	(v_levselsound).w,d0
+		move.b	(v_jpadpress1).w,d1
+		btst	#bitL,d1
+		beq.s	@chkright
+		subq.b	#1,d0
+		bcc.s	@chkright
+		moveq	#$7F,d0
+
+	@chkright:
+		btst	#bitR,d1
+		beq.s	@chkA
+		addq.b	#1,d0
+		cmpi.w	#$80,d0
+		blo.s	@chkA
+		moveq	#0,d0
+
+	@chkA:
+		btst	#bitA,d1
+		beq.s	@changesound
+		addi.b	#$10,d0
+		andi.b	#$7F,d0
+
+	@changesound:
+		move.w	d0,(v_levselsound).w
+		andi.w	#btnBC,d1
+		beq.s	@rts	; rts
+		move.w	(v_levselsound).w,d0
+		addi.w	#$80,d0
+		bra.w	PlaySound
+		;lea	(debug_cheat).l,a0
+		;lea	(super_sonic_cheat).l,a2
+		;lea	(Night_mode_flag).w,a1
+		;moveq	#1,d2	; flag to tell the routine to enable the Super Sonic cheat
+		;bsr.w	CheckCheats
+	@rts:
+		rts
+; ===========================================================================
+
+LevSelControls_SwitchSide:	; not in soundtest, not up/down pressed
+		move.b	(v_jpadpress1).w,d1
+		andi.b	#btnL|btnR,d1
+		beq.s	@rts				; no direction key pressed
+		move.w	(v_levselzone).w,d0	; left or right pressed
+		move.b	LevelSelect_SwitchTable(pc,d0.w),d0 ; set selected zone according to table
+		move.w	d0,(v_levselzone).w
+	@rts:
+		rts
+; ===========================================================================
+
+LevelSelect_SwitchTable:
+	dc.b $15	; 0
+	dc.b $16	; 1
+	dc.b $17	; 2
+	dc.b $18	; 3
+	dc.b $19	; 4
+	dc.b $1A	; 5
+	dc.b $1B	; 6
+	dc.b $1C	; 7
+	dc.b $1C	; 8
+	dc.b $1D	; 9
+	dc.b $1D	; $A
+	dc.b $1E	; $B
+	dc.b $1E	; $C
+	dc.b $1F	; $D
+	dc.b $1F	; $E
+	dc.b $20	; $F
+	dc.b $20	; $10
+	dc.b $20	; $11
+	dc.b $20	; $12
+	dc.b $20	; $13
+	dc.b $20	; $14
+	dc.b 0		; $15
+	dc.b 1		; $16
+	dc.b 2		; $17
+	dc.b 3		; $18
+	dc.b 4		; $19
+	dc.b 5		; $1A
+	dc.b 6		; $1B
+	dc.b 7		; $1C
+	dc.b 9		; $1D
+	dc.b $B		; $1E - SPECIAL STAGE
+	dc.b $D		; $1F - Character
+	dc.b $D		; $20 - CURRENT END (SOUND TEST)
+	even
+; ===========================================================================
+
+;loc_95B8:
+LevelSelect_MarkFields:
+		lea	($FF0000).l,a4
+		lea	(LevSel_MarkTable).l,a5
+		lea	($C00000).l,a6		; VDP_data_port
+		moveq	#0,d0
+		move.w	(v_levselzone).w,d0
+		lsl.w	#2,d0
+		lea	(a5,d0.w),a3
+		moveq	#0,d0
+		move.b	(a3),d0
+		mulu.w	#$50,d0
+		moveq	#0,d1
+		move.b	1(a3),d1
+		add.w	d1,d0
+		lea	(a4,d0.w),a1
+		moveq	#0,d1
+		move.b	(a3),d1
+		lsl.w	#7,d1
+		add.b	1(a3),d1
+		addi.w	#-$4000,d1
+		lsl.l	#2,d1
+		lsr.w	#2,d1
+		ori.w	#$4000,d1
+		swap	d1
+		move.l	d1,4(a6)
+
+		moveq	#$D,d2
+	@loop:
+		move.w	(a1)+,d0
+		add.w	d3,d0
+		move.w	d0,(a6)
+		dbf	d2,@loop
+
+		addq.w	#2,a3
+		moveq	#0,d0
+		move.b	(a3),d0
+		beq.s	@chkitem
+		mulu.w	#$50,d0
+		moveq	#0,d1
+		move.b	1(a3),d1
+		add.w	d1,d0
+		lea	(a4,d0.w),a1
+		moveq	#0,d1
+		move.b	(a3),d1
+		lsl.w	#7,d1
+		add.b	1(a3),d1
+		addi.w	#-$4000,d1
+		lsl.l	#2,d1
+		lsr.w	#2,d1
+		ori.w	#$4000,d1
+		swap	d1
+		move.l	d1,4(a6)
+		move.w	(a1)+,d0
+		add.w	d3,d0
+		move.w	d0,(a6)
+
+	@chkitem:
+		cmpi.w	#$20,(v_levselzone).w
+		bne.s	@rts	; rts
+		bsr.w	LevelSelect_DrawSoundNumber
+	@rts:
+		rts
+; ===========================================================================
+
+LevelSelect_DrawSoundNumber:
+	move.l	#$49440003,(vdp_control_port).l
+	move.w	(v_levselsound).w,d0
+	move.b	d0,d2
+	lsr.b	#4,d0
+	bsr.s	@bra1
+	move.b	d2,d0
+
+@bra1:
+	andi.w	#$F,d0
+	cmpi.b	#$A,d0
+	blo.s	@bra2
+	addi.b	#4,d0
+
+@bra2:
+	addi.b	#$10,d0
+	add.w	d3,d0
+	move.w	d0,(a6)
+	rts
+; ===========================================================================
+
+LevelSelect_DrawIcon:
+		move.w	(v_levselzone).w,d0		; Get selected zone/menu option
+		lea	(LevSel_IconTable).l,a3
+		lea	(a3,d0.w),a3			; Get respective icon frame
+		lea	($FF08C0).l,a1			; Chunk_Table + $C80
+		moveq	#0,d0
+		move.b	(a3),d0				; load icon frame # to d0
+		lsl.w	#3,d0
+		move.w	d0,d1
+		add.w	d0,d0
+		add.w	d1,d0				; d0=(d0<<3)*3;
+
+;		copyTilemap (a1,d0.w), $4B360003, 3, 2
+
+		lea	(a1,d0.w),a1			; Go to respective area in Chunk table
+		move.l	#$4B360003,d0
+		moveq	#3,d1
+		moveq	#2,d2
+		bsr.w	TilemapToVRAM			; Apply tilemap to VRAM
+
+		lea	(Pal_LevSelIcons).l,a1
+		moveq	#0,d0
+		move.b	(a3),d0				; Get respective icon frame
+		lsl.w	#5,d0
+		lea	(a1,d0.w),a1
+		lea	(v_pal_dry+$40).w,a2
+
+		moveq	#7,d1
+	@loop:
+		move.l	(a1)+,(a2)+
+		dbf	d1,@loop
+
+		rts
+; ===========================================================================
+
+LevSel_IconTable:
+	dc.b   0,0,0	;0	GHZ
+	dc.b   0,0,0	;3	BZ
+	dc.b   1,1,1	;6	MZ
+	dc.b   1,1,1	;9	JZ
+	dc.b   2,2,2	;$C	SYZ
+	dc.b   3,3,3	;$F	LZ
+	dc.b   4,4,4	;$12	SLZ
+	dc.b   5,5,5	;$15	SBZ
+	dc.b   5	;$18	FZ
+	dc.b  6,6,6	;$19	SKBZ
+	dc.b  7		;$1C	CCZ (HIDDEN LEVEL)
+	dc.b  8		;$1D	Bonus Stage
+	dc.b  8		;$1E	Special Stage
+; ADD OPTIONS ICONS
+;	dc.b  $E	;$16	BLUE SHIELD
+;	dc.b  $E	;$16	ELEMENTAL SHIELD
+;	dc.b  $E	;$16	6 EMERALDS
+;	dc.b  $E	;$16	7 EMERALDS
+	dc.b  $E	;$1F	Sound Test (SONIC)
+	dc.b  $E	;$20	Sound Test (TAILS)
+	dc.b  $E	;$21	Sound Test (KNUCKLES)
+;	dc.b  $E	;$16	Sound Test (MIGHTY)
+;	dc.b  $E	;$16	Sound Test (AMY)
+;	dc.b  $E	;$16	Sound Test (RAY)
+;	dc.b  $E	;$16	Sound Test (METAL)
+; ===========================================================================
+
+; DATA STRUCTURE NOTING WHICH LINES TO HIGHLIGHT FOR EACH SELECTION
+
+LevSel_MarkTable:	; 4 bytes per level select entry
+; COMPLETE - NORMAL/HARD
+; line primary, 2*column ($E fields), line secondary, 2*column secondary (1 field)
+	dc.b   3,  6,  3,$24	; 0 GHZ1
+	dc.b   3,  6,  4,$24	; 1 GHZ2
+	dc.b   3,  6,  5,$24	; 2 GHZ3
+	dc.b   6,  6,  6,$24	; 3 BZ1
+	dc.b   6,  6,  7,$24	; 4 BZ2
+	dc.b   6,  6,  8,$24	; 5 BZ3
+	dc.b   9,  6,  9,$24	; 6 MZ1
+	dc.b   9,  6, $A,$24	; 7 MZ2
+	dc.b   9,  6, $B,$24	; 8 MZ3
+	dc.b  $C,  6, $C,$24	; 9 JZ1
+	dc.b  $C,  6, $D,$24	; $A JZ2
+	dc.b  $C,  6, $E,$24	; $B JZ3
+	dc.b  $F,  6, $F,$24	; $C SYZ1
+	dc.b  $F,  6,$10,$24	; $D SYZ2
+	dc.b  $F,  6,$11,$24	; $E SYZ3
+	dc.b $12,  6,$12,$24	; $F LZ1
+	dc.b $12,  6,$13,$24	; $10 LZ2
+	dc.b $12,  6,$14,$24	; $11 LZ3
+	dc.b $15,  6,$15,$24	; $12 SLZ1
+	dc.b $15,  6,$16,$24	; $13 SLZ2
+	dc.b $15,  6,$17,$24	; $14 SLZ3
+; --- second column ---
+	dc.b   3,$2C,  3,$48	; $15 SBZ1
+	dc.b   3,$2C,  4,$48	; $16 SBZ2
+	dc.b   3,$2C,  5,$48	; $17 SBZ3
+	dc.b   3,$2C,  6,$48	; $18 SBZ4/FINAL
+	dc.b   7,$2C,  7,$48	; $19 SKBZ1
+	dc.b   7,$2C,  8,$48	; $1A SKBZ2
+	dc.b   7,$2C,  9,$48	; $1B SKBZ3
+	dc.b  $A,$2C,  $A, $48	; $1C CCZ
+	dc.b  $C,$2C,  $C, $48	; $1D BONUS
+	dc.b  $E,$2C,  $E, $48	; $1E SPECIAL
+	dc.b $10,$2C,  $10,$48	; $1F CHARACTER
+	dc.b $12,$2C,$12,$48	; $20 SOUND TEST
+; ===========================================================================
+
+Dynamic_Menu:
+	lea	(v_menuanimtimer).w,a3
+
+loc_3FF30:
+	move.w	(a2)+,d6	; loop counter. We start off with 00 the first time.
+
+loc_3FF32:
+	subq.b	#1,(a3)		; decrement timer
+	bcc.s	loc_3FF78	; if time remains, branch ahead
+	moveq	#0,d0
+	move.b	1(a3),d0	; load animation counter from animation data table
+	cmp.b	6(a2),d0
+	blo.s	loc_3FF48
+	moveq	#0,d0
+	move.b	d0,1(a3)	; set animation counter
+
+loc_3FF48:
+	addq.b	#1,1(a3)	; increment animation counter
+	move.b	(a2),(a3)	; set timer
+	bpl.s	loc_3FF56
+	add.w	d0,d0
+	move.b	9(a2,d0.w),(a3)
+
+loc_3FF56:
+	move.b	8(a2,d0.w),d0
+	lsl.w	#5,d0
+	move.w	4(a2),d2
+	move.l	(a2),d1
+	andi.l	#$FFFFFF,d1		; Filter out the first byte, which contains the first PLC ID, leaving the address of the zone's art in d0
+	add.l	d0,d1
+	moveq	#0,d3
+	move.b	7(a2),d3
+	lsl.w	#4,d3
+	jsr	(QueueDMATransfer).l	; Use d1, d2, and d3 to locate the decompressed art and ready for transfer to VRAM
+
+loc_3FF78:
+	move.b	6(a2),d0
+	tst.b	(a2)
+	bpl.s	loc_3FF82
+	add.b	d0,d0
+
+loc_3FF82:
+	addq.b	#1,d0
+	andi.w	#$FE,d0
+	lea	8(a2,d0.w),a2
+	addq.w	#2,a3
+	dbf	d6,loc_3FF32
+	rts
+; ===========================================================================
+
+; ------------------------------------------------------------------------
+; MENU ANIMATION SCRIPT
+; ------------------------------------------------------------------------
+;word_87C6:
+Anim_SonicMilesBG:
+	dc.w   0
+; Sonic/Miles animated background
+	dc.l $FF<<24|Art_MenuBack
+	dc.w $20
+	dc.b 6
+	dc.b $A
+	dc.b   0,$C7    ; "SONIC"
+	dc.b  $A,  5	; 2
+	dc.b $14,  5	; 4
+	dc.b $1E,$C7	; "TAILS"
+	dc.b $14,  5	; 8
+	dc.b  $A,  5	; 10
 ; ===========================================================================
 
 ; ---------------------------------------------------------------------------
@@ -3797,7 +4376,6 @@ Cont_GotoLevel:
 
 		include	"_incObj\80 Continue Screen Elements.asm"
 		include	"_incObj\81 Continue Screen Sonic.asm"
-		include	"_anim\Continue Screen Sonic.asm"
 Map_ContScr:	include	"_maps\Continue Screen.asm"
 
 ; ===========================================================================
@@ -4029,7 +4607,6 @@ End_MoveSonExit:
 ; ===========================================================================
 
 		include	"_incObj\87 Ending Sequence Sonic.asm"
-		include "_anim\Ending Sequence Sonic.asm"
 		include	"_incObj\88 Ending Sequence Emeralds.asm"
 		include	"_incObj\89 Ending Sequence STH.asm"
 Map_ESon:	include	"_maps\Ending Sequence Sonic.asm"
@@ -4238,7 +4815,6 @@ TryAg_Exit:
 ; ===========================================================================
 
 		include	"_incObj\8B Try Again & End Eggman.asm"
-		include "_anim\Try Again & End Eggman.asm"
 		include	"_incObj\8C Try Again Emeralds.asm"
 Map_EEgg:	include	"_maps\Try Again & End Eggman.asm"
 
@@ -5480,7 +6056,7 @@ Map_Scen:	include	"_maps\Scenery.asm"
 Map_Swi:	include	"_maps\Unused Switch.asm"
 
 		include	"_incObj\2A SBZ Small Door.asm"
-		include	"_anim\SBZ Small Door.asm"
+
 Map_ADoor:	include	"_maps\SBZ Small Door.asm"
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
@@ -5619,7 +6195,7 @@ loc_8B48:
 		include	"_incObj\1E Ball Hog.asm"
 		include	"_incObj\20 Cannonball.asm"
 		include	"_incObj\24, 27 & 3F Explosions.asm"
-		include	"_anim\Ball Hog.asm"
+
 Map_Hog:	include	"_maps\Ball Hog.asm"
 Map_MisDissolve:include	"_maps\Buzz Bomber Missile Dissolve.asm"
 		include	"_maps\Explosions.asm"
@@ -5632,20 +6208,17 @@ Map_Animal3:	include	"_maps\Animals 3.asm"
 Map_Poi:	include	"_maps\Points.asm"
 
 		include	"_incObj\1F Crabmeat.asm"
-		include	"_anim\Crabmeat.asm"
+
 Map_Crab:	include	"_maps\Crabmeat.asm"
 		include	"_incObj\22 Buzz Bomber.asm"
 		include	"_incObj\23 Buzz Bomber Missile.asm"
-		include	"_anim\Buzz Bomber.asm"
-		include	"_anim\Buzz Bomber Missile.asm"
+
 Map_Buzz:	include	"_maps\Buzz Bomber.asm"
 Map_Missile:	include	"_maps\Buzz Bomber Missile.asm"
 
 		include	"_incObj\25 & 37 Rings.asm"
 		include	"_incObj\4B Giant Ring.asm"
 		include	"_incObj\7C Ring Flash.asm"
-
-		include	"_anim\Rings.asm"
 
 		include	"_maps\Rings.asm" ; THESE normal mappings are for debug rings, lost rings, and SS rings
 
@@ -5660,14 +6233,12 @@ Map_Flash:	include	"_maps\Ring Flash.asm"
 		include	"_incObj\26 Monitor.asm"
 		include	"_incObj\2E Monitor Content Power-Up.asm"
 		include	"_incObj\26 Monitor (SolidSides subroutine).asm"
-		include	"_anim\Monitor.asm"
+
+
 Map_Monitor:	include	"_maps\Monitor.asm"
 
 		include	"_incObj\0E Title Screen Sonic.asm"
 		include	"_incObj\0F Press Start and TM.asm"
-
-		include	"_anim\Title Screen Sonic.asm"
-		include	"_anim\Press Start and TM.asm"
 
 		include	"_incObj\sub AnimateSprite.asm"
 
@@ -5675,18 +6246,19 @@ Map_PSB:	include	"_maps\Press Start and TM.asm"
 Map_TSon:	include	"_maps\Title Screen Sonic.asm"
 
 		include	"_incObj\2B Chopper.asm"
-		include	"_anim\Chopper.asm"
+
 Map_Chop:	include	"_maps\Chopper.asm"
 		include	"_incObj\2C Jaws.asm"
-		include	"_anim\Jaws.asm"
+
+
 Map_Jaws:	include	"_maps\Jaws.asm"
 		include	"_incObj\2D Burrobot.asm"
-		include	"_anim\Burrobot.asm"
+
 Map_Burro:	include	"_maps\Burrobot.asm"
 
 		include	"_incObj\2F MZ Large Grassy Platforms.asm"
 		include	"_incObj\35 Burning Grass.asm"
-		include	"_anim\Burning Grass.asm"
+
 Map_LGrass:	include	"_maps\MZ Large Grassy Platforms.asm"
 Map_Fire:	include	"_maps\Fireballs.asm"
 		include	"_incObj\30 MZ Large Green Glass Blocks.asm"
@@ -6771,14 +7343,15 @@ locret_DA8A:
 
 		include	"_incObj\sub FindFreeObj.asm"
 		include	"_incObj\41 Springs.asm"
-		include	"_anim\Springs.asm"
+
 Map_Spring:	include	"_maps\Springs.asm"
 
 		include	"_incObj\42 Newtron.asm"
-		include	"_anim\Newtron.asm"
+
 Map_Newt:	include	"_maps\Newtron.asm"
 		include	"_incObj\43 Roller.asm"
-		include	"_anim\Roller.asm"
+
+
 Map_Roll:	include	"_maps\Roller.asm"
 
 		include	"_incObj\44 GHZ Edge Walls.asm"
@@ -6786,10 +7359,12 @@ Map_Edge:	include	"_maps\GHZ Edge Walls.asm"
 
 		include	"_incObj\13 Lava Ball Maker.asm"
 		include	"_incObj\14 Lava Ball.asm"
-		include	"_anim\Fireballs.asm"
+
+
 
 		include	"_incObj\6D Flamethrower.asm"
-		include	"_anim\Flamethrower.asm"
+
+
 Map_Flame:	include	"_maps\Flamethrower.asm"
 
 		include	"_incObj\46 MZ Bricks.asm"
@@ -6798,11 +7373,15 @@ Map_Brick:	include	"_maps\MZ Bricks.asm"
 		include	"_incObj\12 Light.asm"
 Map_Light	include	"_maps\Light.asm"
 		include	"_incObj\47 Bumper.asm"
-		include	"_anim\Bumper.asm"
+
+
+
 Map_Bump:	include	"_maps\Bumper.asm"
 
 		include	"_incObj\0D Signpost.asm" ; includes "GotThroughAct" subroutine
-		include	"_anim\Signpost.asm"
+
+
+
 		include	"_maps\Signpost.asm"
 		include	"_maps\Signpost - Dynamic Gfx Script.asm"
 
@@ -6810,18 +7389,26 @@ Map_Bump:	include	"_maps\Bumper.asm"
 		include	"_incObj\4E Wall of Lava.asm"
 		include	"_incObj\54 Lava Tag.asm"
 Map_LTag:	include	"_maps\Lava Tag.asm"
-		include	"_anim\Lava Geyser.asm"
-		include	"_anim\Wall of Lava.asm"
+
+
+
+
 Map_Geyser:	include	"_maps\Lava Geyser.asm"
 Map_LWall:	include	"_maps\Wall of Lava.asm"
 
 		include	"_incObj\40 Moto Bug.asm" ; includes "_incObj\sub RememberState.asm"
-		include	"_anim\Moto Bug.asm"
+
+
+
+
 Map_Moto:	include	"_maps\Moto Bug.asm"
 		include	"_incObj\4F.asm"
 
 		include	"_incObj\50 Yadrin.asm"
-		include	"_anim\Yadrin.asm"
+
+
+
+
 Map_Yad:	include	"_maps\Yadrin.asm"
 
 		include	"_incObj\sub SolidObject.asm"
@@ -6834,7 +7421,10 @@ Map_MBlock:	include	"_maps\Moving Blocks (MZ and SBZ).asm"
 Map_MBlockLZ:	include	"_maps\Moving Blocks (LZ).asm"
 
 		include	"_incObj\55 Basaran.asm"
-		include	"_anim\Basaran.asm"
+
+
+
+
 Map_Bas:	include	"_maps\Basaran.asm"
 
 		include	"_incObj\56 Floating Blocks and Doors.asm"
@@ -6859,7 +7449,10 @@ Map_Surf:	include	"_maps\Water Surface.asm"
 		include	"_incObj\0B Pole that Breaks.asm"
 Map_Pole:	include	"_maps\Pole that Breaks.asm"
 		include	"_incObj\0C Flapping Door.asm"
-		include	"_anim\Flapping Door.asm"
+
+
+
+
 Map_Flap:	include	"_maps\Flapping Door.asm"
 
 		include	"_incObj\71 Invisible Barriers.asm"
@@ -6871,15 +7464,24 @@ Map_Fan:	include	"_maps\Fan.asm"
 Map_Seesaw:	include	"_maps\Seesaw.asm"
 Map_SSawBall:	include	"_maps\Seesaw Ball.asm"
 		include	"_incObj\5F Bomb Enemy.asm"
-		include	"_anim\Bomb Enemy.asm"
+
+
+
+
+
 Map_Bomb:	include	"_maps\Bomb Enemy.asm"
 
 		include	"_incObj\60 Orbinaut.asm"
-		include	"_anim\Orbinaut.asm"
+
+
+
+
 Map_Orb:	include	"_maps\Orbinaut.asm"
 
 		include	"_incObj\16 Harpoon.asm"
-		include	"_anim\Harpoon.asm"
+
+
+
 Map_Harp:	include	"_maps\Harpoon.asm"
 		include	"_incObj\61 LZ Blocks.asm"
 Map_LBlock:	include	"_maps\LZ Blocks.asm"
@@ -6888,10 +7490,14 @@ Map_Gar:	include	"_maps\Gargoyle.asm"
 		include	"_incObj\63 LZ Conveyor.asm"
 Map_LConv:	include	"_maps\LZ Conveyor.asm"
 		include	"_incObj\64 Bubbles.asm"
-		include	"_anim\Bubbles.asm"
+
+
+
 		include	"_maps\Bubbles.asm"
 		include	"_incObj\65 Waterfalls.asm"
-		include	"_anim\Waterfalls.asm"
+
+
+
 Map_WFall	include	"_maps\Waterfalls.asm"
 
 		include "_incObj\Sonic Effects.asm"
@@ -6943,10 +7549,11 @@ ResumeMusic:
 
 ; ===========================================================================
 
-		include	"_anim\Drowning Countdown.asm"
+
 Map_Drown:	include	"_maps\Drowning Countdown.asm"
 
-		include	"_anim\Shield and Invincibility.asm"
+
+
 		include	"_maps\Shield and Invincibility.asm"
 		include "_maps\Shield - Dynamic Gfx Script.asm" ; AND INVINCIBILITY
 		include "_maps\Shield - Flame.asm"
@@ -6964,9 +7571,10 @@ Map_Drown:	include	"_maps\Drowning Countdown.asm"
 		include	"_incObj\03 Collision Switcher.asm"
 		include	"_incObj\08 Water Splash.asm"
 
-		include	"_anim\Special Stage Entry (Unused).asm"
+
+
 Map_Vanish:	include	"_maps\Special Stage Entry (Unused).asm"
-		include	"_anim\Water Splash.asm"
+
 Map_Splash:	include	"_maps\Water Splash.asm"
 
 
@@ -7454,7 +8062,9 @@ Map_Jun:	include	"_maps\Rotating Junction.asm"
 Map_Disc:	include	"_maps\Running Disc.asm"
 		include	"_incObj\68 Conveyor Belt.asm"
 		include	"_incObj\69 SBZ Spinning Platforms.asm"
-		include	"_anim\SBZ Spinning Platforms.asm"
+
+
+
 Map_Trap:	include	"_maps\Trapdoor.asm"
 Map_Spin:	include	"_maps\SBZ Spinning Platforms.asm"
 		include	"_incObj\6A Saws and Pizza Cutters.asm"
@@ -7462,13 +8072,15 @@ Map_Saw:	include	"_maps\Saws and Pizza Cutters.asm"
 		include	"_incObj\6B SBZ Stomper and Door.asm"
 Map_Stomp:	include	"_maps\SBZ Stomper and Door.asm"
 		include	"_incObj\6C SBZ Vanishing Platforms.asm"
-		include	"_anim\SBZ Vanishing Platforms.asm"
+
+
 Map_VanP:	include	"_maps\SBZ Vanishing Platforms.asm"
 		include	"_incObj\6E Electrocuter.asm"
-		include	"_anim\Electrocuter.asm"
+
+
 Map_Elec:	include	"_maps\Electrocuter.asm"
 		include	"_incObj\6F SBZ Spin Platform Conveyor.asm"
-		include	"_anim\SBZ Spin Platform Conveyor.asm"
+
 
 off_164A6:	dc.w word_164B2-off_164A6, word_164C6-off_164A6, word_164DA-off_164A6
 		dc.w word_164EE-off_164A6, word_16502-off_164A6, word_16516-off_164A6
@@ -7485,7 +8097,7 @@ Map_Gird:	include	"_maps\Girder Block.asm"
 		include	"_incObj\72 Teleporter.asm"
 
 		include	"_incObj\78 Caterkiller.asm"
-		include	"_anim\Caterkiller.asm"
+
 Map_Cat:	include	"_maps\Caterkiller.asm"
 
 		include	"_incObj\79 Lamppost.asm"
@@ -7552,7 +8164,12 @@ BossMove:
 
 		include	"_incObj\3D Boss - Green Hill (part 2).asm"
 		include	"_incObj\48 Eggman's Swinging Ball.asm"
-		include	"_anim\Eggman.asm"
+
+
+		include	"_incObj\82 Eggman - Scrap Brain 2.asm"
+
+
+
 Map_Eggman:	include	"_maps\Eggman.asm"
 Map_BossItems:	include	"_maps\Boss Items.asm"
 		include	"_incObj\77 Boss - Labyrinth.asm"
@@ -7572,25 +8189,23 @@ Map_BossBlock:	include	"_maps\SYZ Boss Blocks.asm"
 loc_1982C:
 		jmp	(DeleteObject).l
 
-		include	"_incObj\82 Eggman - Scrap Brain 2.asm"
-		include	"_anim\Eggman - Scrap Brain 2 & Final.asm"
 Map_SEgg:	include	"_maps\Eggman - Scrap Brain 2.asm"
 		include	"_incObj\83 SBZ Eggman's Crumbling Floor.asm"
 Map_FFloor:	include	"_maps\SBZ Eggman's Crumbling Floor.asm"
 		include	"_incObj\85 Boss - Final.asm"
-		include	"_anim\FZ Eggman in Ship.asm"
+
 Map_FZDamaged:	include	"_maps\FZ Damaged Eggmobile.asm"
 Map_FZLegs:	include	"_maps\FZ Eggmobile Legs.asm"
 		include	"_incObj\84 FZ Eggman's Cylinders.asm"
 Map_EggCyl:	include	"_maps\FZ Eggman's Cylinders.asm"
 		include	"_incObj\86 FZ Plasma Ball Launcher.asm"
-		include	"_anim\Plasma Ball Launcher.asm"
+
 Map_PLaunch:	include	"_maps\Plasma Ball Launcher.asm"
-		include	"_anim\Plasma Balls.asm"
+
 Map_Plasma:	include	"_maps\Plasma Balls.asm"
 
 		include	"_incObj\3E Prison Capsule.asm"
-		include	"_anim\Prison Capsule.asm"
+
 Map_Pri:	include	"_maps\Prison Capsule.asm"
 
 		include	"_incObj\sub ReactToItem.asm"
@@ -8317,13 +8932,72 @@ Eni_LevSelIcons:	incbin	"tilemaps\Level Select Icons.bin"
 Nem_LevSelIcons:	incbin	"artnem\Level Select Icons.bin"
 		even
 
+
+; ---------------------------------------------------------------------------
+; Sprite Animations
+; ---------------------------------------------------------------------------
+
+		include	"_anim\Sonic.asm"
+		include "_anim\Effects.asm"		; Dash Dush and Skid Dust
+
+		include	"_anim\Continue Screen Sonic.asm"
+		include "_anim\Ending Sequence Sonic.asm"
+		include "_anim\Try Again & End Eggman.asm"
+		include	"_anim\SBZ Small Door.asm"
+		include	"_anim\Ball Hog.asm"
+		include	"_anim\Crabmeat.asm"
+		include	"_anim\Buzz Bomber.asm"
+		include	"_anim\Buzz Bomber Missile.asm"
+		include	"_anim\Rings.asm"
+		include	"_anim\Monitor.asm"
+		include	"_anim\Title Screen Sonic.asm"
+		include	"_anim\Press Start and TM.asm"
+		include	"_anim\Chopper.asm"
+		include	"_anim\Jaws.asm"
+		include	"_anim\Burrobot.asm"
+		include	"_anim\Burning Grass.asm"
+		include	"_anim\Eggman.asm"
+		include	"_anim\Eggman - Scrap Brain 2 & Final.asm"
+		include	"_anim\FZ Eggman in Ship.asm"
+		include	"_anim\Plasma Ball Launcher.asm"
+		include	"_anim\Plasma Balls.asm"
+		include	"_anim\Prison Capsule.asm"
+		include	"_anim\Basaran.asm"
+		include	"_anim\Flapping Door.asm"
+		include	"_anim\Bomb Enemy.asm"
+		include	"_anim\Orbinaut.asm"
+		include	"_anim\Harpoon.asm"
+		include	"_anim\Bubbles.asm"
+		include	"_anim\Waterfalls.asm"
+		include	"_anim\Drowning Countdown.asm"
+		include	"_anim\Shield and Invincibility.asm"
+		include	"_anim\Special Stage Entry (Unused).asm"
+		include	"_anim\Water Splash.asm"
+		include	"_anim\SBZ Spinning Platforms.asm"
+		include	"_anim\SBZ Vanishing Platforms.asm"
+		include	"_anim\Electrocuter.asm"
+		include	"_anim\SBZ Spin Platform Conveyor.asm"
+		include	"_anim\Caterkiller.asm"
+		include	"_anim\Newtron.asm"
+		include	"_anim\Springs.asm"
+		include	"_anim\Roller.asm"
+		include	"_anim\Fireballs.asm"
+		include	"_anim\Flamethrower.asm"
+		include	"_anim\Bumper.asm"
+		include	"_anim\Signpost.asm"
+		include	"_anim\Lava Geyser.asm"
+		include	"_anim\Wall of Lava.asm"
+		include	"_anim\Moto Bug.asm"
+		include	"_anim\Yadrin.asm"
+
+
 ; ---------------------------------------------------------------------------
 ; Sprite Mappings
 ; ---------------------------------------------------------------------------
 
 		include	"_maps\Sonic.asm"
 		include	"_maps\Sonic - Dynamic Gfx Script.asm"
-		include	"_anim\Sonic.asm"
+
 
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics
@@ -8356,7 +9030,7 @@ Art_RedRing:	incbin	"artunc\Red Ring.bin"
 
 		include "_maps\Effects.asm"
 		include "_maps\Effects - Dynamic Gfx Script.asm"
-		include "_anim\Effects.asm"
+
 
 		include "_maps\Red Ring.asm"
 		include "_maps\Red Ring - DPLC.asm"
