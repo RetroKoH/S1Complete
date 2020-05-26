@@ -69,42 +69,33 @@ DLE_Index:
 
 DLE_GHZ:
 		moveq	#0,d0
-		move.b	(v_difficulty).w,d0
-		add.w	d0,d0
-		move.w	DLE_GHZx(pc,d0.w),d0
-		jmp	DLE_GHZx(pc,d0.w)
-; ===========================================================================
-DLE_GHZx:
-		dc.w DLE_GHZN-DLE_GHZx
-		dc.w DLE_GHZE-DLE_GHZx
-		dc.w DLE_GHZN-DLE_GHZx ; For now, Hard shares with Normal
-; ===========================================================================
-
-DLE_GHZN: ; Normal Difficulty
-		moveq	#0,d0
 		move.b	(v_act).w,d0
-		add.w	d0,d0
-		move.w	DLE_GHZNx(pc,d0.w),d0
-		jmp		DLE_GHZNx(pc,d0.w)
+		lsl.w	#3,d0
+		moveq	#0,d1
+		move.b	(v_difficulty).w,d1
+		lsl.w	#1,d1
+		add.w	d1,d0
+		move.w	DLE_GHZx(pc,d0.w),d0
+		jmp		DLE_GHZx(pc,d0.w)
 ; ===========================================================================
-DLE_GHZNx:
-		dc.w DLE_GHZN1-DLE_GHZNx
-		dc.w DLE_GHZN2-DLE_GHZNx
-		dc.w DLE_GHZN3-DLE_GHZNx
+DLE_GHZx:	; Normal			; Easy				; Hard
+		dc.w DLE_GHZ1N-DLE_GHZx, DLE_GHZ1N-DLE_GHZx, DLE_GHZ1N-DLE_GHZx, 0 ; Act 1
+		dc.w DLE_GHZ2N-DLE_GHZx, DLE_GHZ2E-DLE_GHZx, DLE_GHZ2N-DLE_GHZx, 0 ; Act 2
+		dc.w DLE_GHZ3N-DLE_GHZx, DLE_GHZ3N-DLE_GHZx, DLE_GHZ3N-DLE_GHZx, 0 ; Act 3
 ; ===========================================================================
 
-DLE_GHZN1:
-		move.w	#$300,(v_limitbtm1).w ; set lower y-boundary
-		cmpi.w	#$1780,(v_screenposx).w ; has the camera reached $1780 on x-axis?
-		bcs.s	@ret	; if not, branch
-		move.w	#$400,(v_limitbtm1).w ; set lower y-boundary
+DLE_GHZ1N:
+		move.w	#$300,(v_limitbtm1).w		; set initial lower y-boundary
+		cmpi.w	#$1780,(v_screenposx).w		; has the camera reached $1780 on x-axis?
+		bcs.s	@ret						; if not, branch
+		move.w	#$400,(v_limitbtm1).w		; set lower y-boundary
 
 	@ret:
-		rts	
+		rts
 ; ===========================================================================
 
-DLE_GHZN2:
-		move.w	#$300,(v_limitbtm1).w
+DLE_GHZ2N:
+		move.w	#$300,(v_limitbtm1).w		; set initial lower y-boundary
 		cmpi.w	#$ED0,(v_screenposx).w
 		bcs.s	@ret
 		move.w	#$200,(v_limitbtm1).w
@@ -119,114 +110,19 @@ DLE_GHZN2:
 		rts
 ; ===========================================================================
 
-DLE_GHZN3:
+DLE_GHZ2E:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
-		move.w	DLE_GHZN3sub(pc,d0.w),d0
-		jmp		DLE_GHZN3sub(pc,d0.w)
+		move.w	DLE_GHZ2E_Sub(pc,d0.w),d0
+		jmp		DLE_GHZ2E_Sub(pc,d0.w)
 ; ===========================================================================
-DLE_GHZN3sub:
-		dc.w DLE_GHZ3Nmain-DLE_GHZN3sub
-		dc.w DLE_GHZ3Nboss-DLE_GHZN3sub
-		dc.w DLE_GHZ3Nend-DLE_GHZN3sub
-; ===========================================================================
-
-DLE_GHZ3Nmain:
-		move.w	#$300,(v_limitbtm1).w
-		cmpi.w	#$380,(v_screenposx).w
-		bcs.s	locret_6E96
-		move.w	#$310,(v_limitbtm1).w
-		cmpi.w	#$960,(v_screenposx).w
-		bcs.s	locret_6E96
-		cmpi.w	#$280,(v_screenposy).w
-		bcs.s	loc_6E98
-		move.w	#$400,(v_limitbtm1).w
-		cmpi.w	#$1380,(v_screenposx).w
-		bcc.s	loc_6E8E
-		move.w	#$4C0,(v_limitbtm1).w
-		move.w	#$4C0,(v_limitbtm2).w
-
-loc_6E8E:
-		cmpi.w	#$1700,(v_screenposx).w
-		bcc.s	loc_6E98
-
-locret_6E96:
-		rts	
+DLE_GHZ2E_Sub:
+		dc.w DLE_GHZ2E_Main-DLE_GHZ2E_Sub
+		dc.w DLE_GHZ2E_Boss-DLE_GHZ2E_Sub
+		dc.w DLE_GHZ2E_End-DLE_GHZ2E_Sub
 ; ===========================================================================
 
-loc_6E98:
-		move.w	#$300,(v_limitbtm1).w
-		addq.b	#2,(v_dle_routine).w
-		rts	
-; ===========================================================================
-
-DLE_GHZ3Nboss:
-		cmpi.w	#$960,(v_screenposx).w
-		bcc.s	loc_6EB0
-		subq.b	#2,(v_dle_routine).w
-
-loc_6EB0:
-		cmpi.w	#$2960,(v_screenposx).w
-		bcs.s	locret_6EE8
-		bsr.w	FindFreeObj
-		bne.s	loc_6ED0
-		move.b	#id_BossGreenHill,obID(a1) ; load GHZ boss object
-		move.w	#$2A60,obX(a1)
-		move.w	#$280,obY(a1)
-
-loc_6ED0:
-		music	bgm_Boss,0,1,0	; play boss music
-		move.b	#1,(f_lockscreen).w ; lock screen
-		addq.b	#2,(v_dle_routine).w
-		moveq	#plcid_Boss,d0
-		bra.w	AddPLC		; load boss patterns
-; ===========================================================================
-
-locret_6EE8:
-		rts	
-; ===========================================================================
-
-DLE_GHZ3Nend:
-		move.w	(v_screenposx).w,(v_limitleft2).w
-		rts	
-; ===========================================================================
-
-
-DLE_GHZE: ; Easy Difficulty
-		moveq	#0,d0
-		move.b	(v_act).w,d0
-		add.w	d0,d0
-		move.w	DLE_GHZEx(pc,d0.w),d0
-		jmp		DLE_GHZEx(pc,d0.w)
-; ===========================================================================
-DLE_GHZEx:
-		dc.w DLE_GHZE1-DLE_GHZEx
-		dc.w DLE_GHZE2-DLE_GHZEx
-; ===========================================================================
-
-DLE_GHZE1:
-		move.w	#$300,(v_limitbtm1).w ; set lower y-boundary
-		cmpi.w	#$1780,(v_screenposx).w ; has the camera reached $1780 on x-axis?
-		bcs.s	@ret	; if not, branch
-		move.w	#$400,(v_limitbtm1).w ; set lower y-boundary
-
-	@ret:
-		rts	
-; ===========================================================================
-
-DLE_GHZE2:
-		moveq	#0,d0
-		move.b	(v_dle_routine).w,d0
-		move.w	DLE_GHZ2Esub(pc,d0.w),d0
-		jmp		DLE_GHZ2Esub(pc,d0.w)
-; ===========================================================================
-DLE_GHZ2Esub:
-		dc.w DLE_GHZ2Emain-DLE_GHZ2Esub
-		dc.w DLE_GHZ2Eboss-DLE_GHZ2Esub
-		dc.w DLE_GHZ2Eend-DLE_GHZ2Esub
-; ===========================================================================
-
-DLE_GHZ2Emain:
+DLE_GHZ2E_Main:
 		move.w	#$300,(v_limitbtm1).w	; starting bottom limit
 ; Move the death plane up just before the platforms section
 		cmpi.w	#$ED0,(v_screenposx).w
@@ -238,32 +134,32 @@ DLE_GHZ2Emain:
 		move.w	#$400,(v_limitbtm1).w
 ; Move death plane back to the default state leading to the boss arena
 		cmpi.w	#$1BE0,(v_screenposx).w
-		bcc.s	@gotoBoss_GHZ2E
+		bcc.s	@gotoBoss
 
 	@ret:
 		rts
 ; ===========================================================================
-	@gotoBoss_GHZ2E:
+	@gotoBoss:
 		move.w	#$300,(v_limitbtm1).w
 		addq.b	#2,(v_dle_routine).w
 		rts
 ; ===========================================================================
 
-DLE_GHZ2Eboss:
+DLE_GHZ2E_Boss:
 		cmpi.w	#$1E0,(v_screenposx).w
-		bcc.s	BGHZ2E_Cont
+		bcc.s	@cont
 		subq.b	#2,(v_dle_routine).w
 
-BGHZ2E_Cont:
+	@cont:
 		cmpi.w	#$21E0,(v_screenposx).w
-		bcs.s	BGHZ2E_End
+		bcs.s	@end
 		bsr.w	FindFreeObj
-		bne.s	BGHZ2E_Music
+		bne.s	@music
 		move.b	#id_BossGreenHill,obID(a1) ; load GHZ boss object
 		move.w	#$22E0,obX(a1)
 		move.w	#$280,obY(a1)
 
-BGHZ2E_Music:
+	@music:
 		music	bgm_Boss,0,1,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
@@ -271,11 +167,83 @@ BGHZ2E_Music:
 		bra.w	AddPLC		; load boss patterns
 ; ===========================================================================
 
-BGHZ2E_End:
+	@end:
 		rts	
 ; ===========================================================================
 
-DLE_GHZ2Eend:
+DLE_GHZ2E_End:
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts	
+; ===========================================================================
+
+DLE_GHZ3N:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_GHZ3N_Sub(pc,d0.w),d0
+		jmp		DLE_GHZ3N_Sub(pc,d0.w)
+; ===========================================================================
+DLE_GHZ3N_Sub:
+		dc.w DLE_GHZ3N_Main-DLE_GHZ3N_Sub
+		dc.w DLE_GHZ3N_Boss-DLE_GHZ3N_Sub
+		dc.w DLE_GHZ3N_End-DLE_GHZ3N_Sub
+; ===========================================================================
+
+DLE_GHZ3N_Main:
+		move.w	#$300,(v_limitbtm1).w
+		cmpi.w	#$380,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$310,(v_limitbtm1).w
+		cmpi.w	#$960,(v_screenposx).w
+		bcs.s	@ret
+		cmpi.w	#$280,(v_screenposy).w
+		bcs.s	@gotoBoss
+		move.w	#$400,(v_limitbtm1).w
+		cmpi.w	#$1380,(v_screenposx).w
+		bcc.s	@skip
+		move.w	#$4C0,(v_limitbtm1).w
+		move.w	#$4C0,(v_limitbtm2).w
+
+	@skip:
+		cmpi.w	#$1700,(v_screenposx).w
+		bcc.s	@gotoBoss
+
+	@ret:
+		rts	
+; ===========================================================================
+
+	@gotoBoss:
+		move.w	#$300,(v_limitbtm1).w
+		addq.b	#2,(v_dle_routine).w
+		rts	
+; ===========================================================================
+
+DLE_GHZ3N_Boss:
+		cmpi.w	#$960,(v_screenposx).w
+		bcc.s	@cont
+		subq.b	#2,(v_dle_routine).w
+
+	@cont:
+		cmpi.w	#$2960,(v_screenposx).w
+		bcs.s	@ret
+		bsr.w	FindFreeObj
+		bne.s	@music
+		move.b	#id_BossGreenHill,obID(a1) ; load GHZ boss object
+		move.w	#$2A60,obX(a1)
+		move.w	#$280,obY(a1)
+
+	@music:
+		music	bgm_Boss,0,1,0	; play boss music
+		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
+		moveq	#plcid_Boss,d0
+		bra.w	AddPLC		; load boss patterns
+; ===========================================================================
+
+	@ret:
+		rts	
+; ===========================================================================
+
+DLE_GHZ3N_End:
 		move.w	(v_screenposx).w,(v_limitleft2).w
 		rts	
 ; ===========================================================================
@@ -356,22 +324,28 @@ locret_6F8C:
 DLE_MZ:
 		moveq	#0,d0
 		move.b	(v_act).w,d0
-		add.w	d0,d0
+		lsl.w	#3,d0
+		moveq	#0,d1
+		move.b	(v_difficulty).w,d1
+		lsl.w	#1,d1
+		add.w	d1,d0
 		move.w	DLE_MZx(pc,d0.w),d0
-		jmp	DLE_MZx(pc,d0.w)
+		jmp		DLE_MZx(pc,d0.w)
 ; ===========================================================================
-DLE_MZx:	dc.w DLE_MZ1-DLE_MZx
-		dc.w DLE_MZ2-DLE_MZx
-		dc.w DLE_MZ3-DLE_MZx
+DLE_MZx:	; Normal			; Easy			; Hard
+		dc.w DLE_MZ1N-DLE_MZx, DLE_MZ1N-DLE_MZx, DLE_MZ1N-DLE_MZx, 0
+		dc.w DLE_MZ2N-DLE_MZx, DLE_MZ2E-DLE_MZx, DLE_MZ2N-DLE_MZx, 0
+		dc.w DLE_MZ3N-DLE_MZx, DLE_MZ3N-DLE_MZx, DLE_MZ3N-DLE_MZx, 0
 ; ===========================================================================
 
-DLE_MZ1:
+DLE_MZ1N:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
 		move.w	off_6FB2(pc,d0.w),d0
-		jmp	off_6FB2(pc,d0.w)
+		jmp		off_6FB2(pc,d0.w)
 ; ===========================================================================
-off_6FB2:	dc.w loc_6FBA-off_6FB2
+off_6FB2:
+		dc.w loc_6FBA-off_6FB2
 		dc.w loc_6FEA-off_6FB2
 		dc.w loc_702E-off_6FB2
 		dc.w loc_7050-off_6FB2
@@ -463,40 +437,41 @@ locret_7072:
 		rts	
 ; ===========================================================================
 
-DLE_MZ2:
+DLE_MZ2N:
 		move.w	#$520,(v_limitbtm1).w
 		cmpi.w	#$1700,(v_screenposx).w
-		bcs.s	locret_7088
+		bcs.s	@ret
 		move.w	#$200,(v_limitbtm1).w
 
-locret_7088:
+	@ret:
 		rts	
 ; ===========================================================================
 
-DLE_MZ3:
+DLE_MZ2E:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
-		move.w	off_7098(pc,d0.w),d0
-		jmp	off_7098(pc,d0.w)
+		move.w	DLE_MZ2E_Sub(pc,d0.w),d0
+		jmp		DLE_MZ2E_Sub(pc,d0.w)
 ; ===========================================================================
-off_7098:	dc.w DLE_MZ3boss-off_7098
-		dc.w DLE_MZ3end-off_7098
+DLE_MZ2E_Sub:
+		dc.w DLE_MZ2E_Boss-DLE_MZ2E_Sub
+		dc.w DLE_MZ2E_End-DLE_MZ2E_Sub
 ; ===========================================================================
 
-DLE_MZ3boss:
-		move.w	#$720,(v_limitbtm1).w
-		cmpi.w	#$1560,(v_screenposx).w
-		bcs.s	locret_70E8
-		move.w	#$210,(v_limitbtm1).w
-		cmpi.w	#$17F0,(v_screenposx).w
-		bcs.s	locret_70E8
+DLE_MZ2E_Boss:
+		move.w	#$520,(v_limitbtm1).w
+		cmpi.w	#$1700,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$200,(v_limitbtm1).w
+		cmpi.w	#$1A80,(v_screenposx).w
+		bcs.s	@ret
 		bsr.w	FindFreeObj
-		bne.s	loc_70D0
-		move.b	#id_BossMarble,0(a1) ; load MZ boss object
-		move.w	#$19F0,obX(a1)
+		bne.s	@music
+		move.b	#id_BossMarble,obID(a1) ; load MZ boss object
+		move.w	#$1C80,obX(a1)
 		move.w	#$22C,obY(a1)
 
-loc_70D0:
+	@music:
 		music	bgm_Boss,0,1,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
@@ -504,11 +479,52 @@ loc_70D0:
 		bra.w	AddPLC		; load boss patterns
 ; ===========================================================================
 
-locret_70E8:
+	@ret:
 		rts	
 ; ===========================================================================
 
-DLE_MZ3end:
+DLE_MZ2E_End:
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts	
+; ===========================================================================
+
+DLE_MZ3N:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_MZ3N_Sub(pc,d0.w),d0
+		jmp		DLE_MZ3N_Sub(pc,d0.w)
+; ===========================================================================
+DLE_MZ3N_Sub:
+		dc.w DLE_MZ3N_Boss-DLE_MZ3N_Sub
+		dc.w DLE_MZ3N_End-DLE_MZ3N_Sub
+; ===========================================================================
+
+DLE_MZ3N_Boss:
+		move.w	#$720,(v_limitbtm1).w
+		cmpi.w	#$1560,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$210,(v_limitbtm1).w
+		cmpi.w	#$17F0,(v_screenposx).w
+		bcs.s	@ret
+		bsr.w	FindFreeObj
+		bne.s	@music
+		move.b	#id_BossMarble,obID(a1) ; load MZ boss object
+		move.w	#$19F0,obX(a1)
+		move.w	#$22C,obY(a1)
+
+	@music:
+		music	bgm_Boss,0,1,0	; play boss music
+		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
+		moveq	#plcid_Boss,d0
+		bra.w	AddPLC		; load boss patterns
+; ===========================================================================
+
+	@ret:
+		rts	
+; ===========================================================================
+
+DLE_MZ3N_End:
 		move.w	(v_screenposx).w,(v_limitleft2).w
 		rts	
 ; ===========================================================================

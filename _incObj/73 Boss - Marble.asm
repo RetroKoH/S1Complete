@@ -33,7 +33,9 @@ Obj73_ObjData:	; routine number, animation
 
 Obj73_Main:	; Routine 0
 		move.w	obX(a0),obBossBufferX(a0)
+		move.w	obX(a0),(v_boss_start_x).w	; new variable for positioning purposes between layouts (Difficulties, Boss Rush, etc.)
 		move.w	obY(a0),obBossBufferY(a0)
+		move.w	obY(a0),(v_boss_start_y).w	; new variable for positioning purposes between layouts (Difficulties, Boss Rush, etc.)
 		move.b	#$F,obColType(a0)
 		move.b	#8,obColProp(a0) ; set number of hits to 8
 		cmpi.b	#difEasy,(v_difficulty).w
@@ -97,7 +99,13 @@ BMZ_ShipStart:
 		move.w	d0,obVelY(a0)
 		move.w	#-$100,obVelX(a0)
 		bsr.w	BossMove
-		cmpi.w	#$1910,obBossBufferX(a0)
+
+		move.w	(v_boss_start_x).w,d0
+		subi.w	#$E0,d0
+		move.w	obBossBufferX(a0),d1
+		cmp.w	d0,d1
+		;cmpi.w	#$1910,obBossBufferX(a0)
+
 		bne.s	loc_18334
 		addq.b	#2,ob2ndRout(a0)
 		clr.b	obSubtype(a0)
@@ -182,7 +190,11 @@ loc_183CA:
 		tst.w	obVelX(a0)
 		bne.s	loc_183FE
 		moveq	#$40,d0
-		cmpi.w	#$22C,obBossBufferY(a0)
+
+		move.w	(v_boss_start_y).w,d1
+		move.w	obBossBufferY(a0),d2
+		cmp.w	d1,d2
+
 		beq.s	loc_183E6
 		bcs.s	loc_183DE
 		neg.w	d0
@@ -230,21 +242,34 @@ loc_1844A:
 loc_1845C:
 		btst	#0,obStatus(a0)
 		beq.s	loc_18474
-		cmpi.w	#$1910,obBossBufferX(a0)
+
+		move.w	(v_boss_start_x).w,d0
+		subi.w	#$E0,d0
+		move.w	obBossBufferX(a0),d1
+		cmp.w	d0,d1
+;		cmpi.w	#$1910,obBossBufferX(a0)
+
 		blt.s	locret_1849C
-		move.w	#$1910,obBossBufferX(a0)
+		move.w	d0,obBossBufferX(a0)
 		bra.s	loc_18482
 ; ===========================================================================
 
 loc_18474:
-		cmpi.w	#$1830,obBossBufferX(a0)
+		move.w	(v_boss_start_x).w,d0
+		subi.w	#$1C0,d0
+		move.w	obBossBufferX(a0),d1
+		cmp.w	d0,d1
+;		cmpi.w	#$1830,obBossBufferX(a0)
 		bgt.s	locret_1849C
-		move.w	#$1830,obBossBufferX(a0)
+		move.w	d0,obBossBufferX(a0)
 
 loc_18482:
 		clr.w	obVelX(a0)
 		move.w	#-$180,obVelY(a0)
-		cmpi.w	#$22C,obBossBufferY(a0)
+		move.w	(v_boss_start_y).w,d0
+		move.w	obBossBufferY(a0),d1
+		cmp.w	d0,d1
+;		cmpi.w	#$22C,obBossBufferY(a0)
 		bcc.s	loc_18498
 		neg.w	obVelY(a0)
 
@@ -258,9 +283,10 @@ locret_1849C:
 Obj73_MakeLava2:
 		bsr.w	BossMove
 		move.w	obBossBufferY(a0),d0
-		subi.w	#$22C,d0
+		move.w	(v_boss_start_y).w,d1
+		sub.w	d1,d0
 		bgt.s	locret_184F4
-		move.w	#$22C,d0
+		move.w	d1,d0
 		tst.w	obVelY(a0)
 		beq.s	loc_184EA
 		clr.w	obVelY(a0)
@@ -308,7 +334,13 @@ BMZ_AfterExplosions:
 		addq.w	#1,obBossDelayTimer(a0)
 		beq.s	loc_18544
 		bpl.s	loc_1854E
-		cmpi.w	#$270,obBossBufferY(a0)
+
+		move.w	(v_boss_start_y).w,d0
+		addi.w	#$44,d0
+		move.w	obBossBufferY(a0),d1
+		cmp.w	d0,d1
+;		cmpi.w	#$270,obBossBufferY(a0)
+
 		bcc.s	loc_18544
 		addi.w	#$18,obVelY(a0)
 		bra.s	loc_1857A
@@ -348,7 +380,13 @@ BMZ_Retreat:
 ;		move.b	#$F,obColType(a0)			; make the boss vulnerable to damage again
 		move.w	#$500,obVelX(a0)
 		move.w	#-$40,obVelY(a0)
-		cmpi.w	#$1960,(v_limitright2).w
+
+		move.w	(v_boss_start_x).w,d0
+		subi.w	#$90,d0
+		move.w	(v_limitright2).w,d1
+		cmp.w	d0,d1
+
+;		cmpi.w	#$1960,(v_limitright2).w
 		bcc.s	loc_1859C
 		addq.w	#2,(v_limitright2).w
 		bra.s	loc_185A2

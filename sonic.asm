@@ -1917,7 +1917,7 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
-		move.b	#difEasy,(v_difficulty).w
+		;move.b	#difEasy,(v_difficulty).w ; TESTING PURPOSES
 
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC

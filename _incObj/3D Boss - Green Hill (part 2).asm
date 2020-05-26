@@ -4,7 +4,7 @@ BGHZ_MakeBall: 	; Sub-Routine 0
 		move.w	#-$40,obVelY(a0)
 		bsr.w	BossMove
 
-		move.w	(v_boss_start_x),d0
+		move.w	(v_boss_start_x).w,d0
 		subi.w	#$60,d0
 		move.w	obBossBufferX(a0),d1
 		cmp.w	d0,d1						; has Eggman reached the center of the arena? 
@@ -32,7 +32,7 @@ BGHZ_ShipSetDirection:	; Sub-Routine 4
 		move.w	#$3F,obBossDelayTimer(a0)	; Eggman moves for $3F frames again after turning
 		move.w	#$100,obVelX(a0)			; move the ship sideways
 
-		move.w	(v_boss_start_x),d0
+		move.w	(v_boss_start_x).w,d0
 		subi.w	#$60,d0
 		move.w	obBossBufferX(a0),d1
 		cmp.w	d0,d1						; has Eggman reached the center of the arena? 
@@ -157,7 +157,7 @@ BGHZ_FaceMain:	; Routine 4
 		subq.b	#4,d0
 		bne.s	loc_17A3E
 
-		move.w	(v_boss_start_x),d2
+		move.w	(v_boss_start_x).w,d2
 		subi.w	#$60,d2
 		move.w	obBossBufferX(a1),d3
 		cmp.w	d2,d3						; has Eggman reached the center of the arena? 
