@@ -6,9 +6,10 @@ DebugMode:
 		moveq	#0,d0
 		move.b	(v_debuguse).w,d0
 		move.w	Debug_Index(pc,d0.w),d1
-		jmp	Debug_Index(pc,d1.w)
+		jmp		Debug_Index(pc,d1.w)
 ; ===========================================================================
-Debug_Index:	dc.w Debug_Main-Debug_Index
+Debug_Index:
+		dc.w Debug_Main-Debug_Index
 		dc.w Debug_Action-Debug_Index
 ; ===========================================================================
 
@@ -21,7 +22,7 @@ Debug_Main:	; Routine 0
 		andi.w	#$7FF,(v_player+obY).w
 		andi.w	#$7FF,(v_screenposy).w
 		andi.w	#$3FF,(v_bgscreenposy).w
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 		move.b	#aniID_Walk,obAnim(a0)
 
 		clr.w	obVelX(a0)

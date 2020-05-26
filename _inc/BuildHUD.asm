@@ -32,7 +32,7 @@ BuildHUD:
 		moveq	#0,d3
 		move.b	(v_hudscrollpos).w,d3		; set X pos. Will scroll to $90.
 		move.w	#128+136,d2					; set Y pos
-		lea	(Map_HUD).l,a1
+		lea		(Map_HUD).l,a1
 		movea.w	#$6CA,a3					; set art tile and flags
 		cmpi.b	#id_Special,(v_gamemode).w	; is this the Special Stage?
 		bne.s	@notSS						; if yes, branch ahead
