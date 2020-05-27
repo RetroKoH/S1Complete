@@ -535,48 +535,56 @@ DLE_MZ3N_End:
 DLE_SLZ:
 		moveq	#0,d0
 		move.b	(v_act).w,d0
-		add.w	d0,d0
+		lsl.w	#3,d0
+		moveq	#0,d1
+		move.b	(v_difficulty).w,d1
+		lsl.w	#1,d1
+		add.w	d1,d0
 		move.w	DLE_SLZx(pc,d0.w),d0
-		jmp	DLE_SLZx(pc,d0.w)
+		jmp		DLE_SLZx(pc,d0.w)
 ; ===========================================================================
-DLE_SLZx:	dc.w DLE_SLZ12-DLE_SLZx
-		dc.w DLE_SLZ12-DLE_SLZx
-		dc.w DLE_SLZ3-DLE_SLZx
+DLE_SLZx:
+		dc.w DLE_SLZ12N-DLE_SLZx, DLE_SLZ12N-DLE_SLZx, DLE_SLZ12N-DLE_SLZx, 0 ; Act 1
+		dc.w DLE_SLZ12N-DLE_SLZx, DLE_SLZ2E-DLE_SLZx, DLE_SLZ12N-DLE_SLZx, 0 ; Act 2
+		dc.w DLE_SLZ3N-DLE_SLZx, DLE_SLZ3N-DLE_SLZx, DLE_SLZ3N-DLE_SLZx, 0 ; Act 3
 ; ===========================================================================
 
-DLE_SLZ12:
+DLE_SLZ12N:
 		rts	
 ; ===========================================================================
 
-DLE_SLZ3:
+DLE_SLZ2E:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
-		move.w	off_7118(pc,d0.w),d0
-		jmp	off_7118(pc,d0.w)
+		move.w	DLE_SLZ2E_Sub(pc,d0.w),d0
+		jmp		DLE_SLZ2E_Sub(pc,d0.w)
 ; ===========================================================================
-off_7118:	dc.w DLE_SLZ3main-off_7118
-		dc.w DLE_SLZ3boss-off_7118
-		dc.w DLE_SLZ3end-off_7118
+DLE_SLZ2E_Sub:
+		dc.w DLE_SLZ2E_Main-DLE_SLZ2E_Sub
+		dc.w DLE_SLZ2E_Boss-DLE_SLZ2E_Sub
+		dc.w DLE_SLZ2E_End-DLE_SLZ2E_Sub
 ; ===========================================================================
 
-DLE_SLZ3main:
-		cmpi.w	#$1E70,(v_screenposx).w
-		bcs.s	locret_7130
+DLE_SLZ2E_Main:
+		cmpi.w	#$1DF0,(v_screenposx).w
+		bcs.s	@end
 		move.w	#$210,(v_limitbtm1).w
 		addq.b	#2,(v_dle_routine).w
 
-locret_7130:
+	@end:
 		rts	
 ; ===========================================================================
 
-DLE_SLZ3boss:
-		cmpi.w	#$2000,(v_screenposx).w
-		bcs.s	locret_715C
+DLE_SLZ2E_Boss:
+		cmpi.w	#$1F80,(v_screenposx).w
+		bcs.s	@end
 		bsr.w	FindFreeObj
-		bne.s	loc_7144
-		move.b	#id_BossStarLight,(a1) ; load SLZ boss object
+		bne.s	@music
+		move.b	#id_BossStarLight,obID(a1) ; load SLZ boss object
+		move.w	#$2108,obX(a1)
+		move.w	#$228,obY(a1)
 
-loc_7144:
+	@music:
 		music	bgm_Boss,0,1,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
@@ -584,13 +592,60 @@ loc_7144:
 		bra.w	AddPLC		; load boss patterns
 ; ===========================================================================
 
-locret_715C:
+	@end:
 		rts	
 ; ===========================================================================
 
-DLE_SLZ3end:
+DLE_SLZ2E_End:
 		move.w	(v_screenposx).w,(v_limitleft2).w
 		rts
+; ===========================================================================
+
+DLE_SLZ3N:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_SLZ3N_Sub(pc,d0.w),d0
+		jmp		DLE_SLZ3N_Sub(pc,d0.w)
+; ===========================================================================
+DLE_SLZ3N_Sub:
+		dc.w DLE_SLZ3N_Main-DLE_SLZ3N_Sub
+		dc.w DLE_SLZ3N_Boss-DLE_SLZ3N_Sub
+		dc.w DLE_SLZ3N_End-DLE_SLZ3N_Sub
+; ===========================================================================
+
+DLE_SLZ3N_Main:
+		cmpi.w	#$1E70,(v_screenposx).w
+		bcs.s	@end
+		move.w	#$210,(v_limitbtm1).w
+		addq.b	#2,(v_dle_routine).w
+
+	@end:
+		rts	
+; ===========================================================================
+
+DLE_SLZ3N_Boss:
+		cmpi.w	#$2000,(v_screenposx).w
+		bcs.s	@end
+		bsr.w	FindFreeObj
+		bne.s	@music
+		move.b	#id_BossStarLight,obID(a1) ; load SLZ boss object
+		move.w	#$2188,obX(a1)
+		move.w	#$228,obY(a1)
+
+	@music:
+		music	bgm_Boss,0,1,0	; play boss music
+		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
+		moveq	#plcid_Boss,d0
+		bra.w	AddPLC		; load boss patterns
+; ===========================================================================
+
+	@end:
+		rts	
+; ===========================================================================
+
+DLE_SLZ3N_End:
+		move.w	(v_screenposx).w,(v_limitleft2).w
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
