@@ -809,16 +809,21 @@ DLE_SYZ3N_End:
 DLE_SBZ:
 		moveq	#0,d0
 		move.b	(v_act).w,d0
-		add.w	d0,d0
+		lsl.w	#3,d0
+		moveq	#0,d1
+		move.b	(v_difficulty).w,d1
+		lsl.w	#1,d1
+		add.w	d1,d0
 		move.w	DLE_SBZx(pc,d0.w),d0
-		jmp	DLE_SBZx(pc,d0.w)
+		jmp		DLE_SBZx(pc,d0.w)
 ; ===========================================================================
-DLE_SBZx:	dc.w DLE_SBZ1-DLE_SBZx
-		dc.w DLE_SBZ2-DLE_SBZx
-		dc.w DLE_FZ-DLE_SBZx
+DLE_SBZx:
+		dc.w DLE_SBZ1N-DLE_SBZx, DLE_SBZ1N-DLE_SBZx, DLE_SBZ1N-DLE_SBZx, 0
+		dc.w DLE_SBZ2N-DLE_SBZx, DLE_SBZ2E-DLE_SBZx, DLE_SBZ2N-DLE_SBZx, 0
+		dc.w DLE_FZ-DLE_SBZx, 	 DLE_FZ-DLE_SBZx, 	 DLE_FZ-DLE_SBZx, 0
 ; ===========================================================================
 
-DLE_SBZ1:
+DLE_SBZ1N:
 		move.w	#$720,(v_limitbtm1).w
 		cmpi.w	#$1880,(v_screenposx).w
 		bcs.s	locret_7242
@@ -828,19 +833,36 @@ DLE_SBZ1:
 		move.w	#$2A0,(v_limitbtm1).w
 
 locret_7242:
-		rts	
+		rts
 ; ===========================================================================
 
-DLE_SBZ2:
+DLE_SBZ2N:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
-		move.w	off_7252(pc,d0.w),d0
-		jmp	off_7252(pc,d0.w)
+		move.w	off_SBZ2N(pc,d0.w),d0
+		jmp		off_SBZ2N(pc,d0.w)
 ; ===========================================================================
-off_7252:	dc.w DLE_SBZ2main-off_7252
-		dc.w DLE_SBZ2boss-off_7252
-		dc.w DLE_SBZ2boss2-off_7252
-		dc.w DLE_SBZ2end-off_7252
+
+DLE_SBZ2E:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	off_SBZ2E(pc,d0.w),d0
+		jmp		off_SBZ2E(pc,d0.w)
+; ===========================================================================
+
+off_SBZ2N:
+		dc.w DLE_SBZ2main-off_SBZ2N
+		dc.w DLE_SBZ2boss-off_SBZ2N
+		dc.w DLE_SBZ2boss2-off_SBZ2N
+		dc.w DLE_SBZ2end-off_SBZ2N
+; ===========================================================================
+
+off_SBZ2E:
+		dc.w DLE_SBZ2Emain-off_SBZ2E
+		dc.w DLE_FZboss-off_SBZ2E
+		dc.w DLE_FZend-off_SBZ2E
+		dc.w locret_7322-off_SBZ2E
+		dc.w DLE_FZend2-off_SBZ2E
 ; ===========================================================================
 
 DLE_SBZ2main:
@@ -853,15 +875,33 @@ DLE_SBZ2main:
 		addq.b	#2,(v_dle_routine).w
 
 locret_727A:
-		rts	
+		rts
 ; ===========================================================================
+
+DLE_SBZ2Emain:
+		move.w	#$800,(v_limitbtm1).w
+		cmpi.w	#$1800,(v_screenposx).w
+		bcs.s	@ret
+		move.w	#$510,(v_limitbtm1).w
+		cmpi.w	#$2100,(v_screenposx).w
+		bcs.s	@ret
+		addq.b	#2,(v_dle_routine).w
+		move.w	#$510,(v_limittop2).w
+		moveq	#plcid_FZBoss,d0
+		bsr.w	AddPLC				; load FZ boss patterns
+		music	bgm_FZ, 0,1,0
+
+	@ret:
+		rts
+; ===========================================================================
+
 
 DLE_SBZ2boss:
 		cmpi.w	#$1EB0,(v_screenposx).w
 		bcs.s	locret_7298
 		bsr.w	FindFreeObj
 		bne.s	locret_7298
-		move.b	#id_FalseFloor,(a1) ; load collapsing block object
+		move.b	#id_FalseFloor,obID(a1) ; load collapsing block object
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_EggmanSBZ2,d0
 		bra.w	AddPLC		; load SBZ2 Eggman patterns
@@ -876,7 +916,7 @@ DLE_SBZ2boss2:
 		bcs.s	loc_72B6
 		bsr.w	FindFreeObj
 		bne.s	loc_72B0
-		move.b	#id_ScrapEggman,(a1) ; load SBZ2 Eggman object
+		move.b	#id_ScrapEggman,obID(a1) ; load SBZ2 Eggman object
 		addq.b	#2,(v_dle_routine).w
 
 loc_72B0:
@@ -903,7 +943,8 @@ DLE_FZ:
 		move.w	off_72D8(pc,d0.w),d0
 		jmp	off_72D8(pc,d0.w)
 ; ===========================================================================
-off_72D8:	dc.w DLE_FZmain-off_72D8, DLE_FZboss-off_72D8
+off_72D8:
+		dc.w DLE_FZmain-off_72D8, DLE_FZboss-off_72D8
 		dc.w DLE_FZend-off_72D8, locret_7322-off_72D8
 		dc.w DLE_FZend2-off_72D8
 ; ===========================================================================
@@ -924,7 +965,7 @@ DLE_FZboss:
 		bcs.s	loc_7312
 		bsr.w	FindFreeObj
 		bne.s	loc_7312
-		move.b	#id_BossFinal,(a1) ; load FZ boss object
+		move.b	#id_BossFinal,obID(a1) ; load FZ boss object
 		addq.b	#2,(v_dle_routine).w
 		move.b	#1,(f_lockscreen).w ; lock screen
 

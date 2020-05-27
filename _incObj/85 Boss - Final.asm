@@ -82,7 +82,7 @@ loc_19E20:
 		lea		$36(a0),a2
 		jsr		(FindFreeObj).l
 		bne.s	loc_19E5A
-		move.b	#id_BossPlasma,(a1) ; load energy ball object
+		move.b	#id_BossPlasma,obID(a1) ; load energy ball object
 		move.w	a1,(a2)
 		move.l	a0,$34(a1)
 		lea		$38(a0),a2
@@ -93,23 +93,27 @@ loc_19E3E:
 		jsr	(FindNextFreeObj).l
 		bne.s	loc_19E5A
 		move.w	a1,(a2)+
-		move.b	#id_EggmanCylinder,(a1) ; load crushing	cylinder object
+		move.b	#id_EggmanCylinder,obID(a1) ; load crushing	cylinder object
 		move.l	a0,$34(a1)
 		move.b	d2,obSubtype(a1)
 		addq.w	#2,d2
 		dbf	d1,loc_19E3E
 
 loc_19E5A:
-		move.w	#0,$34(a0)
+		clr.w	$34(a0)
 		move.b	#8,obColProp(a0) ; set number of hits to 8
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@notEasy
+		move.b	#6,obColProp(a0)			; set number of hits to 6 for Easy Mode
+	@notEasy:
 		move.w	#-1,$30(a0)
 
 Obj85_Eggman:	; Routine 2
 		moveq	#0,d0
 		move.b	$34(a0),d0
 		move.w	off_19E80(pc,d0.w),d0
-		jsr	off_19E80(pc,d0.w)
-		jmp	(DisplaySprite).l
+		jsr		off_19E80(pc,d0.w)
+		jmp		(DisplaySprite).l
 ; ===========================================================================
 off_19E80:	dc.w loc_19E90-off_19E80, loc_19EA8-off_19E80
 		dc.w loc_19FE6-off_19E80, loc_1A02A-off_19E80
