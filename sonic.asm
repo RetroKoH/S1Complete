@@ -2035,7 +2035,7 @@ GM_Title:
 		moveq	#palid_Title,d0	; load title screen palette
 		bsr.w	PalLoad1
 		sfx		bgm_Title,0,1,1	; play title screen music
-		move.b	#0,(f_debugmode).w ; disable debug mode
+		clr.b	(f_debugmode).w ; disable debug mode
 		move.w	#$178,(v_demolength).w ; run title screen for $178 frames
 
 		lea		(v_objspace+$80).w,a0
@@ -3547,7 +3547,7 @@ Level_StartGame:
 		move.b	#1,(f_level_started).w ; LEVEL START FLAG
 	@demo:
 		bclr	#7,(v_gamemode).w ; subtract $80 from mode to end pre-level stuff
-		move.b	#1,(f_debugmode).w ; enable debug mode
+;		move.b	#1,(f_debugmode).w ; enable debug mode
 
 ; ---------------------------------------------------------------------------
 ; Main level loop (when	all title card and loading sequences are finished)

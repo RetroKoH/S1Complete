@@ -292,7 +292,7 @@ Obj73_MakeLava2:
 		clr.w	obVelY(a0)
 		move.w	#$50,obBossDelayTimer(a0)
 		bchg	#0,obStatus(a0)
-		jsr	(FindFreeObj).l
+		jsr		(FindFreeObj).l
 		bne.s	loc_184EA
 		move.w	obBossBufferX(a0),obX(a1)
 		move.w	obBossBufferY(a0),obY(a1)

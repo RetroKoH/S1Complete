@@ -468,7 +468,7 @@ DLE_MZ2E_Boss:
 		bsr.w	FindFreeObj
 		bne.s	@music
 		move.b	#id_BossMarble,obID(a1) ; load MZ boss object
-		move.w	#$1C80,obX(a1)
+		move.w	#$1C70,obX(a1)
 		move.w	#$22C,obY(a1)
 
 	@music:
@@ -600,67 +600,140 @@ DLE_SLZ3end:
 DLE_SYZ:
 		moveq	#0,d0
 		move.b	(v_act).w,d0
-		add.w	d0,d0
+		lsl.w	#3,d0
+		moveq	#0,d1
+		move.b	(v_difficulty).w,d1
+		lsl.w	#1,d1
+		add.w	d1,d0
 		move.w	DLE_SYZx(pc,d0.w),d0
 		jmp	DLE_SYZx(pc,d0.w)
 ; ===========================================================================
-DLE_SYZx:	dc.w DLE_SYZ1-DLE_SYZx
-		dc.w DLE_SYZ2-DLE_SYZx
-		dc.w DLE_SYZ3-DLE_SYZx
+DLE_SYZx:	; Normal			; Easy				; Hard
+		dc.w DLE_SYZ1N-DLE_SYZx, DLE_SYZ1N-DLE_SYZx, DLE_SYZ1N-DLE_SYZx, 0 ; Act 1
+		dc.w DLE_SYZ2N-DLE_SYZx, DLE_SYZ2E-DLE_SYZx, DLE_SYZ2N-DLE_SYZx, 0 ; Act 2
+		dc.w DLE_SYZ3N-DLE_SYZx, DLE_SYZ3N-DLE_SYZx, DLE_SYZ3N-DLE_SYZx, 0 ; Act 3
 ; ===========================================================================
 
-DLE_SYZ1:
+DLE_SYZ1N:
 		rts	
 ; ===========================================================================
 
-DLE_SYZ2:
+DLE_SYZ2N:
 		move.w	#$520,(v_limitbtm1).w
 		cmpi.w	#$25A0,(v_screenposx).w
-		bcs.s	locret_71A2
+		bcs.s	@end
 		move.w	#$420,(v_limitbtm1).w
 		cmpi.w	#$4D0,(v_player+obY).w
-		bcs.s	locret_71A2
+		bcs.s	@end
 		move.w	#$520,(v_limitbtm1).w
 
-locret_71A2:
+	@end:
 		rts	
 ; ===========================================================================
 
-DLE_SYZ3:
+DLE_SYZ2E:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_SYZ2E_Sub(pc,d0.w),d0
+		jmp		DLE_SYZ2E_Sub(pc,d0.w)
+; ===========================================================================
+
+DLE_SYZ2E_Sub:
+		dc.w DLE_SYZ2E_Main-DLE_SYZ2E_Sub
+		dc.w DLE_SYZ2E_Boss-DLE_SYZ2E_Sub
+		dc.w DLE_SYZ2E_End-DLE_SYZ2E_Sub
+; ===========================================================================
+
+DLE_SYZ2E_Main:
+		move.w	#$520,(v_limitbtm1).w
+		cmpi.w	#$25A0,(v_screenposx).w
+		bcs.s	@end
+		move.w	#$420,(v_limitbtm1).w
+		cmpi.w	#$4D0,(v_player+obY).w
+		bcs.s	@chkBoss
+		move.w	#$520,(v_limitbtm1).w
+
+	@chkBoss:
+		cmpi.w	#$29C0,(v_screenposx).w
+		bcs.s	@end
+		bsr.w	FindFreeObj
+		bne.s	@end
+		move.b	#id_BossBlock,obID(a1) ; load blocks that boss picks up
+		move.w	#$2B10,obX(a1)
+		move.w	#$4D2,obY(a1)
+		addq.b	#2,(v_dle_routine).w
+
+	@end:
+		rts	
+; ===========================================================================
+
+DLE_SYZ2E_Boss:
+		cmpi.w	#$2B00,(v_screenposx).w
+		bcs.s	@end
+		move.w	#$41C,(v_limitbtm1).w
+		bsr.w	FindFreeObj
+		bne.s	@music
+		move.b	#id_BossSpringYard,obID(a1) ; load SYZ boss object
+		move.w	#$2CB0,obX(a1) ; -$100
+		move.w	#$42A,obY(a1) ; -$B0
+
+	@music:
+		music	bgm_Boss,0,1,0	; play boss music
+		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
+		moveq	#plcid_Boss,d0
+		bra.w	AddPLC		; load boss patterns
+; ===========================================================================
+
+	@end:
+		rts	
+; ===========================================================================
+
+DLE_SYZ2E_End:
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts	
+; ===========================================================================
+
+DLE_SYZ3N:
 		moveq	#0,d0
 		move.b	(v_dle_routine).w,d0
 		move.w	off_71B2(pc,d0.w),d0
-		jmp	off_71B2(pc,d0.w)
+		jmp		off_71B2(pc,d0.w)
 ; ===========================================================================
-off_71B2:	dc.w DLE_SYZ3main-off_71B2
-		dc.w DLE_SYZ3boss-off_71B2
-		dc.w DLE_SYZ3end-off_71B2
+off_71B2:
+		dc.w DLE_SYZ3N_Main-off_71B2
+		dc.w DLE_SYZ3N_Boss-off_71B2
+		dc.w DLE_SYZ3N_End-off_71B2
 ; ===========================================================================
 
-DLE_SYZ3main:
+DLE_SYZ3N_Main:
 		cmpi.w	#$2AC0,(v_screenposx).w
 		bcs.s	locret_71CE
 		bsr.w	FindFreeObj
 		bne.s	locret_71CE
-		move.b	#id_BossBlock,(a1) ; load blocks that boss picks up
+		move.b	#id_BossBlock,obID(a1) ; load blocks that boss picks up
+		move.w	#$2C10,obX(a1)
+		move.w	#$582,obY(a1)
 		addq.b	#2,(v_dle_routine).w
 
 locret_71CE:
 		rts	
 ; ===========================================================================
 
-DLE_SYZ3boss:
+DLE_SYZ3N_Boss:
 		cmpi.w	#$2C00,(v_screenposx).w
 		bcs.s	locret_7200
 		move.w	#$4CC,(v_limitbtm1).w
 		bsr.w	FindFreeObj
 		bne.s	loc_71EC
-		move.b	#id_BossSpringYard,(a1) ; load SYZ boss	object
-		addq.b	#2,(v_dle_routine).w
+		move.b	#id_BossSpringYard,obID(a1) ; load SYZ boss	object
+		move.w	#$2DB0,obX(a1)
+		move.w	#$4DA,obY(a1)
 
 loc_71EC:
 		music	bgm_Boss,0,1,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
 		bra.w	AddPLC		; load boss patterns
 ; ===========================================================================
@@ -669,10 +742,11 @@ locret_7200:
 		rts	
 ; ===========================================================================
 
-DLE_SYZ3end:
+DLE_SYZ3N_End:
 		move.w	(v_screenposx).w,(v_limitleft2).w
 		rts	
 ; ===========================================================================
+
 ; ---------------------------------------------------------------------------
 ; Scrap	Brain Zone dynamic level events
 ; ---------------------------------------------------------------------------

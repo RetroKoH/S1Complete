@@ -45,7 +45,13 @@ Obj74_Action:	; Routine 2
 		jsr	(SpeedToPos).l
 		lea	(Ani_Fire).l,a1
 		jsr	(AnimateSprite).l
-		cmpi.w	#$2E8,obY(a0)
+
+		move.w	(v_boss_start_y).w,d0
+		addi.w	#$BC,d0
+		move.w	obY(a0),d1
+		cmp.w	d0,d1
+;		cmpi.w	#$2E8,obY(a0)
+
 		bhi.s	Obj74_Delete
 		rts	
 ; ===========================================================================
@@ -127,7 +133,12 @@ Obj74_Duplicate:
 		tst.w	d1
 		bpl.s	loc_18826
 		move.w	obX(a0),d0
-		cmpi.w	#$1940,d0
+
+		move.w	(v_boss_start_x).w,d1
+		subi.w	#$B0,d1
+		cmp.w	d1,d0
+;		cmpi.w	#$1940,d0
+
 		bgt.s	loc_1882C
 		move.w	$30(a0),d1
 		cmp.w	d0,d1
