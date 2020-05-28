@@ -8177,11 +8177,16 @@ BossMove:
 
 
 
-Map_Eggman:	include	"_maps\Eggman.asm"
+Map_Eggman:		include	"_maps\Eggman.asm"
+
 Map_BossItems:	include	"_maps\Boss Items.asm"
+
+				include "_maps\Eggman - Bridge Boss.asm"
+
 		include	"_incObj\77 Boss - Labyrinth.asm"
 		include	"_incObj\73 Boss - Marble.asm"
 		include	"_incObj\74 MZ Boss Fire.asm"
+		include	"_incObj\8E Boss - Labyrinth 2.asm"
 
 	Obj7A_Delete:
 		jmp	(DeleteObject).l
@@ -9377,6 +9382,8 @@ Blk128_SBZ3:	incbin	"map128\SBZ3.bin"
 ; Compressed graphics - bosses and ending sequence
 ; ---------------------------------------------------------------------------
 Nem_Eggman:	incbin	"artnem\Boss - Main.bin"
+		even
+Nem_Eggman_Alt: incbin	"artnem\Boss - Alt Bosses.bin"
 		even
 Nem_Weapons:	incbin	"artnem\Boss - Weapons.bin"
 		even

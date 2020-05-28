@@ -143,6 +143,8 @@ ptr_CreditsText:	dc.l CreditsText
 ptr_EndEggman:		dc.l EndEggman
 ptr_TryChaos:		dc.l TryChaos
 ;ptr_RedRing:		dc.l RedRing
+ptr_Obj8D:			dc.l NullObject		; Red Ring
+ptr_BossLabyrinth2:	dc.l BossLabyrinth2	; 8-bit LZ boss
 
 NullObject:
 		;jmp	(DeleteObject).l	; It would be safer to have this instruction here, but instead it just falls through to ObjectFall
@@ -289,3 +291,5 @@ id_CreditsText:		equ ((ptr_CreditsText-Obj_Index)/4)+1
 id_EndEggman:		equ ((ptr_EndEggman-Obj_Index)/4)+1
 id_TryChaos:		equ ((ptr_TryChaos-Obj_Index)/4)+1
 ;id_RedRing:			equ ((ptr_RedRing-Obj_Index)/4)+1
+id_Obj8D:			equ ((ptr_Obj8D-Obj_Index)/4)+1
+id_BossLZ2:			equ ((ptr_BossLabyrinth2-Obj_Index)/4)+1

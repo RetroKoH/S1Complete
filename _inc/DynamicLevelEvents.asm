@@ -255,21 +255,76 @@ DLE_GHZ3N_End:
 DLE_LZ:
 		moveq	#0,d0
 		move.b	(v_act).w,d0
-		add.w	d0,d0
+		lsl.w	#3,d0
+		moveq	#0,d1
+		move.b	(v_difficulty).w,d1
+		lsl.w	#1,d1
+		add.w	d1,d0
 		move.w	DLE_LZx(pc,d0.w),d0
 		jmp	DLE_LZx(pc,d0.w)
 ; ===========================================================================
-DLE_LZx:	dc.w DLE_LZ12-DLE_LZx
-		dc.w DLE_LZ12-DLE_LZx
-		dc.w DLE_LZ3-DLE_LZx
-		dc.w DLE_SBZ3-DLE_LZx
+DLE_LZx:	; Normal			; Easy				; Hard
+		dc.w DLE_LZ12N-DLE_LZx, DLE_LZ12N-DLE_LZx, DLE_LZ12N-DLE_LZx, 0 ; Act 1
+		dc.w DLE_LZ12N-DLE_LZx, DLE_LZ2E-DLE_LZx, DLE_LZ12N-DLE_LZx, 0 ; Act 2
+		dc.w DLE_LZ3N-DLE_LZx, DLE_LZ3N-DLE_LZx, DLE_LZ3N-DLE_LZx, 0 ; Act 3
+		dc.w DLE_SBZ3N-DLE_LZx, DLE_SBZ3N-DLE_LZx, DLE_SBZ3N-DLE_LZx, 0 ; SBZ Act 3
 ; ===========================================================================
 
-DLE_LZ12:
+DLE_LZ12N:
+		rts
+; ===========================================================================
+
+DLE_LZ2E:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_LZ2E_Sub(pc,d0.w),d0
+		jmp		DLE_LZ2E_Sub(pc,d0.w)
+; ===========================================================================
+DLE_LZ2E_Sub:
+		dc.w DLE_LZ2E_Main-DLE_LZ2E_Sub
+		dc.w DLE_LZ2E_Boss-DLE_LZ2E_Sub
+		dc.w DLE_LZ2E_End-DLE_LZ2E_Sub
+; ===========================================================================
+
+DLE_LZ2E_Main:
+		cmpi.w	#$EF0,(v_screenposx).w
+		bcs.s	@end
+		move.w	#$E00,(v_limitleft2).w
+		move.w	#$34A,(v_limitbtm1).w
+		move.w	#$34A,(v_limittop2).w
+		addq.b	#2,(v_dle_routine).w
+
+	@end:
 		rts	
 ; ===========================================================================
 
-DLE_LZ3:
+DLE_LZ2E_Boss:
+		cmpi.w	#$10A0,(v_screenposx).w
+		bcs.s	@end
+		bsr.w	FindFreeObj
+		bne.s	@music
+		move.b	#id_BossLZ2,obID(a1) ; load test boss object
+		move.w	#$1140,obX(a1)
+		move.w	#$450,obY(a1)
+
+	@music:
+		music	bgm_Boss,0,1,0	; play boss music
+		move.b	#1,(f_lockscreen).w ; lock screen
+		addq.b	#2,(v_dle_routine).w
+		moveq	#plcid_BossAlt,d0
+		bra.w	AddPLC		; load boss patterns
+; ===========================================================================
+
+	@end:
+		rts
+; ===========================================================================
+
+DLE_LZ2E_End:
+		move.w	(v_screenposx).w,(v_limitleft2).w
+		rts
+; ===========================================================================
+
+DLE_LZ3N:
 		tst.b	(f_switch+$F).w	; has switch $F	been pressed?
 		beq.s	loc_6F28	; if not, branch
 		cmpi.l	#Level_LZ3NoWall,(v_lvllayoutfg).w	; MJ: is current layout already set to wall version?
@@ -304,7 +359,7 @@ locret_6F64:
 		rts	
 ; ===========================================================================
 
-DLE_SBZ3:
+DLE_SBZ3N:
 		cmpi.w	#$D00,(v_screenposx).w
 		bcs.s	locret_6F8C
 		cmpi.w	#$18,(v_player+obY).w ; has Sonic reached the top of the level?

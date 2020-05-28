@@ -24,6 +24,8 @@ ptr_PLC_SBZ2:		dc.w PLC_SBZ2-ArtLoadCues
 			zonewarning PLC_Levels,4
 
 ptr_PLC_Boss:			dc.w PLC_Boss-ArtLoadCues
+ptr_PLC_BossAlt:		dc.w PLC_BossAlt-ArtLoadCues ; Adjust this.
+; In the future, we want different PLCs for every Boss
 ptr_PLC_EndofAct:		dc.w PLC_EndofAct-ArtLoadCues
 ptr_PLC_SpecialStage:	dc.w PLC_SpecialStage-ArtLoadCues
 
@@ -231,6 +233,13 @@ PLC_Boss:	dc.w ((PLC_Bossend-PLC_Boss-2)/6)-1
 		plcm	Nem_SlzSpike,	ArtNem_SLZWeapons_locVRAM	; spikeball (SLZ boss)
 		plcm	Nem_Exhaust,	ArtNem_Exhaust_locVRAM	; exhaust flame
 	PLC_Bossend:
+
+PLC_BossAlt:	dc.w ((PLC_BossAltend-PLC_BossAlt-2)/6)-1
+		plcm	Nem_Eggman_Alt,	ArtNem_Eggman_locVRAM	; Eggman main patterns
+		plcm	Nem_Prison,		ArtNem_Prison_locVRAM	; prison capsule
+		plcm	Nem_Bomb,		ArtNem_SLZWeapons_locVRAM	; bomb enemy (gets overwritten, shrapnel is used for SLZ boss)
+		plcm	Nem_SlzSpike,	ArtNem_SLZWeapons_locVRAM	; spikeball (SLZ boss)
+	PLC_BossAltend:
 ; ---------------------------------------------------------------------------
 ; Pattern load cues - act 1/2 end (Signpost is uncompressed)
 ; ---------------------------------------------------------------------------
@@ -372,6 +381,7 @@ plcid_SYZ2:			equ (ptr_PLC_SYZ2-ArtLoadCues)/2		; $D
 plcid_SBZ:			equ (ptr_PLC_SBZ-ArtLoadCues)/2			; $E
 plcid_SBZ2:			equ (ptr_PLC_SBZ2-ArtLoadCues)/2		; $F
 plcid_Boss:			equ (ptr_PLC_Boss-ArtLoadCues)/2		; $11
+plcid_BossAlt:		equ (ptr_PLC_BossAlt-ArtLoadCues)/2
 plcid_EndofAct:		equ (ptr_PLC_EndofAct-ArtLoadCues)/2	; $12
 plcid_SpecialStage:	equ (ptr_PLC_SpecialStage-ArtLoadCues)/2 ; $14
 plcid_GHZAnimals:	equ (ptr_PLC_GHZAnimals-ArtLoadCues)/2	; $15
