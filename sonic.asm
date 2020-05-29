@@ -3347,6 +3347,8 @@ Level_ClrRam:
 		clr.w	(VDP_Command_Buffer).w
 		move.w	#VDP_Command_Buffer,(VDP_Command_Buffer_Slot).w
 
+		clr.b	(f_boss_active).w	; clear boss act flag
+
 		cmpi.b	#id_LZ,(v_zone).w ; is level LZ?
 		bne.s	Level_LoadPal	; if not, branch
 
@@ -3734,15 +3736,10 @@ SyncEnd:
 
 
 EndofActLoad:			; XREF: GM_Level
-		cmpi.b	#2,(v_act).w				; is act number 02 (act 3)?
-		beq.s	@exit						; if yes, branch
-		cmpi.b	#difEasy,(v_difficulty).w	; is this easy mode?
-		bne.s	@notEasy
-		cmpi.b	#1,(v_act).w				; is act number 01 (act 2)?
-		beq.s	@exit						; if yes, branch
-	@notEasy:
+		tst.b	(f_boss_active).w	; is this a boss act?
+		bne.s	@exit
 		tst.w	(v_debuguse).w		; is debug mode	being used?
-		bne.w	@exit				; if yes, branch
+		bne.s	@exit				; if yes, branch
 		move.w	(v_screenposx).w,d0
 		move.w	(v_limitright2).w,d1
 		subi.w	#$100,d1

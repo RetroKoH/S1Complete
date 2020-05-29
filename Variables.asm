@@ -26,6 +26,7 @@ VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slo
 ; $FFFFC900-CAFF - UNUSED
 v_boss_start_x:			equ $FFFFCA00
 v_boss_start_y:			equ $FFFFCA04
+f_boss_active:			equ $FFFFCA08
 
 v_tracksonic:			equ $FFFFCB00	; position tracking data for Sonic ($100 bytes)
 v_hscrolltablebuffer:	equ $FFFFCC00 ; scrolling table data (actually $380 bytes, but $400 is reserved for it)

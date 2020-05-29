@@ -123,6 +123,8 @@ DLE_GHZ2E_Sub:
 ; ===========================================================================
 
 DLE_GHZ2E_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		move.w	#$300,(v_limitbtm1).w	; starting bottom limit
 ; Move the death plane up just before the platforms section
 		cmpi.w	#$ED0,(v_screenposx).w
@@ -189,6 +191,8 @@ DLE_GHZ3N_Sub:
 ; ===========================================================================
 
 DLE_GHZ3N_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		move.w	#$300,(v_limitbtm1).w
 		cmpi.w	#$380,(v_screenposx).w
 		bcs.s	@ret
@@ -261,7 +265,7 @@ DLE_LZ:
 		lsl.w	#1,d1
 		add.w	d1,d0
 		move.w	DLE_LZx(pc,d0.w),d0
-		jmp	DLE_LZx(pc,d0.w)
+		jmp		DLE_LZx(pc,d0.w)
 ; ===========================================================================
 DLE_LZx:	; Normal			; Easy				; Hard
 		dc.w DLE_LZ12N-DLE_LZx, DLE_LZ12N-DLE_LZx, DLE_LZ12N-DLE_LZx, 0 ; Act 1
@@ -287,6 +291,8 @@ DLE_LZ2E_Sub:
 ; ===========================================================================
 
 DLE_LZ2E_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		cmpi.w	#$EF0,(v_screenposx).w
 		bcs.s	@end
 		move.w	#$E00,(v_limitleft2).w
@@ -325,23 +331,25 @@ DLE_LZ2E_End:
 ; ===========================================================================
 
 DLE_LZ3N:
-		tst.b	(f_switch+$F).w	; has switch $F	been pressed?
-		beq.s	loc_6F28	; if not, branch
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
+		tst.b	(f_switch+$F).w						; has switch $F	been pressed?
+		beq.s	loc_6F28							; if not, branch
 		cmpi.l	#Level_LZ3NoWall,(v_lvllayoutfg).w	; MJ: is current layout already set to wall version?
-		beq.s	loc_6F28				; MJ: if so, branch to skip
+		beq.s	loc_6F28							; MJ: if so, branch to skip
 		move.l	#Level_LZ3NoWall,(v_lvllayoutfg).w	; MJ: Set wall version of act 3's layout to be read
-		sfx	sfx_Rumbling,0,1,0 ; play rumbling sound
+		sfx		sfx_Rumbling,0,1,0 					; play rumbling sound
 
 loc_6F28:
 		tst.b	(v_dle_routine).w
-		bne.s	locret_6F64
+		bne.s	locret_6F62
 		cmpi.w	#$1CA0,(v_screenposx).w
 		bcs.s	locret_6F62
 		cmpi.w	#$600,(v_screenposy).w
 		bcc.s	locret_6F62
 		bsr.w	FindFreeObj
 		bne.s	loc_6F4A
-		move.b	#id_BossLabyrinth,0(a1) ; load LZ boss object
+		move.b	#id_BossLabyrinth,obID(a1) ; load LZ boss object
 
 loc_6F4A:
 		music	bgm_Boss,0,1,0	; play boss music
@@ -355,11 +363,9 @@ locret_6F62:
 		rts	
 ; ===========================================================================
 
-locret_6F64:
-		rts	
-; ===========================================================================
-
 DLE_SBZ3N:
+		bset	#0,(f_boss_active).w	; This act doesn't have a boss, but dont load EndofAct routine
+
 		cmpi.w	#$D00,(v_screenposx).w
 		bcs.s	locret_6F8C
 		cmpi.w	#$18,(v_player+obY).w ; has Sonic reached the top of the level?
@@ -514,6 +520,8 @@ DLE_MZ2E_Sub:
 ; ===========================================================================
 
 DLE_MZ2E_Boss:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		move.w	#$520,(v_limitbtm1).w
 		cmpi.w	#$1700,(v_screenposx).w
 		bcs.s	@ret
@@ -555,6 +563,8 @@ DLE_MZ3N_Sub:
 ; ===========================================================================
 
 DLE_MZ3N_Boss:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		move.w	#$720,(v_limitbtm1).w
 		cmpi.w	#$1560,(v_screenposx).w
 		bcs.s	@ret
@@ -621,6 +631,8 @@ DLE_SLZ2E_Sub:
 ; ===========================================================================
 
 DLE_SLZ2E_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		cmpi.w	#$1DF0,(v_screenposx).w
 		bcs.s	@end
 		move.w	#$210,(v_limitbtm1).w
@@ -669,6 +681,8 @@ DLE_SLZ3N_Sub:
 ; ===========================================================================
 
 DLE_SLZ3N_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		cmpi.w	#$1E70,(v_screenposx).w
 		bcs.s	@end
 		move.w	#$210,(v_limitbtm1).w
@@ -755,6 +769,8 @@ DLE_SYZ2E_Sub:
 ; ===========================================================================
 
 DLE_SYZ2E_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		move.w	#$520,(v_limitbtm1).w
 		cmpi.w	#$25A0,(v_screenposx).w
 		bcs.s	@end
@@ -817,6 +833,8 @@ off_71B2:
 ; ===========================================================================
 
 DLE_SYZ3N_Main:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		cmpi.w	#$2AC0,(v_screenposx).w
 		bcs.s	locret_71CE
 		bsr.w	FindFreeObj
@@ -934,6 +952,8 @@ locret_727A:
 ; ===========================================================================
 
 DLE_SBZ2Emain:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		move.w	#$800,(v_limitbtm1).w
 		cmpi.w	#$1800,(v_screenposx).w
 		bcs.s	@ret
@@ -1005,6 +1025,8 @@ off_72D8:
 ; ===========================================================================
 
 DLE_FZmain:
+		bset	#0,(f_boss_active).w		; Note that this act has a boss
+
 		cmpi.w	#$2148,(v_screenposx).w
 		bcs.s	loc_72F4
 		addq.b	#2,(v_dle_routine).w
