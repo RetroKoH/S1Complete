@@ -288,11 +288,9 @@ RLoss_Collect:	; Routine 4
 RLoss_Sparkle:	; Routine 6
 		lea		(Ani_Ring).l,a1
 		bsr.w	AnimateSprite
-		;bra.w	RLoss_DisplaySparkle
-; ===========================================================================
 
 RLoss_DisplaySparkle:
-		lea	(v_spritequeue+$80).w,a1	; immediately jump to position in queue
+		lea		(v_spritequeue+$80).w,a1	; immediately jump to position in queue
 		cmpi.w	#$7E,(a1)			; is this part of the queue full?
 		bcc.s	@full				; if yes, branch
 		addq.w	#2,(a1)				; increment sprite count

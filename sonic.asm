@@ -3718,7 +3718,7 @@ Sync4:
 		add.w	(v_ani3_buf).w,d0
 		move.w	d0,(v_ani3_buf).w
 		rol.w	#7,d0
-		andi.w	#3,d0
+		andi.w	#7,d0
 		move.b	d0,(v_ani3_frame).w
 		subq.b	#1,(v_ani3_time).w
 
