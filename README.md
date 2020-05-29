@@ -12,7 +12,6 @@ Hack To-Do List:
 - I am aware of the drop dash, and would love the assistance. I was planning to leave it alone and figure it out myself later using the pseudo-code MainMemory posted, but if you are willing to help, I certainly won't refuse it.
 - I agree about the sounds and visuals, though I'll probably keep it simple, in line with what the latest Sonic 1 re-release (Mega Play) did, though I'm curious to get your thoughts.
 - The HUD issues I'm aware of. The former, I'm not sure exactly how to fix. This started happening after I ported the S2 non-object HUD and is part of the reason why the HUD now scrolls in and out of frame. The latter issue (which I just noticed earlier today while applying a change to special stages) I'm sure is a simple enough fix. I'll tackle that first.
-- The road sign is, for all intents and purposes, an oversight. I am moving certain tiles to not use the first palette line anymore, and didn't finish work on those particular parts of the chunk. Easy enough fix, hell it's even fixed in my old build. I've just been a little lazy.
 - SBZ3's issue is a result of me porting the new art in via SonLvl. I don't wanna pin all the blame on that app, perhaps I made an error somewhere. It'll be a simple fix, just time-consuming... As for the points, I had no idea. Nice catch.
 - On that note, Ralakimus pointed out a bug in that zone related to floor collision. IDK how that happened and plan on fixing it ASAP.
 - Flower art is broken, AND palettes when NOT in normal mode. I will get to that later on.
