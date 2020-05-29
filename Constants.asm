@@ -299,6 +299,11 @@ afRoutine:	equ $FC	; increment routine counter
 afReset:	equ $FB	; reset animation and 2nd object routine counter
 af2ndRoutine:	equ $FA	; increment 2nd routine counter
 
+; Game Mode settings
+modeClassic:	equ 0
+modeOriginal:	equ 1
+modeHandheld:	equ 2
+modeComplete:	equ 3
 ; Difficulty settings
 difNormal:	equ 0
 difEasy:	equ 1

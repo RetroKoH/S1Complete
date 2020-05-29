@@ -1,7 +1,6 @@
 ; ---------------------------------------------------------------------------
 ; Object 8D - Red Ring
-; Emerald that is found in levels in Master System mode
-; Object will destroy itself if not in correct mode.
+; Collectible Red Ring
 ; ---------------------------------------------------------------------------
 
 RedRing:				; XREF: Obj_Index
@@ -24,7 +23,7 @@ RedRing_Init:	; Routine 0
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 
-		; Remove emerald if not in Complete Mode (Normal or Hard Difficulty only)
+		; Remove red ring if not in Complete Mode (Normal or Hard Difficulty only)
 ;		cmpi.b	#2,(v_optgamemode).w	; Are you playing in Complete Mode?
 ;		bne.w	LEm_Delete		; if not, branch and delete
 ;		move.b	subtype(a0),d0
@@ -57,7 +56,6 @@ RedRing_Collect:	; Routine 4
 		lea		(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
-		move.b	$34(a0),d1
 		bset	d1,2(a2,d0.w)
 
 RedRing_Sparkle:	; Routine 6
@@ -72,7 +70,7 @@ RedRing_Delete:	; Routine 6
 ; ===========================================================================
 
 ; ---------------------------------------------------------------------------
-; Signpost dynamic pattern loading subroutine
+; Red Ring dynamic pattern loading subroutine
 ; ---------------------------------------------------------------------------
 
 RedRing_LoadGfx:

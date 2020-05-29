@@ -6217,8 +6217,8 @@ Map_Crab:	include	"_maps\Crabmeat.asm"
 		include	"_incObj\22 Buzz Bomber.asm"
 		include	"_incObj\23 Buzz Bomber Missile.asm"
 
-Map_Buzz:	include	"_maps\Buzz Bomber.asm"
-Map_Missile:	include	"_maps\Buzz Bomber Missile.asm"
+		include	"_maps\Buzz Bomber.asm"
+		include	"_maps\Buzz Bomber Missile.asm"
 
 		include	"_incObj\25 & 37 Rings.asm"
 		include	"_incObj\4B Giant Ring.asm"
@@ -7400,13 +7400,12 @@ Map_LTag:	include	"_maps\Lava Tag.asm"
 Map_Geyser:	include	"_maps\Lava Geyser.asm"
 Map_LWall:	include	"_maps\Wall of Lava.asm"
 
+
+
 		include	"_incObj\40 Moto Bug.asm" ; includes "_incObj\sub RememberState.asm"
 
 
-
-
 Map_Moto:	include	"_maps\Moto Bug.asm"
-		include	"_incObj\4F.asm"
 
 		include	"_incObj\50 Yadrin.asm"
 
@@ -8219,7 +8218,8 @@ Map_Pri:	include	"_maps\Prison Capsule.asm"
 
 		include	"_incObj\sub ReactToItem.asm"
 
-		include "_incObj\8D Red Ring.asm"
+		include "_incObj\4F Red Ring.asm" ; Complete Mode
+		include "_incObj\8D Level Emerald.asm" ; Handheld Mode
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	show the special stage layout
@@ -9043,6 +9043,7 @@ Art_RedRing:	incbin	"artunc\Red Ring.bin"
 
 		include "_maps\Red Ring.asm"
 		include "_maps\Red Ring - DPLC.asm"
+		include "_maps\Emerald.asm"
 
 		include	"_maps\SS Walls.asm"
 
@@ -9302,6 +9303,8 @@ Nem_Lamp:	incbin	"artnem\Lamppost.bin"
 Nem_BigFlash:	incbin	"artnem\Giant Ring Flash.bin"
 		even
 Nem_Bonus:	incbin	"artnem\Hidden Bonuses.bin" ; hidden bonuses at end of a level
+		even
+Nem_ChaosEm:	incbin	"artnem\Emerald.bin" ; Chaos Emerald found in levels
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - continue screen

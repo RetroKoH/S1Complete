@@ -80,7 +80,6 @@ ptr_GeyserMaker:	dc.l GeyserMaker
 ptr_LavaGeyser:		dc.l LavaGeyser
 ptr_LavaWall:		dc.l LavaWall
 ptr_RedRing:		dc.l RedRing
-;ptr_Obj4F:			dc.l Obj4F
 ptr_Yadrin:			dc.l Yadrin		; $50
 ptr_SmashBlock:		dc.l SmashBlock
 ptr_MovingBlock:	dc.l MovingBlock
@@ -142,8 +141,7 @@ ptr_EndSTH:			dc.l EndSTH
 ptr_CreditsText:	dc.l CreditsText
 ptr_EndEggman:		dc.l EndEggman
 ptr_TryChaos:		dc.l TryChaos
-;ptr_RedRing:		dc.l RedRing
-ptr_Obj8D:			dc.l NullObject		; Red Ring
+ptr_LvlEmerald:		dc.l LvlEmerald		; In-Level Chaos Emerald
 ptr_BossLabyrinth2:	dc.l BossLabyrinth2	; 8-bit LZ boss
 
 NullObject:
@@ -227,7 +225,6 @@ id_GiantRing:		equ ((ptr_GiantRing-Obj_Index)/4)+1
 id_GeyserMaker:		equ ((ptr_GeyserMaker-Obj_Index)/4)+1
 id_LavaGeyser:		equ ((ptr_LavaGeyser-Obj_Index)/4)+1
 id_LavaWall:		equ ((ptr_LavaWall-Obj_Index)/4)+1
-;id_Obj4F:		equ ((ptr_Obj4F-Obj_Index)/4)+1
 id_RedRing:			equ ((ptr_RedRing-Obj_Index)/4)+1
 id_Yadrin:		equ ((ptr_Yadrin-Obj_Index)/4)+1		; $50
 id_SmashBlock:		equ ((ptr_SmashBlock-Obj_Index)/4)+1
@@ -290,6 +287,5 @@ id_EndSTH:			equ ((ptr_EndSTH-Obj_Index)/4)+1
 id_CreditsText:		equ ((ptr_CreditsText-Obj_Index)/4)+1
 id_EndEggman:		equ ((ptr_EndEggman-Obj_Index)/4)+1
 id_TryChaos:		equ ((ptr_TryChaos-Obj_Index)/4)+1
-;id_RedRing:			equ ((ptr_RedRing-Obj_Index)/4)+1
-id_Obj8D:			equ ((ptr_Obj8D-Obj_Index)/4)+1
+id_LvlEmerald:		equ ((ptr_LvlEmerald-Obj_Index)/4)+1
 id_BossLZ2:			equ ((ptr_BossLabyrinth2-Obj_Index)/4)+1

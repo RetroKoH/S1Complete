@@ -201,7 +201,7 @@ Pow_SlowShoes: ; Used to slow down the player
 		bne.s	@nomusic				; if yes, branch
 		cmpi.w	#$C,(v_air).w			; is drowning countdown active?
 		bls.s	@nomusic				; if yes, branch
-		music	bgm_Speedup,1,0,0		; speed	up the music
+		music	bgm_Slowdown,1,0,0		; speed	up the music
 
 	@nomusic:
 		rts
