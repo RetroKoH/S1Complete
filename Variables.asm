@@ -334,8 +334,9 @@ v_lamp_wtrpos:	equ v_lastlamp+$20 ; water position at lamppost (2 bytes)
 v_lamp_wtrrout:	equ v_lastlamp+$22 ; water routine at lamppost
 v_lamp_wtrstat:	equ v_lastlamp+$23 ; water state at lamppost
 v_lamp_lives:	equ v_lastlamp+$24 ; lives counter at lamppost
-v_emeralds:	equ $FFFFFE57	; number of chaos emeralds
-v_emldlist:	equ $FFFFFE58	; which individual emeralds you have (00 = no; 01 = yes) (6 bytes)
+v_emeralds:		equ $FFFFFE57	; number of chaos emeralds
+v_emeraldlist:	equ $FFFFFE58	; which individual emeralds you have (bitfield)
+; 59-5d UNUSED
 v_oscillate:	equ $FFFFFE5E	; values which oscillate - for swinging platforms, et al ($42 bytes)
 
 v_spindashsfx1:	= $FFFFFEB0

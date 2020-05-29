@@ -29,9 +29,9 @@ LEm_Main:	; Routine 0
 		cmpi.b	#modeHandheld,(v_optgamemode).w	; Are you playing in Handheld Mode?
 		bne.w	LEm_Delete						; if not, branch and delete
 		move.b	obSubtype(a0),d0
-;		btst	d0,(v_emeraldlist).w
-;		beq.s	@okay
-;		rts
+		btst	d0,(v_emeraldlist).w
+		beq.s	@okay
+		bra.w	LEm_Delete						; if you already got this emerald, delete object
 ; ===========================================================================
 
 	@okay:
@@ -63,11 +63,11 @@ LEm_Collect:	; Routine 4
 		addq.b	#2,obRoutine(a0)
 		clr.b	obColType(a0)			; can no longer collide with the item
 		move.w	#$80,obPriority(a0)		; collected emerald will sparkle like a ring.
-;		move.b	subtype(a0),d0			; move emerald number to d0
-;		bset	d0,(v_emeraldlist).w	; set emerald as collected
-;		bne.s	@collected				; if emerald is already collected, branch
-;		addq.b	#1,(v_emeralds).w		; increment emerald count
-;	@collected:
+		move.b	obSubtype(a0),d0		; move emerald number to d0
+		bset	d0,(v_emeraldlist).w	; set emerald as collected
+		bne.s	@collected				; if emerald is already collected, branch
+		addq.b	#1,(v_emeralds).w		; increment emerald count
+	@collected:
 		move.w	#bgm_ExtraLife,d0		; play extra life music (replace with SMS emerald music)
 		jmp		(PlaySound_Special).l
 		lea		(v_objstate).w,a2

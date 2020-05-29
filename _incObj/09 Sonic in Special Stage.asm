@@ -28,7 +28,7 @@ Obj09_Main:	; Routine 0
 		move.l	#Map_Sonic,obMap(a0)
 		move.w	#$780,obGfx(a0)
 		move.b	#4,obRender(a0)
-		clr.b	obPriority(a0)
+		clr.w	obPriority(a0)
 		move.b	#aniID_Roll,obAnim(a0)
 		bset	#2,obStatus(a0)
 		bset	#1,obStatus(a0)
@@ -539,18 +539,19 @@ Obj09_ChkEmer:
 		move.l	a1,4(a2)
 
 Obj09_GetEmer:
-		cmpi.b	#6,(v_emeralds).w ; do you have all the emeralds?
-		beq.s	Obj09_NoEmer	; if yes, branch
+		cmpi.b	#6,(v_emeralds).w	; do you have all the emeralds?
+		beq.s	Obj09_NoEmer		; if yes, branch
 		subi.b	#$3B,d4
-		moveq	#0,d0
-		move.b	(v_emeralds).w,d0
-		lea	(v_emldlist).w,a2
-		move.b	d4,(a2,d0.w)
-		addq.b	#1,(v_emeralds).w ; add 1 to number of emeralds
+		bset	d4,(v_emeraldlist)	; set the appropriate bit in the emerald bitfield
+		addq.b	#1,(v_emeralds).w	; add 1 to number of emeralds
+		addq.b	#1,(v_lastspecial).w ; inc SS index
+		cmpi.b	#6,(v_lastspecial).w ; these last 3 lines prevent the first stage from being played twice
+		bcs.s	Obj09_NoEmer         ; if not the last emerald, branch
+		clr.b	(v_lastspecial).w	; reset if 6 (7) or higher. aka, reset so we start from the 1st stage again.
 
 Obj09_NoEmer:
-		clr.b	(f_timecount).w	; stop the time counter (remove the HUD)
-		sfx		bgm_Emerald,0,0,0 ;	play emerald music
+		clr.b	(f_timecount).w		; stop the time counter (remove the HUD)
+		sfx		bgm_Emerald,0,0,0	; play emerald music
 		moveq	#0,d4
 		rts	
 ; ===========================================================================

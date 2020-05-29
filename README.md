@@ -8,6 +8,9 @@ This uses Sonic 2's 128x128 chunk and path-swapper systems. Modifications by Mar
 See: http://info.sonicretro.org/Project_Sonic_1:_Two-Eight
 
 Hack To-Do List:
+
+What is the difference between LevelSelect_PressStart and LevelSelect_StartZone?
+
 * Fix bug with executing Peelout at the right edge of the screen (similar to the spindash bug)
 	Noticable in bosses.
 * Add underwater and cycling palettes for Easy/Hard Mode

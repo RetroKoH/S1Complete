@@ -2192,9 +2192,8 @@ PlayLevel:
 		move.l	d0,(v_time).w	; clear time
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastspecial).w ; clear special stage number
-		move.b	d0,(v_emeralds).w ; clear emeralds
-		move.l	d0,(v_emldlist).w ; clear emeralds
-		move.l	d0,(v_emldlist+4).w ; clear emeralds
+		move.b	d0,(v_emeralds).w ; clear emerald count
+		move.b	d0,(v_emeraldlist).w ; clear emeralds
 		move.b	d0,(v_continues).w ; clear continues
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		sfx	bgm_Fade,0,1,1 ; fade out music
@@ -2331,8 +2330,8 @@ LevelSelect_PressStart:
 		clr.l	(v_score).w	; clear score
 ;		clr.l	(v_startscore).w ; clear starting score
 		clr.b	(v_lastspecial).w ; clear special stage number
-		clr.b	(v_emeralds).w ; clear emeralds
-;		clr.b	(v_emeraldlist).w ; clear emeralds
+		clr.b	(v_emeralds).w ; clear emerald count
+		clr.b	(v_emeraldlist).w ; clear emeralds
 		clr.b	(v_continues).w ; clear continues
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		;move.w	(Player_option).w,(Player_mode).w
@@ -2394,8 +2393,8 @@ LevelSelect_StartZone:
 		clr.l	(v_score).w		; clear score
 ;		clr.l	(v_startscore).w	; clear start score <- KingofHarts Level Select Mod (REV C EDIT)
 		clr.b	(v_lastspecial).w	; clear special stage number
-		clr.b	(v_emeralds).w		; clear emeralds
-;		clr.b	(v_emeraldlist).w	; clear emeralds list
+		clr.b	(v_emeralds).w		; clear emerald count
+		clr.b	(v_emeraldlist).w	; clear emeralds list
 		clr.b	(v_continues).w		; clear continues
 		move.l	#5000,(v_scorelife).w	; extra life is awarded at 50000 points
 		move.b	#$E0,d0
@@ -8705,35 +8704,27 @@ SS_StartLoc:	include	"_inc\Start Location Array - Special Stages.asm"
 SS_Load:
 		moveq	#0,d0
 		move.b	(v_lastspecial).w,d0 ; load number of last special stage entered
-		addq.b	#1,(v_lastspecial).w
-		cmpi.b	#6,(v_lastspecial).w
-		blo.s	SS_ChkEmldNum
-		move.b	#0,(v_lastspecial).w ; reset if higher than 6
+		cmpi.b	#6,(v_emeralds).w    ; Does Sonic already have all emeralds?
+		bcs.s	SS_Not7Emeralds      ; if not, branch
+		addq.b	#1,(v_lastspecial).w ; if yes, Special Stage increments always.
+		cmpi.b	#6,(v_lastspecial).w ; 6 (7 - Complete)
+		bcs.s	SS_Not7Emeralds
+		clr.b	(v_lastspecial).w ; reset if 7 or higher
 
-SS_ChkEmldNum:
-		cmpi.b	#6,(v_emeralds).w ; do you have all emeralds?
-		beq.s	SS_LoadData	; if yes, branch
-		moveq	#0,d1
-		move.b	(v_emeralds).w,d1
-		subq.b	#1,d1
-		blo.s	SS_LoadData
-		lea	(v_emldlist).w,a3 ; check which emeralds you have
-
-SS_ChkEmldLoop:	
-		cmp.b	(a3,d1.w),d0
-		bne.s	SS_ChkEmldRepeat
-		bra.s	SS_Load
-; ===========================================================================
-
-SS_ChkEmldRepeat:
-		dbf	d1,SS_ChkEmldLoop
+SS_Not7Emeralds:
+		cmpi.b	#6,d0                ; 6 (7) EMERALDS
+		bcs.s	SS_LoadData
+		move.b	#0,d0                ; reset if 6 (7) or higher
+		move.b	d0,(v_lastspecial).w
 
 SS_LoadData:
 		lsl.w	#2,d0
 		lea		SS_StartLoc(pc,d0.w),a1
 		move.w	(a1)+,(v_player+obX).w
 		move.w	(a1)+,(v_player+obY).w
-		movea.l	SS_LayoutIndex(pc,d0.w),a0
+		movea.l SS_LayoutIndex(pc,d0.w),a0 ; Replaced with lines below due to a length error. (LayoutIndex data is 130 bytes too far away)
+;		lea	SS_LayoutIndex,a0 ; load index into an address register
+;		movea.l (a0,d0.w),a0      ; then performs the same as above line
 		lea	($FF4000).l,a1
 		move.w	#0,d0
 		jsr	(EniDec).l
@@ -8752,7 +8743,22 @@ loc_1B6F6:
 		moveq	#$3F,d2
 
 loc_1B6F8:
-		move.b	(a0)+,(a1)+
+;		move.b	(a0)+,(a1)+
+		; SS Continued addition (Places a 1-Up icon instead of an emerald, if all emeralds are obtained)
+		move.b	(a0)+,d0		; load the layout item into d0
+		cmpi.b	#$3B,d0			; is the item an emerald?
+		bcs.s	@notem
+		cmpi.b	#$40,d0                 ; REV C EDIT - 7 EMERALDS
+		bhi.s	@notem
+		;cmpi.b	#7,(v_emeralds).w	; do you have all the emeralds? ; REV C EDIT - 7 EMERALDS
+		move.b	d0,d3
+		subi.b	#$3B,d3
+		btst	d3,(v_emeraldlist).w	; does Sonic have this emerald?
+		beq.s	@notem			; if not, branch
+		move.b	#$28,d0			; else, make a 1up
+
+	@notem:
+		move.b	d0,(a1)+		; move the item into memory
 		dbf	d2,loc_1B6F8
 
 		lea	$40(a1),a1
