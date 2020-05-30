@@ -63,7 +63,7 @@ PLC_Main2:	dc.w ((PLC_Main2end-PLC_Main2-2)/6)-1
 		plcm	Nem_Lamp,		ArtNem_Lamppost_locVRAM		; lamppost
 		plcm	Nem_Ring,		ArtNem_Ring_locVRAM 		; rings
 		plcm	Nem_Monitors,	ArtNem_Monitors_locVRAM		; monitors
-;		plcm	Nem_ChaosEm,	$AE80						; chaos emerald
+		plcm	Nem_ChaosEm,	$AE80						; chaos emerald
 		plcm	Nem_Lives,		$FA80						; lives	counter
 	PLC_Main2end:
 ; ---------------------------------------------------------------------------

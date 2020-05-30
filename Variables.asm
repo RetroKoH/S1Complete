@@ -286,11 +286,11 @@ v_errortype:				equ $FFFFFC44	; error type
 
 
 v_systemstack:	equ $FFFFFE00
-f_restart:	equ $FFFFFE02	; restart level flag (2 bytes)
+f_restart:		equ $FFFFFE02	; restart level flag (2 bytes)
 v_framecount:	equ $FFFFFE04	; frame counter (adds 1 every frame) (2 bytes)
 v_framebyte:	equ v_framecount+1; low byte for frame counter
 v_debugitem:	equ $FFFFFE06	; debug item currently selected (NOT the object number of the item)
-v_debuguse:	equ $FFFFFE08	; debug mode use & routine counter (when Sonic is a ring/item) (2 bytes)
+v_debuguse:		equ $FFFFFE08	; debug mode use & routine counter (when Sonic is a ring/item) (2 bytes)
 v_debugxspeed:	equ $FFFFFE0A	; debug mode - horizontal speed
 v_debugyspeed:	equ $FFFFFE0B	; debug mode - vertical speed
 v_vbla_count:	equ $FFFFFE0C	; vertical interrupt counter (adds 1 every VBlank) (4 bytes)

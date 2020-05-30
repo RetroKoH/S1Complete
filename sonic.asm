@@ -1148,14 +1148,19 @@ locret_16DA:
 		rts	
 ; ===========================================================================
 
-loc_16DC:
-		lea	(v_plc_buffer).w,a0
-		moveq	#$15,d0
+loc_16DC: ; Fixed via Vladikcomper's plc fix. Thanks Ralakimus for pointing this out
+        lea		(v_plc_buffer).w,a0
+        lea		6(a0),a1
+        moveq	#$E,d0        ; do $F cues
 
 loc_16E2:
-		move.l	6(a0),(a0)+
-		dbf	d0,loc_16E2
-		rts	
+        move.l	(a1)+,(a0)+
+        move.w	(a1)+,(a0)+
+        dbf		d0,loc_16E2
+        moveq	#0,d0
+        move.l	d0,(a0)+    ; clear the last cue to avoid overcopying it
+        move.w	d0,(a0)+    ;
+        rts
 ; End of function ProcessDPLC2
 
 ; ---------------------------------------------------------------------------
