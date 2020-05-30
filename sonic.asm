@@ -273,7 +273,7 @@ GameProgram:
 		cmpi.l	#'init',(v_init).w ; has checksum routine already run?
 		beq.w	GameInit	; if yes, branch
 
-CheckSumCheck: ; FASTER CHECKSUM CHECK BY MARKEYJESTER
+CheckSumCheck: ; FASTER CHECKSUM CHECK BY MARKEYJESTER; Fixed by Ralakimus
 		movea.w	#$0200,a0				; prepare start address
 		move.l	(RomEndLoc).w,d7		; load size
 		sub.l	a0,d7					; minus start address
@@ -281,6 +281,7 @@ CheckSumCheck: ; FASTER CHECKSUM CHECK BY MARKEYJESTER
 		andi.w	#$000F,d5				; get only the remaining nybble
 		lsr.l	#$04,d7					; divide the size by 20
 		move.w	d7,d6					; load lower word size
+		subq.w	#1,d6					; fix lower word size for dbf
 		swap	d7						; get upper word size
 		moveq	#$00,d0					; clear d0
 
@@ -295,8 +296,9 @@ CS_MainBlock:
 		add.w	(a0)+,d0				; ''
 		dbf		d6,CS_MainBlock			; repeat until all main block sections are done
 		dbf		d7,CS_MainBlock			; ''
-		subq.w	#$01,d5					; decrease remaining nybble for dbf
-		bpl.s	CS_Finish				; if there is no remaining nybble, branch
+		lsr.w	#$01,d5					; divide remaining nybble by 2
+		bcs.s	CS_Remains				; if there are remaining nybble, branch
+		beq.s	CS_Finish				; if there is no remaining nybble, branch
 
 CS_Remains:
 		add.w	(a0)+,d0				; add remaining words
