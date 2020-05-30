@@ -10,7 +10,7 @@ Sonic_Floor:
 		cmpi.b	#$C,(v_top_solid_bit).w				; MJ: is second collision set to be used?
 		beq.s	@first								; MJ: if not, branch
 		move.l	(v_colladdr2).w,(v_collindex).w		; MJ: load second collision data location
-@first:
+	@first:
 		move.b	(v_lrb_solid_bit).w,d5				; MJ: load L/R/B soldity bit
 		move.w	obVelX(a0),d1
 		move.w	obVelY(a0),d2
@@ -39,7 +39,7 @@ Sonic_Floor:
 	@noRightWall:
 		bsr.w	Sonic_CheckFloor
 		tst.w	d1
-		bpl.s	locret_1367E
+		bpl.w	locret_1367E
 		move.b	obVelY(a0),d2
 		addq.b	#8,d2
 		neg.b	d2
@@ -62,11 +62,13 @@ Sonic_Floor:
 		beq.s	loc_1364E
 		asr		obVelY(a0)
 		bra.s	loc_13670
-; ===========================================================================
 
 loc_1364E:
 		clr.w	obVelY(a0)
+		cmpi.b  #$16,obJumpFlag(a0)
+		bge.s   @cont
 		move.w	obVelX(a0),obInertia(a0)
+	@cont:
 		bra.w	Sonic_ResetOnFloor
 ; ===========================================================================
 
@@ -78,6 +80,8 @@ loc_1365C:
 
 loc_13670:
 		bsr.w	Sonic_ResetOnFloor
+		cmpi.b  #$16,obJumpFlag(a0)
+		bge.s   locret_1367E
 		move.w	obVelY(a0),obInertia(a0)
 		tst.b	d3
 		bpl.s	locret_1367E
@@ -120,7 +124,10 @@ Sonic_HitFloor:
 		move.b	d3,obAngle(a0)
 		move.b	#aniID_Walk,obAnim(a0)
 		clr.w	obVelY(a0)
+		cmpi.b  #$16,obJumpFlag(a0)
+		bge.s   @cont
 		move.w	obVelX(a0),obInertia(a0)
+	@cont:
 		bra.w	Sonic_ResetOnFloor
 
 	@noFloor:
@@ -185,7 +192,7 @@ Sonic_HitCeiling2:
 		clr.w	obVelY(a0)
 
 	@end:
-		rts	
+		rts
 ; ===========================================================================
 ; identical to Sonic_HitFloor...
 Sonic_HitFloor2:
@@ -198,7 +205,10 @@ Sonic_HitFloor2:
 		move.b	d3,obAngle(a0)
 		move.b	#aniID_Walk,obAnim(a0)
 		clr.w	obVelY(a0)
+		cmpi.b  #$16,obJumpFlag(a0)
+		bge.s   @cont
 		move.w	obVelX(a0),obInertia(a0)
+	@cont:
 		bra.w	Sonic_ResetOnFloor
 
 	@end:

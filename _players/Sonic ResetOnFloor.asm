@@ -103,11 +103,32 @@ DropDash:
 		move.b	#obBallWidth,obWidth(a0)
 		move.b	#aniID_Roll,obAnim(a0)
 		addq.w	#obPlayerHeight-obBallHeight,obY(a0)
-		move.w	#$C00,obInertia(a0)
+		move.w	#$800,d1
+		move.w	#$C00,d2
+
 		btst	#staFacing,obStatus(a0)
-		beq.s	@dontflip
-		neg.w	obInertia(a0)
-	@dontflip:
+		bne.s	@facingleft
+		move.w	obInertia(a0),d0
+		asr.w	#2,d0
+		add.w	d1,d0
+		move.w  d0,obInertia(a0)            ; move d0 (new dashspeed) to Sonic's inertia
+		cmp.w	d2,d0
+		blt.s	@skipcap
+		move.w	d2,obInertia(a0)
+		bra.s	@skipcap
+
+	@facingleft:
+		neg.w	d1
+		neg.w	d2
+		move.w	obInertia(a0),d0
+		asr.w	#2,d0
+		add.w	d1,d0
+		move.w  d0,obInertia(a0)            ; move d0 (new dashspeed) to Sonic's inertia
+		cmp.w	d2,d0
+		bgt.s	@skipcap
+		move.w	d2,obInertia(a0)
+
+	@skipcap:
 		bset	#staSpin,obStatus(a0)
 		clr.b	obJumpFlag(a0)
 		rts
