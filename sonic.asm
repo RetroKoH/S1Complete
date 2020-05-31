@@ -2012,7 +2012,6 @@ GM_Title:
 		clr.b	(v_lastlamp).w		; clear lamppost counter
 		clr.w	(v_debuguse).w		; disable debug item placement mode
 		clr.w	(f_demo).w			; disable debug mode
-		clr.w	($FFFFFFEA).w 		; unused variable
 		clr.w	(v_zone).w			; set level to GHZ (00)
 		clr.w	(v_pcyc_time).w 	; disable palette cycling
 		bsr.w	LevelSizeLoad
@@ -2203,7 +2202,7 @@ PlayLevel:
 		move.b	d0,(v_emeraldlist).w ; clear emeralds
 		move.b	d0,(v_continues).w ; clear continues
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
-		sfx	bgm_Fade,0,1,1 ; fade out music
+		sfx		bgm_Fade,0,1,1 ; fade out music
 		rts	
 ; ===========================================================================
 
@@ -2330,8 +2329,14 @@ LevelSelect_PressStart:
 		bne.w	LevelSelect_StartZone
 
 		move.b	#id_Special,(v_gamemode).w ; => SpecialStage
+		bset	#0,(f_timeattack).w
 		clr.w	(v_zone).w
 		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+
+	@clear:
 		clr.w	(v_rings).w	; clear rings
 		clr.l	(v_time).w	; clear time
 		clr.l	(v_score).w	; clear score
@@ -2394,7 +2399,13 @@ LevelSelect_StartZone:
 		andi.w	#$3FFF,d0
 		move.w	d0,(v_zone).w
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
-		move.b	#3,(v_lives).w		; set lives to 3
+		bset	#0,(f_timeattack).w
+		move.b	#3,(v_lives).w	; set lives to 3
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@clear
+		move.b	#5,(v_lives).w	; set lives to 5
+
+	@clear:
 		clr.w	(v_rings).w		; clear rings
 		clr.l	(v_time).w		; clear time
 		clr.l	(v_score).w		; clear score
@@ -3875,6 +3886,7 @@ SS_MainLoop:
 		bsr.w	PauseGame
 		move.b	#$A,(v_vbla_routine).w
 		bsr.w	WaitForVBla
+		addq.w	#1,(v_framecount).w ; Added for blinking HUD and timing in SS Time Attack mode
 		bsr.w	MoveSonicInDemo
 		move.w	(v_jpadhold1).w,(v_jpadhold2).w
 		jsr		(ExecuteObjects).l
@@ -8831,10 +8843,10 @@ AddPoints:
 		bhi.s   @belowmax ; if yes, branch
 		move.l  d1,(a3) ; reset score to 999999
 
+	@belowmax:
 		cmpi.b	#difHard,(v_difficulty).w
 		beq.s	@noextralife
 
-	@belowmax:
 		move.l  (a3),d0
 		cmp.l   (v_scorelife).w,d0 ; has Sonic got 50000+ points?
 		blo.s   @noextralife ; if not, branch

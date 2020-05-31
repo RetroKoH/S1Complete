@@ -131,7 +131,7 @@ Got_RingBonus:
 Got_ChkBonus:
 		tst.w	d0					; is there any bonus?
 		bne.s	Got_AddBonus		; if yes, branch
-		sfx	sfx_Cash,0,0,0			; play "ker-ching" sound
+		sfx		sfx_Cash,0,0,0			; play "ker-ching" sound
 		addq.b	#2,obRoutine(a0)
 		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w
 		bne.s	Got_SetDelay
@@ -153,6 +153,12 @@ Got_AddBonus:
 ; ===========================================================================
 
 Got_NextLevel:	; Routine $A
+		tst.b	(f_timeattack).w
+		beq.s	@notTimeAttack
+		move.b	#id_MenuScreen,(v_gamemode).w
+		bra.s	Got_Display2
+
+	@notTimeAttack:
 		move.b	(v_zone).w,d0
 		andi.w	#7,d0
 		lsl.w	#3,d0

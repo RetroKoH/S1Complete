@@ -495,7 +495,7 @@ Obj09_ChkCont:
 		move.l	a1,4(a2)
 
 Obj09_GetCont:
-		jsr	(CollectRing).l
+		jsr		(CollectRing).l
 		cmpi.w	#50,(v_rings).w	; check if you have 50 rings
 		bcs.s	Obj09_NoCont
 		bset	#0,(v_lifecount).w

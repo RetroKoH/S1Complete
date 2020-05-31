@@ -964,7 +964,7 @@ DLE_SBZ2Emain:
 		move.w	#$510,(v_limittop2).w
 		moveq	#plcid_FZBoss,d0
 		bsr.w	AddPLC				; load FZ boss patterns
-		music	bgm_FZ, 0,1,0
+		music	bgm_FZ, 0,0,0
 
 	@ret:
 		rts
