@@ -364,20 +364,46 @@ locret_6F62:
 ; ===========================================================================
 
 DLE_SBZ3N:
+		moveq	#0,d0
+		move.b	(v_dle_routine).w,d0
+		move.w	DLE_SBZ3N_Sub(pc,d0.w),d0
+		jmp		DLE_SBZ3N_Sub(pc,d0.w)
+; ===========================================================================
+DLE_SBZ3N_Sub:
+		dc.w DLE_SBZ3N_Main-DLE_SBZ3N_Sub
+		dc.w DLE_SBZ3N_TA-DLE_SBZ3N_Sub
+; ===========================================================================
+
+DLE_SBZ3N_Main:
 		bset	#0,(f_boss_active).w	; This act doesn't have a boss, but dont load EndofAct routine
 
 		cmpi.w	#$D00,(v_screenposx).w
-		bcs.s	locret_6F8C
+		bcs.s	@end
 		cmpi.w	#$18,(v_player+obY).w ; has Sonic reached the top of the level?
-		bcc.s	locret_6F8C	; if not, branch
+		bcc.s	@end	; if not, branch
+
+		tst.b	(f_timeattack).w 	; is this a Time Attack run?
+		beq.s	@notTA
+		addq.b	#2,(v_dle_routine).w
+		move.b	#1,(f_lockmulti).w	; freeze Sonic
+		clr.w	(v_player+obVelX).w
+		clr.w	(v_player+obVelY).w
+		clr.b	(f_timecount).w		; stop time counter
+		jmp		GotThroughAct_TA
+
+	@notTA:
 		clr.b	(v_lastlamp).w
 		move.w	#1,(f_restart).w ; restart level
 		move.w	#(id_SBZ<<8)+2,(v_zone).w ; set level number to 0502 (FZ)
 		move.b	#1,(f_lockmulti).w ; freeze Sonic
 
-locret_6F8C:
-		rts	
+	@end:
+		rts
 ; ===========================================================================
+
+DLE_SBZ3N_TA:
+		rts
+
 ; ---------------------------------------------------------------------------
 ; Marble Zone dynamic level events
 ; ---------------------------------------------------------------------------

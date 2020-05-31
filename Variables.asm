@@ -344,6 +344,7 @@ v_spindashsfx2:	= v_spindashsfx1+1
 v_spindashsfx3:	= v_spindashsfx1+2
 v_cameralag:	= $FFFFFEB4	; camera lag after launching Spin Dash (1 byte)
 v_scrolldelay:	= $FFFFFEBE	; scroll delay timer
+v_centstep:		equ $FFFFFEBF	; value used to increment centiseconds
 
 v_ani0_time:	equ $FFFFFEC0	; synchronised sprite animation 0 - time until next frame (used for synchronised animations)
 v_ani0_frame:	equ $FFFFFEC1	; synchronised sprite animation 0 - current frame

@@ -10,7 +10,7 @@ See: http://info.sonicretro.org/Project_Sonic_1:_Two-Eight
 Hack To-Do List:
 
 - Add sounds and visuals to the drop dash, in line with what the latest Sonic 1 re-release (Mega Play) did.
-- The HUD issues I'm aware of. The former, I'm not sure exactly how to fix. This started happening after I ported the S2 non-object HUD and is part of the reason why the HUD now scrolls in and out of frame. The latter issue (which I just noticed earlier today while applying a change to special stages) I'm sure is a simple enough fix. I'll tackle that first.
+- Fix garbled HUD that occurs when going from level to special stage and vice versa. Can fix by scrolling it out.
 - SBZ3's issue is a result of me porting the new art in via SonLvl. I don't wanna pin all the blame on that app, perhaps I made an error somewhere. It'll be a simple fix, just time-consuming... As for the points, I had no idea. Nice catch.
 - On that note, Ralakimus pointed out a bug in that zone related to floor collision. IDK how that happened and plan on fixing it ASAP.
 - Flower art is broken, AND palettes when NOT in normal mode. I will get to that later on.

@@ -142,6 +142,8 @@ GotThroughAct:
 		tst.b	(v_objspace+$5C0).w
 		bne.s	locret_ECEE
 		move.w	(v_limitright2).w,(v_limitleft2).w
+
+GotThroughAct_TA: ; For SBZ3 Time Attack
 		bclr	#stsInvinc,(v_status_secondary).w 	; disable invincibility
 		move.b	#id_GotThroughCard,(v_objspace+$5C0).w
 

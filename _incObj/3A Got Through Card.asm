@@ -129,10 +129,12 @@ Got_RingBonus:
 		sub.w	d1,(v_ringbonus).w	; subtract decrement from ring bonus
 
 Got_ChkBonus:
-		tst.w	d0					; is there any bonus?
-		bne.s	Got_AddBonus		; if yes, branch
-		sfx		sfx_Cash,0,0,0			; play "ker-ching" sound
+		tst.w	d0							; is there any bonus?
+		bne.s	Got_AddBonus				; if yes, branch
+		sfx		sfx_Cash,0,0,0				; play "ker-ching" sound
 		addq.b	#2,obRoutine(a0)
+		tst.b	(f_timeattack).w			; Time attack mode omits the SBZ2 cutscene
+		bne.s	Got_SetDelay
 		cmpi.w	#(id_SBZ<<8)+1,(v_zone).w
 		bne.s	Got_SetDelay
 		addq.b	#4,obRoutine(a0)
@@ -145,17 +147,18 @@ locret_C692:
 ; ===========================================================================
 
 Got_AddBonus:
-		jsr	(AddPoints).l
+		jsr		(AddPoints).l
 		move.b	(v_vbla_byte).w,d0
 		andi.b	#3,d0
 		bne.s	locret_C692
-		sfx	sfx_Switch,1,0,0	; play "blip" sound
+		sfx		sfx_Switch,1,0,0	; play "blip" sound
 ; ===========================================================================
 
 Got_NextLevel:	; Routine $A
 		tst.b	(f_timeattack).w
 		beq.s	@notTimeAttack
 		move.b	#id_MenuScreen,(v_gamemode).w
+		clr.b	(v_lastlamp).w
 		bra.s	Got_Display2
 
 	@notTimeAttack:

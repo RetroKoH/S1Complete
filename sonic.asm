@@ -2196,6 +2196,7 @@ PlayLevel:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
+		move.b	d0,(v_centstep).w
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastspecial).w ; clear special stage number
 		move.b	d0,(v_emeralds).w ; clear emerald count
@@ -2339,6 +2340,7 @@ LevelSelect_PressStart:
 	@clear:
 		clr.w	(v_rings).w	; clear rings
 		clr.l	(v_time).w	; clear time
+		clr.b	(v_centstep).w
 		clr.l	(v_score).w	; clear score
 ;		clr.l	(v_startscore).w ; clear starting score
 		clr.b	(v_lastspecial).w ; clear special stage number
@@ -2408,6 +2410,7 @@ LevelSelect_StartZone:
 	@clear:
 		clr.w	(v_rings).w		; clear rings
 		clr.l	(v_time).w		; clear time
+		clr.b	(v_centstep).w
 		clr.l	(v_score).w		; clear score
 ;		clr.l	(v_startscore).w	; clear start score <- KingofHarts Level Select Mod (REV C EDIT)
 		clr.b	(v_lastspecial).w	; clear special stage number
@@ -2859,6 +2862,7 @@ Demo_Level:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
+		move.b	d0,(v_centstep).w
 		move.l	d0,(v_score).w	; clear score
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		rts	
@@ -3473,10 +3477,11 @@ Level_LoadObj:
 		jsr		(ExecuteObjects).l
 		jsr		(BuildSprites).l
 		moveq	#0,d0
-		tst.b	(v_lastlamp).w	; are you starting from	a lamppost?
-		bne.s	Level_SkipClr	; if yes, branch
-		move.w	d0,(v_rings).w	; clear rings
-		move.l	d0,(v_time).w	; clear time
+		tst.b	(v_lastlamp).w		; are you starting from	a lamppost?
+		bne.s	Level_SkipClr		; if yes, branch
+		move.w	d0,(v_rings).w		; clear rings
+		move.l	d0,(v_time).w		; clear time
+		move.b	d0,(v_centstep).w	; clear centisecond incrementer (for Time Attack HUD)
 		move.b	d0,(v_lifecount).w ; clear lives counter
 
 	Level_SkipClr:
@@ -3487,16 +3492,15 @@ Level_LoadObj:
 	@skiptimeclear: ; end of mod
 ;		move.l  (v_startscore).w,(v_score).w
 		move.b	d0,(v_status_secondary).w
-		move.b	d0,($FFFFFE2F).w
 		move.w	d0,(v_debuguse).w
 		move.w	d0,(f_restart).w
 		move.w	d0,(v_framecount).w
 		bsr.w	OscillateNumInit
 		move.b	#1,(f_scorecount).w ; update score counter
 		move.b	#1,(f_ringcount).w ; update rings counter
-		move.b	#1,(f_timecount).w ; update time counter
-		move.w	#0,(v_btnpushtime1).w
-		lea	(DemoDataPtr).l,a1 ; load demo data
+;		move.b	#1,(f_timecount).w ; update time counter
+		clr.w	(v_btnpushtime1).w
+		lea		(DemoDataPtr).l,a1 ; load demo data
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		lsl.w	#2,d0
@@ -3565,6 +3569,7 @@ Level_StartGame:
 		bmi.s	@demo
 		move.b	#1,(f_level_started).w ; LEVEL START FLAG
 	@demo:
+		move.b	#1,(f_timecount).w ; update time counter
 		bclr	#7,(v_gamemode).w ; subtract $80 from mode to end pre-level stuff
 ;		move.b	#1,(f_debugmode).w ; enable debug mode
 
@@ -3588,10 +3593,10 @@ Level_MainLoop:
 		cmpi.b	#6,(v_player+obRoutine).w ; has Sonic just died?
 		bhs.s	Level_SkipScroll ; if yes, branch
 
-	Level_DoScroll:
+Level_DoScroll:
 		bsr.w	DeformLayers
 
-	Level_SkipScroll:
+Level_SkipScroll:
 		cmpi.b	#$90,(v_hudscrollpos).w
 		beq.s	Level_SkipHUDScroll
 		add.b	#4,(v_hudscrollpos).w
@@ -4390,6 +4395,7 @@ Cont_GotoLevel:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
+		move.b	d0,(v_centstep).w
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
@@ -4493,7 +4499,6 @@ End_LoadData:
 		move.l	d0,(v_time).w
 		move.b	d0,(v_lifecount).w
 		move.b	d0,(v_status_secondary).w 
-		move.b	d0,($FFFFFE2F).w
 		move.w	d0,(v_debuguse).w
 		move.w	d0,(f_restart).w
 		move.w	d0,(v_framecount).w
@@ -4733,6 +4738,7 @@ EndingDemoLoad:
 		moveq	#0,d0
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
+		move.b	d0,(v_centstep).w
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost counter
 		cmpi.w	#4,(v_creditsnum).w ; is SLZ demo running?
@@ -8826,6 +8832,7 @@ Map_SS_Down:	include	"_maps\SS DOWN Block.asm"
 
 		include	"_maps\HUD.asm"
 		include	"_maps\HUD SS.asm"
+		include	"_maps\HUD TA.asm"
 
 ; ---------------------------------------------------------------------------
 ; Add points subroutine
@@ -8866,6 +8873,7 @@ AddPoints:
 
 		include	"_inc\HUD_Update.asm"
 		include	"_inc\HUD_Update_SS.asm"
+		include	"_inc\HUD_Update_TA.asm"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load countdown numbers on the continue screen

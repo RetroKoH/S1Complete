@@ -1,5 +1,5 @@
 ; ---------------------------------------------------------------------------
-; Sprite mappings - SCORE, TIME, RINGS
+; Sprite mappings - only RINGS and LIVES are shown
 ; ---------------------------------------------------------------------------
 Map_HUD_SS:
 		dc.w @allyellow-Map_HUD_SS

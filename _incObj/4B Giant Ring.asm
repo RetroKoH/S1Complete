@@ -8,13 +8,19 @@ GiantRing:
 		move.w	GRing_Index(pc,d0.w),d1
 		jmp	GRing_Index(pc,d1.w)
 ; ===========================================================================
-GRing_Index:	dc.w GRing_Main-GRing_Index
+GRing_Index:
+		dc.w GRing_Main-GRing_Index
 		dc.w GRing_Animate-GRing_Index
 		dc.w GRing_Collect-GRing_Index
 		dc.w GRing_Delete-GRing_Index
 ; ===========================================================================
 
 GRing_Main:	; Routine 0
+		tst.b	(f_timeattack).w		; don't let the Giant Ring appear in Time Attack mode
+		bne.w	GRing_Delete
+		cmpi.b	#modeHandheld,(v_optgamemode).w
+		beq.w	GRing_Delete			; dont let the Ring appear in handheld mode either
+
 		move.l	#Map_GRing,obMap(a0)
 		move.w	#$2430,obGfx(a0)
 		ori.b	#4,obRender(a0)

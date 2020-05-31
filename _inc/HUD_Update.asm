@@ -10,6 +10,11 @@ hudVRAM:	macro loc
 
 
 HUD_Update:
+		tst.b 	(f_timeattack).w
+		beq.s	@notTA
+		bra.w	HUD_Update_TA
+
+	@notTA:
 		tst.w	(f_debugmode).w	; is debug mode	on?
 		bne.w	HudDebug	; if yes, branch
 		tst.b	(f_scorecount).w ; does the score need updating?
