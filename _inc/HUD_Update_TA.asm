@@ -51,8 +51,8 @@ HUD_Update_TA:
 		addi.b	#1,d1
 		
 	@skip2:
-		addq.b	#1,-(a1)	; increment 1/60s counter
-		cmpi.b	#100,(a1)	; check if passed 60
+		add.b	d1,-(a1)	; increment centiseconds counter
+		cmpi.b	#100,(a1)	; check if passed 100
 		bcs.s	@updatecent
 
 		move.b	#0,(a1)
