@@ -16,7 +16,7 @@ Hud_1:		dc.l 1
 
 
 Hud_Mins:
-		lea	(Hud_1).l,a2
+		lea		(Hud_1).l,a2
 		moveq	#0,d6
 		bra.s	loc_1C9BA
 ; End of function Hud_Mins
@@ -26,12 +26,12 @@ Hud_Mins:
 
 
 Hud_Secs:
-		lea	(Hud_10).l,a2
+		lea		(Hud_10).l,a2
 		moveq	#1,d6
 
 loc_1C9BA:
 		moveq	#0,d4
-		lea	Art_Hud(pc),a1
+		lea		Art_Hud(pc),a1
 
 Hud_TimeLoop:
 		moveq	#0,d2
@@ -53,7 +53,7 @@ loc_1C9CC:
 loc_1C9D6:
 		lsl.w	#6,d2
 		move.l	d0,4(a6)
-		lea	(a1,d2.w),a3
+		lea		(a1,d2.w),a3
 		move.l	(a3)+,(a6)
 		move.l	(a3)+,(a6)
 		move.l	(a3)+,(a6)
@@ -71,7 +71,7 @@ loc_1C9D6:
 		move.l	(a3)+,(a6)
 		move.l	(a3)+,(a6)
 		addi.l	#$400000,d0
-		dbf	d6,Hud_TimeLoop
+		dbf		d6,Hud_TimeLoop
 
 		rts	
 ; End of function Hud_Secs
@@ -155,10 +155,10 @@ Hud_Lives:
 		hudVRAM	$FBA0		; set VRAM address
 		moveq	#0,d1
 		move.b	(v_lives).w,d1	; load number of lives
-		lea	(Hud_10).l,a2
+		lea		(Hud_10).l,a2
 		moveq	#1,d6
 		moveq	#0,d4
-		lea	Art_LivesNums(pc),a1
+		lea		Art_LivesNums(pc),a1
 
 Hud_LivesLoop:
 		move.l	d0,4(a6)
@@ -184,7 +184,7 @@ loc_1CAA2:
 
 loc_1CAA6:
 		lsl.w	#5,d2
-		lea	(a1,d2.w),a3
+		lea		(a1,d2.w),a3
 		move.l	(a3)+,(a6)
 		move.l	(a3)+,(a6)
 		move.l	(a3)+,(a6)
@@ -196,7 +196,7 @@ loc_1CAA6:
 
 loc_1CABC:
 		addi.l	#$400000,d0
-		dbf	d6,Hud_LivesLoop ; repeat 1 more time
+		dbf		d6,Hud_LivesLoop ; repeat 1 more time
 
 		rts	
 ; ===========================================================================

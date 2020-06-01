@@ -3436,6 +3436,11 @@ Level_TtlCardLoop:
 		bne.s	Level_TtlCardLoop ; if not, branch
 		tst.l	(v_plc_buffer).w ; are there any items in the pattern load cue?
 		bne.s	Level_TtlCardLoop ; if yes, branch
+		tst.b	(f_timeattack).w
+		beq.s 	@notTimeAttack
+		jsr		(Hud_Base_TA).l	; load Time Attack HUD gfx
+		bra.s	Level_SkipTtlCard
+	@notTimeAttack:
 		jsr		(Hud_Base).l	; load basic HUD gfx
 
 	Level_SkipTtlCard:
@@ -9311,11 +9316,9 @@ Nem_Cater:	incbin	"artnem\Enemy Caterkiller.bin"
 ; ---------------------------------------------------------------------------
 Art_TitleCard:	incbin	"artunc\Title Cards.bin"
 Art_TitleCard_End:		even
-Nem_Hud:	incbin	"artnem\HUD.bin"	; HUD (rings, time, score)
+Nem_Hud:	incbin	"artnem\HUD.bin"	; HUD (score, time, rings)
 		even
-Nem_Hud_SS:	incbin	"artnem\HUD - SS.bin"	; HUD (rings)
-		even
-Nem_Hud_TA:	incbin	"artnem\HUD - TA.bin"	; HUD (time, rings)
+Nem_Hud_SS:	incbin	"artnem\HUD - SS.bin"	; HUD (time, rings)
 		even
 Nem_Lives:	incbin	"artnem\HUD - Life Counter Icon.bin"
 		even

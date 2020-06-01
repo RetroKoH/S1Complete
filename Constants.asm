@@ -694,7 +694,7 @@ ArtNem_Animal2_locVRAM:			equ $B1C0
 ArtNem_Animal2:					equ $2000+(ArtNem_Animal2_locVRAM/$20)
 
 ArtNem_Explosions_locVRAM:		equ $B400
-ArtNem_Explosions:				equ (ArtNem_Explosions_locVRAM/$20)
+ArtNem_Explosions:				equ $2000+(ArtNem_Explosions_locVRAM/$20)
 
 ArtNem_Monitors_locVRAM:		equ $D000
 ArtNem_Monitors:				equ (ArtNem_Monitors_locVRAM/$20)

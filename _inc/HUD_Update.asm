@@ -8,21 +8,20 @@ hudVRAM:	macro loc
 		move.l	#($40000000+((loc&$3FFF)<<16)+((loc&$C000)>>14)),d0
 		endm
 
-
 HUD_Update:
 		tst.b 	(f_timeattack).w
 		beq.s	@notTA
 		bra.w	HUD_Update_TA
 
 	@notTA:
-		tst.w	(f_debugmode).w	; is debug mode	on?
-		bne.w	HudDebug	; if yes, branch
-		tst.b	(f_scorecount).w ; does the score need updating?
-		beq.s	@chkrings	; if not, branch
+		tst.w	(f_debugmode).w		; is debug mode	on?
+		bne.w	HudDebug			; if yes, branch
+		tst.b	(f_scorecount).w	; does the score need updating?
+		beq.s	@chkrings			; if not, branch
 
 		clr.b	(f_scorecount).w
-		hudVRAM	$DC80		; set VRAM address
-		move.l	(v_score).w,d1	; load score
+		hudVRAM	$DC80				; set VRAM address
+		move.l	(v_score).w,d1		; load score
 		bsr.w	Hud_Score
 
 	@chkrings:
@@ -163,10 +162,10 @@ Hud_LoadZero:
 
 
 Hud_Base:
-		lea	($C00000).l,a6
-		bsr.w	Hud_Lives
+		lea		($C00000).l,a6
+		bsr.w	Hud_Lives				; Load Lives counter at FBA0 and FBE0
 		locVRAM	$DC40
-		lea	Hud_TilesBase(pc),a2
+		lea		Hud_TilesBase(pc),a2
 		move.w	#$E,d2
 
 loc_1C83E:
@@ -198,8 +197,10 @@ loc_1C85E:
 ; End of function Hud_Base
 
 ; ===========================================================================
-Hud_TilesBase:	dc.b $16, $FF, $FF, $FF, $FF, $FF, $FF,	0, 0, $14, 0, 0
+Hud_TilesBase:	dc.b $16, $FF, $FF, $FF, $FF, $FF, $FF,	0,   0, $14, 0,  0
+;					 'E'  ''   ''   ''   ''   ''   ''   '0' '0' ':' '0' '0'
 Hud_TilesZero:	dc.b $FF, $FF, 0, 0
+;
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load debug mode	numbers	patterns
 ; ---------------------------------------------------------------------------
@@ -232,7 +233,7 @@ HudDb_XYLoop:
 		andi.w	#$F,d2
 		cmpi.w	#$A,d2
 		bcs.s	loc_1C8B2
-		addq.w	#4,d2		; REV C EDIT - Accomodate new text art for ASCII text
+		addq.w	#4,d2		; Accomodate new text art for ASCII text
 
 loc_1C8B2:
 		lsl.w	#5,d2

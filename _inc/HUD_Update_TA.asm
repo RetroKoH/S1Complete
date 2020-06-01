@@ -24,7 +24,7 @@ HUD_Update_TA:
 
 	@notzero:
 		clr.b	(f_ringcount).w
-		hudVRAM	$DF40		; set VRAM address
+		hudVRAM	$DF40			; set VRAM address
 		moveq	#0,d1
 		move.w	(v_rings).w,d1	; load number of rings
 		bsr.w	Hud_Rings
@@ -66,25 +66,19 @@ HUD_Update_TA:
 		move.b	#9,(a1)		; keep as 9
 
 	@updatetime:
-		hudVRAM	$DE40
+		hudVRAM	$DD80
 		moveq	#0,d1
 		move.b	(v_timemin).w,d1 ; load	minutes
 		bsr.w	Hud_Mins
-		hudVRAM	$DEC0
+		hudVRAM	$DE00
 		moveq	#0,d1
 		move.b	(v_timesec).w,d1 ; load	seconds
 		bsr.w	Hud_Secs
 	@updatecent:
-		hudVRAM	$D780	;Mercury Macros
+		hudVRAM	$DEC0
 		moveq	#0,d1
 		move.b	(v_timecent).w,d1 ; load centiseconds
 		bsr.w	Hud_Secs
-
-;	@chklives:
-;		tst.b	(f_lifecount).w ; does the lives counter need updating?
-;		beq.s	@chkbonus	; if not, branch
-;		clr.b	(f_lifecount).w
-;		bsr.w	Hud_Lives
 
 	@chkbonus:
 		tst.b	(f_endactbonus).w ; do time/ring bonus counters need updating?
@@ -102,29 +96,6 @@ HUD_Update_TA:
 		rts	
 ; ===========================================================================
 
-;TimeOver:
-;		clr.b	(f_timecount).w
-;		lea	(v_player).w,a0
-;		movea.l	a0,a2
-;		bsr.w	KillSonic
-;		move.b	#1,(f_timeover).w
-;		rts	
-; ===========================================================================
-
-; ---------------------------------------------------------------------------
-; Subroutine to	load " on the	HUD
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-Hud_LoadMarks:				; XREF: HUD_Update
-		locVRAM	$D740
-		lea		Hud_TilesMarks(pc),a2
-		move.w	#2,d2
-		bra.s	Hud_BaseCont
-; End of function Hud_LoadMarks
-
 ; ---------------------------------------------------------------------------
 ; Subroutine to	load uncompressed HUD patterns ("0", "')
 ; ---------------------------------------------------------------------------
@@ -133,10 +104,9 @@ Hud_LoadMarks:				; XREF: HUD_Update
 
 
 Hud_Base_TA:
-		lea	($C00000).l,a6
-;		bsr.w	Hud_Lives
-		bsr.s	Hud_LoadMarks
-		locVRAM	$DC40
+		lea		($C00000).l,a6
+		bsr.w	Hud_Rings
+		locVRAM	$DC40 ; All unc data such as Score, etc, starts here
 		lea		Hud_TilesBaseTA(pc),a2
 		move.w	#$E,d2
 
@@ -169,6 +139,7 @@ Hud_BaseCont:
 ; End of function Hud_Base_TA
 
 ; ===========================================================================
-Hud_TilesMarks:		dc.b $1A, 0, 0, 0
-Hud_TilesBaseTA:	dc.b $16, $FF, $FF, $FF, $FF, $FF, $FF,	0, 0, $18, 0, 0
+Hud_TilesBaseTA:	dc.b $FF, $FF, $FF, $FF, $FF, $0,  $18,	 0,  0, $1A, 0,  0
+;					      ''  ''   ''   ''   ''   '0'  "'"  '0' '0' '"' '0' '0'
+					dc.b $FF, $FF, 0, 0
 ; ===========================================================================
