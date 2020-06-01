@@ -2057,13 +2057,13 @@ GM_Title:
 	@isjap:
 		move.b	#id_PSBTM,(v_objspace+$100).w ; load object which hides part of Sonic
 		move.b	#2,(v_objspace+$100+obFrame).w
-		jsr	(ExecuteObjects).l
+		jsr		(ExecuteObjects).l
 		bsr.w	DeformLayers
-		jsr	(BuildSprites).l
+		jsr		(BuildSprites).l
 		moveq	#plcid_Main,d0
 		bsr.w	NewPLC
-		move.w	#0,(v_title_dcount).w
-		move.w	#0,(v_title_ccount).w
+		clr.w	(v_title_dcount).w
+		clr.w	(v_title_ccount).w
 		move.w	(v_vdp_buffer1).w,d0
 		ori.b	#$40,d0
 		move.w	d0,(vdp_control_port).l
@@ -9314,6 +9314,8 @@ Art_TitleCard_End:		even
 Nem_Hud:	incbin	"artnem\HUD.bin"	; HUD (rings, time, score)
 		even
 Nem_Hud_SS:	incbin	"artnem\HUD - SS.bin"	; HUD (rings)
+		even
+Nem_Hud_TA:	incbin	"artnem\HUD - TA.bin"	; HUD (time, rings)
 		even
 Nem_Lives:	incbin	"artnem\HUD - Life Counter Icon.bin"
 		even

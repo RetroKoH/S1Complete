@@ -53,7 +53,7 @@ plcm:	macro gfx,vram
 ; Pattern load cues - standard block 1
 ; ---------------------------------------------------------------------------
 PLC_Main:	dc.w ((PLC_Mainend-PLC_Main-2)/6)-1
-		plcm	Nem_Hud,		ArtNem_HUD_locVRAM			; HUD
+		plcm	Nem_Hud,		ArtNem_HUD_locVRAM		; HUD
 		plcm	Nem_Points,		ArtNem_Points_locVRAM	; points from enemy
 	PLC_Mainend:
 ; ---------------------------------------------------------------------------
