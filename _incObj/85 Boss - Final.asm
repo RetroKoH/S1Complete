@@ -10,7 +10,7 @@ BossFinal:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Obj85_Index(pc,d0.w),d0
-		jmp	Obj85_Index(pc,d0.w)
+		jmp		Obj85_Index(pc,d0.w)
 ; ===========================================================================
 Obj85_Index:
 		dc.w Obj85_Main-Obj85_Index
@@ -57,7 +57,7 @@ Obj85_Loop:
 		bne.s	loc_19E20
 
 Obj85_LoadBoss:
-		move.b	#id_BossFinal,(a1)
+		move.b	#id_BossFinal,obID(a1)
 		move.w	(a2)+,obX(a1)
 		move.w	(a2)+,obY(a1)
 		move.w	(a2)+,obGfx(a1)
@@ -90,18 +90,18 @@ loc_19E20:
 		moveq	#3,d1
 
 loc_19E3E:
-		jsr	(FindNextFreeObj).l
+		jsr		(FindNextFreeObj).l
 		bne.s	loc_19E5A
 		move.w	a1,(a2)+
 		move.b	#id_EggmanCylinder,obID(a1) ; load crushing	cylinder object
 		move.l	a0,$34(a1)
 		move.b	d2,obSubtype(a1)
 		addq.w	#2,d2
-		dbf	d1,loc_19E3E
+		dbf		d1,loc_19E3E
 
 loc_19E5A:
 		clr.w	$34(a0)
-		move.b	#8,obColProp(a0) ; set number of hits to 8
+		move.b	#1,obColProp(a0) ; set number of hits to 8
 		cmpi.b	#difEasy,(v_difficulty).w
 		bne.s	@notEasy
 		move.b	#6,obColProp(a0)			; set number of hits to 6 for Easy Mode
@@ -143,7 +143,7 @@ loc_19EA8:
 		addq.w	#2,d1
 		tst.l	d0
 		bpl.s	loc_19EC6
-		exg	d1,d0
+		exg		d1,d0
 
 loc_19EC6:
 		lea	word_19FD6(pc),a1
@@ -447,7 +447,17 @@ loc_1A248:
 		bcs.s	loc_1A260
 		tst.b	obRender(a0)
 		bmi.s	loc_1A260
-		move.b	#$18,(v_gamemode).w
+
+		tst.b	(f_timeattack).w 	; is this a Time Attack run?
+		beq.s	@notTA
+		clr.b	(f_timecount).w		; stop time counter
+		jsr		GotThroughAct_TA
+		bra.s	@delete
+
+	@notTA:
+		move.b	#id_Ending,(v_gamemode).w
+
+	@delete:
 		addq.l	#4,sp
 		bra.w	Obj85_Delete
 ; ===========================================================================
