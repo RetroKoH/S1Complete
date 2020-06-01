@@ -6,8 +6,8 @@ Lamppost:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Lamp_Index(pc,d0.w),d1
-		jsr	Lamp_Index(pc,d1.w)
-		jmp	(RememberState).l
+		jsr		Lamp_Index(pc,d1.w)
+		jmp		(RememberState).l
 ; ===========================================================================
 Lamp_Index:	dc.w Lamp_Main-Lamp_Index
 		dc.w Lamp_Blue-Lamp_Index
@@ -20,13 +20,16 @@ lamp_time:	equ $36		; length of time to twirl the lamp
 ; ===========================================================================
 
 Lamp_Main:	; Routine 0
+		tst.b	(f_timeattack).w		; Don't let the Lamppost appear in Time Attack mode
+		bne.s	@timeattack
+
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Lamp,obMap(a0)
 		move.w	#ArtNem_Lamppost,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#8,obActWid(a0)
 		move.w	#$280,obPriority(a0)
-		lea	(v_objstate).w,a2
+		lea		(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		bclr	#7,2(a2,d0.w)
@@ -39,11 +42,14 @@ Lamp_Main:	; Routine 0
 		cmp.b	d2,d1		; is this a "new" lamppost?
 		bcs.s	Lamp_Blue	; if yes, branch
 
-@red:
+	@red:
 		bset	#0,2(a2,d0.w)
 		move.b	#4,obRoutine(a0) ; goto Lamp_Finish next
 		move.b	#3,obFrame(a0)	; use red lamppost frame
-		rts	
+		rts
+
+	@timeattack:
+		jmp		DeleteObject
 ; ===========================================================================
 
 Lamp_Blue:	; Routine 2
@@ -78,9 +84,9 @@ Lamp_Blue:	; Routine 2
 		cmpi.w	#$68,d0
 		bcc.s	@donothing
 
-		sfx	sfx_Lamppost,0,0,0	; play lamppost sound
+		sfx		sfx_Lamppost,0,0,0	; play lamppost sound
 		addq.b	#2,obRoutine(a0)
-		jsr	(FindFreeObj).l
+		jsr		(FindFreeObj).l
 		bne.s	@fail
 		move.b	#id_Lamppost,0(a1)	; load twirling	lamp object
 		move.b	#6,obRoutine(a1) ; goto Lamp_Twirl next
@@ -98,7 +104,7 @@ Lamp_Blue:	; Routine 2
 	@fail:
 		move.b	#1,obFrame(a0)	; use "post only" frame
 		bsr.w	Lamp_StoreInfo
-		lea	(v_objstate).w,a2
+		lea		(v_objstate).w,a2
 		moveq	#0,d0
 		move.b	obRespawnNo(a0),d0
 		bset	#0,2(a2,d0.w)
