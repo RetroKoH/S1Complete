@@ -426,21 +426,21 @@ HurtSonic_NoRings:
 
 
 KillSonic:
-		tst.w	(v_debuguse).w	; is debug mode	active?
-		bne.s	@dontdie	; if yes, branch
+		tst.w	(v_debuguse).w				; is debug mode	active?
+		bne.s	@dontdie					; if yes, branch
 		bclr	#1,(v_status_secondary).w	; remove invincibility
 		move.b	#6,obRoutine(a0)
-		jsr		Sonic_ResetOnFloor ; was bsr.w
+		jsr		Sonic_ResetOnFloor			; was bsr.w
 		bset	#1,obStatus(a0)
 		move.w	#-$700,obVelY(a0)
 		move.w	#0,obVelX(a0)
 		move.w	#0,obInertia(a0)
 		move.b	#aniID_Death,obAnim(a0)
 		bset	#7,obGfx(a0)
-		move.w	#sfx_Death,d0	; play normal death sound
-		cmpi.b	#id_Spikes,obID(a2)	; check	if you were killed by spikes
+		move.w	#sfx_Death,d0				; play normal death sound
+		cmpi.b	#id_Spikes,obID(a2)			; check	if you were killed by spikes
 		bne.s	@sound
-		move.w	#sfx_HitSpikes,d0 ; play spikes death sound
+		move.w	#sfx_HitSpikes,d0			; play spikes death sound
 
 	@sound:
 		jsr	(PlaySound_Special).l

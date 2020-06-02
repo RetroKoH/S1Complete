@@ -2354,6 +2354,7 @@ LevelSelect_PressStart:
 
 LevelSelect_Return:
 		move.b	#id_Sega,(v_gamemode).w ; => SegaScreen
+		clr.b	(f_timeattack).w
 		rts
 ; ===========================================================================
 
