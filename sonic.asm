@@ -3991,22 +3991,22 @@ loc_47D4:
 		move.w	#$7FF,d1
 	SS_EndClrObjRam:
 		move.l	d0,(a1)+
-		dbf	d1,SS_EndClrObjRam ; clear object RAM
+		dbf		d1,SS_EndClrObjRam ; clear object RAM
 
-		move.b	#id_SSResult,(v_objspace+$5C0).w ; load results screen object
+		move.b	#id_SSResult,(v_resultspace).w ; load results screen object
 
 SS_NormalExit:
 		bsr.w	PauseGame
 		move.b	#$C,(v_vbla_routine).w
 		bsr.w	WaitForVBla
-		jsr	(ExecuteObjects).l
-		jsr	(BuildSprites).l
+		jsr		(ExecuteObjects).l
+		jsr		(BuildSprites).l
 		bsr.w	RunPLC
 		tst.w	(f_restart).w
 		beq.s	SS_NormalExit
 		tst.l	(v_plc_buffer).w
 		bne.s	SS_NormalExit
-		sfx	sfx_EnterSS,0,1,0 ; play special stage exit sound
+		sfx		sfx_EnterSS,0,1,0 ; play special stage exit sound
 		bsr.w	PaletteWhiteOut
 		rts	
 ; ===========================================================================

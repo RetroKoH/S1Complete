@@ -328,7 +328,7 @@ Obj7B_Loop:
 		move.b	#$A,obRoutine(a1)
 		move.l	#Map_BSBall,obMap(a1)
 		move.w	#$180,obPriority(a1)
-		move.w	#ArtNem_SLZWeapons,obGfx(a1)
+		move.w	#ArtNem_SLZWeapons+$27,obGfx(a1)
 		move.w	obX(a0),obX(a1)
 		move.w	obY(a0),obY(a1)
 		move.w	(a2)+,obVelX(a1)

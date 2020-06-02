@@ -16,7 +16,7 @@ Light_Index:
 Light_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_Light,obMap(a0)
-		move.w	#0,obGfx(a0)
+		move.w	#$2000,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.b	#$10,obActWid(a0)
 		move.w	#$300,obPriority(a0)
@@ -28,7 +28,7 @@ Light_Animate:	; Routine 2
 		addq.b	#1,obFrame(a0)
 		cmpi.b	#6,obFrame(a0)
 		bcs.s	@chkdel
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 
 	@chkdel:
 		out_of_range	DeleteObject
