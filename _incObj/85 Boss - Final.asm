@@ -101,7 +101,7 @@ loc_19E3E:
 
 loc_19E5A:
 		clr.w	$34(a0)
-		move.b	#1,obColProp(a0) ; set number of hits to 8
+		move.b	#8,obColProp(a0) ; set number of hits to 8
 		cmpi.b	#difEasy,(v_difficulty).w
 		bne.s	@notEasy
 		move.b	#6,obColProp(a0)			; set number of hits to 6 for Easy Mode

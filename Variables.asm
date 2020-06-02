@@ -51,7 +51,15 @@ v_sparkspace:		= v_emeraldspace+$40 ; object variable space reserved for lightni
 
 v_gogglespace:		= v_objspace+$540	; object variable space reserved for Goggles (Shared with Ending Emerald #7)
 v_effectspace:		= v_objspace+$580	; object variable space reserved for dust effects		- 1 object
+
 v_resultspace:		= v_objspace+$5C0	; object variable space reserved for results screen		- 7 objects
+v_resultspace2:		= v_resultspace+$40
+v_resultspace3:		= v_resultspace2+$40
+v_resultspace4:		= v_resultspace3+$40
+v_resultspace5:		= v_resultspace4+$40
+v_resultspace6:		= v_resultspace5+$40
+v_resultspace7:		= v_resultspace6+$40 ; final piece, reserved for RING BONUS
+
 v_waterspace:		= v_objspace+$780	; object variable space reserved for the water surface		- 2 objects
 v_lvlobjspace:		equ v_objspace+$800	; level object variable space ($1800 bytes)
 

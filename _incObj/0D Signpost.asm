@@ -139,48 +139,55 @@ Sign_SonicRun:	; Routine 6
 
 
 GotThroughAct:
-		tst.b	(v_objspace+$5C0).w
-		bne.s	locret_ECEE
+		tst.b	(v_resultspace).w
+		bne.w	locret_ECEE
 		move.w	(v_limitright2).w,(v_limitleft2).w
 
 GotThroughAct_TA: ; For SBZ3 Time Attack
+		tst.b	(v_resultspace).w
+		bne.s	locret_ECEE
 		bclr	#stsInvinc,(v_status_secondary).w 	; disable invincibility
-		move.b	#id_GotThroughCard,(v_objspace+$5C0).w
+		move.b	#id_GotThroughCard,(v_resultspace).w
 
-		move.l  a0,-(sp)            ; save object address to stack
-		move.l  #$70000002,($C00004)  ; set mode "VRAM Write to $B000"
-		lea Art_TitleCard,a0        ; load title card patterns
-		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0; the title card art lenght, in tiles
-		jsr LoadUncArt          ; load uncompressed art
-		move.l  (sp)+,a0            ; get object address from stack
+		move.l  a0,-(sp) 				; save object address to stack
+		move.l  #$70000002,($C00004)	; set mode "VRAM Write to $B000"
+		lea 	Art_TitleCard,a0		; load title card patterns
+		move.l  #((Art_TitleCard_End-Art_TitleCard)/32)-1,d0 ; the title card art lenght, in tiles
+		jsr 	LoadUncArt				; load uncompressed art
+		move.l  (sp)+,a0				; get object address from stack
 
+		tst.b	(f_timeattack).w		; is this time attack?
+		bne.s	@nobonuses				; if yes, branch
 		move.b	#1,(f_endactbonus).w
 		moveq	#0,d0
 		move.b	(v_timemin).w,d0
-		mulu.w	#60,d0		; convert minutes to seconds
+		mulu.w	#60,d0				; convert minutes to seconds
 		moveq	#0,d1
 		move.b	(v_timesec).w,d1
-		add.w	d1,d0		; add up your time
-		divu.w	#15,d0		; divide by 15
+		add.w	d1,d0				; add up your time
+		divu.w	#15,d0				; divide by 15
 		moveq	#$14,d1
-		cmp.w	d1,d0		; is time 5 minutes or higher?
-		bcs.s	@hastimebonus	; if not, branch
-		move.w	d1,d0		; use minimum time bonus (0)
+		cmp.w	d1,d0				; is time 5 minutes or higher?
+		bcs.s	@hastimebonus		; if not, branch
+		move.w	d1,d0				; use minimum time bonus (0)
 
 	@hastimebonus:
 		add.w	d0,d0
-		move.w	TimeBonuses(pc,d0.w),(v_timebonus).w ; set time bonus
-		move.w	(v_rings).w,d0	; load number of rings
-		mulu.w	#10,d0		; multiply by 10
-		move.w	d0,(v_ringbonus).w ; set ring bonus
-		sfx		bgm_GotThrough,0,0,0	; play "Sonic got through" music
+		move.w	TimeBonuses(pc,d0.w),(v_timebonus).w	; set time bonus
+		move.w	(v_rings).w,d0							; load number of rings
+		mulu.w	#10,d0									; multiply by 10
+		move.w	d0,(v_ringbonus).w						; set ring bonus
+
+	@nobonuses:
+		sfx		bgm_GotThrough,0,0,0					; play "Sonic got through" music
 
 locret_ECEE:
 		rts	
 ; End of function GotThroughAct
 
 ; ===========================================================================
-TimeBonuses:	dc.w 5000, 5000, 1000, 500, 400, 400, 300, 300,	200, 200
+TimeBonuses:
+		dc.w 5000, 5000, 1000, 500, 400, 400, 300, 300,	200, 200
 		dc.w 200, 200, 100, 100, 100, 100, 50, 50, 50, 50, 0
 ; ===========================================================================
 

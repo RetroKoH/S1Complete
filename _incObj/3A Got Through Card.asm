@@ -6,17 +6,18 @@ GotThroughCard:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Got_Index(pc,d0.w),d1
-		jmp	Got_Index(pc,d1.w)
+		jmp		Got_Index(pc,d1.w)
 ; ===========================================================================
-Got_Index:	dc.w Got_ChkPLC-Got_Index
-		dc.w Got_Move-Got_Index
-		dc.w Got_Wait-Got_Index
-		dc.w Got_TimeBonus-Got_Index
-		dc.w Got_Wait-Got_Index
-		dc.w Got_NextLevel-Got_Index
-		dc.w Got_Wait-Got_Index
-		dc.w Got_Move2-Got_Index
-		dc.w loc_C766-Got_Index
+Got_Index:
+		dc.w Got_ChkPLC-Got_Index    ; 0
+		dc.w Got_Move-Got_Index      ; 2
+		dc.w Got_Wait-Got_Index      ; 4
+		dc.w Got_TimeBonus-Got_Index ; 6
+		dc.w Got_Wait-Got_Index      ; 8
+		dc.w Got_NextLevel-Got_Index ; $A
+		dc.w Got_Wait-Got_Index      ; $C
+		dc.w Got_Move2-Got_Index     ; $E
+		dc.w loc_C766-Got_Index      ; $10
 
 got_mainX:	equ $30		; position for card to display on
 got_finalX:	equ $32		; position for card to finish on
@@ -32,6 +33,9 @@ Got_Main:
 		movea.l	a0,a1
 		lea		(Got_Config).l,a2
 		moveq	#6,d1
+		tst.b	(f_timeattack).w
+		beq.s	Got_Loop
+		moveq	#3,d1
 
 Got_Loop:
 		move.b	#id_GotThroughCard,obID(a1)
@@ -44,14 +48,19 @@ Got_Loop:
 		cmpi.b	#6,d0
 		bne.s	loc_C5CA
 		add.b	(v_act).w,d0	; add act number to frame number
+		cmpi.b	#3,(v_act).w
+		bne.s	loc_C5CA
+		sub.b	#1,d0
 
 	loc_C5CA:
 		move.b	d0,obFrame(a1)
 		move.l	#Map_Got,obMap(a1)
 		move.w	#$8580,obGfx(a1)
-		move.b	#0,obRender(a1)
+		clr.b	obRender(a1)
 		lea		$40(a1),a1
 		dbf		d1,Got_Loop	; repeat 6 times
+
+; Add to this to implement Time Attack Elements
 
 Got_Move:	; Routine 2
 		moveq	#$10,d1		; set horizontal speed
@@ -82,12 +91,22 @@ loc_C610:
 ; ===========================================================================
 
 loc_C61A:
-		cmpi.b	#$E,($FFFFD724).w ; in v_objspace...
+		tst.b	(f_timeattack).w
+		bne.s	@timeattackmode
+		cmpi.b	#$E,(v_resultspace7+obRoutine).w	; Check routine for RING BONUS object
 		beq.s	loc_C610
 		cmpi.b	#4,obFrame(a0)
 		bne.s	loc_C5FE
 		addq.b	#2,obRoutine(a0)
-		move.w	#180,obTimeFrame(a0) ; set time delay to 3 seconds
+		move.w	#180,obTimeFrame(a0)		; set time delay to 3 seconds
+		bra.s	Got_Wait
+	@timeattackmode:
+		cmpi.b	#$E,(v_resultspace4+obRoutine).w	; Check routine for oval object
+		beq.s	loc_C610
+		cmpi.b	#5,obFrame(a0)						; Check if oval frame object
+		bne.s	loc_C5FE							; because we only want to execute once
+		move.b	#$8,obRoutine(a0)
+		move.w	#360,obTimeFrame(a0)				; set time delay to 6 seconds
 
 Got_Wait:	; Routine 4, 8, $C
 		subq.w	#1,obTimeFrame(a0) ; subtract 1 from time delay
@@ -173,6 +192,7 @@ Got_NextLevel:	; Routine $A
 		cmpi.b	#difEasy,(v_difficulty).w	; is the game set on Easy?
 		bne.s	@skip
 		move.w	LevelOrderEasy(pc,d0.w),d1 ; load level from easy mode level order array
+
 	@skip:
 		move.w	d1,d0 ; load level from level order array
 		move.w	d0,(v_zone).w	; set level number
@@ -278,10 +298,10 @@ LevelOrderEasy:
 ; ===========================================================================
 
 Got_Move2:	; Routine $E
-		moveq	#$20,d1		; set horizontal speed
+		moveq	#$20,d1			; set horizontal speed
 		move.w	got_finalX(a0),d0
-		cmp.w	obX(a0),d0	; has item reached its finish position?
-		beq.s	Got_SBZ2	; if yes, branch
+		cmp.w	obX(a0),d0		; has item reached its finish position?
+		beq.s	Got_SBZ2		; if yes, branch
 		bge.s	Got_ChgPos2
 		neg.w	d1
 
@@ -315,23 +335,23 @@ loc_C766:	; Routine $10
 		;    x-start,	x-main,	y-main,
 		;				routine, frame number
 
-Got_Config:	dc.w 4,		$124,	$BC			; "SONIC HAS"
+Got_Config:	dc.w 4,		$124,	$BC		; "_____ HAS"		$D5C0
 		dc.b 				2,	0
 
-		dc.w -$120,	$120,	$D0			; "PASSED"
+		dc.w -$120,	$120,	$D0			; "PASSED"			$D600
 		dc.b 				2,	1
 
-		dc.w $40C,	$14C,	$D6			; "ACT" 1/2/3
+		dc.w $40C,	$14C,	$D6			; "ACT" 1/2/3		$D640
 		dc.b 				2,	6
 
-		dc.w $520,	$120,	$EC			; score
+		dc.w $20C,	$14C,	$CC			; oval				$D680
+		dc.b 				2,	5
+
+		dc.w $520,	$120,	$EC			; score				$D6C0
 		dc.b 				2,	2
 
-		dc.w $540,	$120,	$FC			; time bonus
+		dc.w $540,	$120,	$FC			; time bonus		$D700
 		dc.b 				2,	3
 
-		dc.w $560,	$120,	$10C			; ring bonus
+		dc.w $560,	$120,	$10C		; ring bonus		$D740
 		dc.b 				2,	4
-
-		dc.w $20C,	$14C,	$CC			; oval
-		dc.b 				2,	5

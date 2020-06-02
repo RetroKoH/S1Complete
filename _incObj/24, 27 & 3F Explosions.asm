@@ -6,9 +6,10 @@ MissileDissolve:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	MDis_Index(pc,d0.w),d1
-		jmp	MDis_Index(pc,d1.w)
+		jmp		MDis_Index(pc,d1.w)
 ; ===========================================================================
-MDis_Index:	dc.w MDis_Main-MDis_Index
+MDis_Index:
+		dc.w MDis_Main-MDis_Index
 		dc.w MDis_Animate-MDis_Index
 ; ===========================================================================
 
@@ -18,10 +19,10 @@ MDis_Main:	; Routine 0
 		move.w	#$41C,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
-		move.b	#0,obColType(a0)
+		clr.b	obColType(a0)
 		move.b	#$C,obActWid(a0)
 		move.b	#9,obTimeFrame(a0)
-		move.b	#0,obFrame(a0)
+		clr.b	obFrame(a0)
 		sfx	sfx_A5,0,0,0		 ; play sound
 
 MDis_Animate:	; Routine 2
@@ -92,20 +93,21 @@ ExplosionBomb:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	ExBom_Index(pc,d0.w),d1
-		jmp	ExBom_Index(pc,d1.w)
+		jmp		ExBom_Index(pc,d1.w)
 ; ===========================================================================
-ExBom_Index:	dc.w ExBom_Main-ExBom_Index
+ExBom_Index:
+		dc.w ExBom_Main-ExBom_Index
 		dc.w ExItem_Animate-ExBom_Index
 ; ===========================================================================
 
 ExBom_Main:	; Routine 0
 		addq.b	#2,obRoutine(a0)
 		move.l	#Map_ExplodeBomb,obMap(a0)
-		move.w	#$5A0,obGfx(a0)
+		move.w	#ArtNem_Explosions,obGfx(a0)
 		move.b	#4,obRender(a0)
 		move.w	#$80,obPriority(a0)
-		move.b	#0,obColType(a0)
+		clr.b	obColType(a0)
 		move.b	#$C,obActWid(a0)
 		move.b	#7,obTimeFrame(a0)
-		move.b	#0,obFrame(a0)
-		sfx	sfx_Bomb,1,0,0	; play exploding bomb sound
+		clr.b	obFrame(a0)
+		sfx		sfx_Bomb,1,0,0	; play exploding bomb sound
