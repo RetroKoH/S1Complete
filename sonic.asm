@@ -14,7 +14,6 @@
 SonicMappingsVer:	equ	1
 		include	"SpritePiece.asm"
 
-EnableSRAM:			equ 0	; change to 1 to enable SRAM
 BackupSRAM:			equ 1
 AddressSRAM:		equ 3	; 0 = odd+even; 2 = even only; 3 = odd only
 
@@ -103,13 +102,10 @@ RomStartLoc:	dc.l StartOfRom		; Start address of ROM
 RomEndLoc:		dc.l EndOfRom-1		; End address of ROM
 RamStartLoc:	dc.l $FF0000		; Start address of RAM
 RamEndLoc:		dc.l $FFFFFF		; End address of RAM
-SRAMSupport:if EnableSRAM=1
+SRAMSupport:
 				dc.b $52, $41, $A0+(BackupSRAM<<6)+(AddressSRAM<<3), $20
-			else
-				dc.l $20202020
-			endc
-				dc.l $20202020		; SRAM start ($200001)
-				dc.l $20202020		; SRAM end ($20xxxx)
+				dc.l $00200000		; SRAM start ($200001)
+				dc.l $00200200		; SRAM end ($20xxxx)
 Notes:			dc.b "                                                    " ; Notes (unused, anything can be put in this space, but it has to be 52 bytes.)
 Region:			dc.b "JUE             " ; Region (Country code)
 EndOfHeader:
