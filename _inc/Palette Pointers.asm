@@ -16,24 +16,33 @@ ptr_Pal_Options:	palp	Pal_Options,v_pal_dry,$40		; 2 - Options
 ptr_Pal_Sonic:		palp	Pal_Sonic,v_pal_dry,$10			; 3 - Sonic
 
 Pal_Levels:
-ptr_Pal_GHZ:		palp	Pal_GHZ,v_pal_dry+$20, $30		; 4 - GHZ
+ptr_Pal_GHZ:		palp	Pal_GHZ,v_pal_dry+$20, $30			; 4 - GHZ
 ptr_Pal_GHZ_Easy:	palp	Pal_GHZ_Easy,v_pal_dry+$20, $30		; 7 - GHZ - Easy Mode
 ptr_Pal_GHZ_Hard:	palp	Pal_GHZ_Hard,v_pal_dry+$20, $30		; 7 - GHZ - Hard Mode
-ptr_Pal_LZ:			palp	Pal_LZ,v_pal_dry+$20,$30		; 5 - LZ
+ptr_Pal_LZ:			palp	Pal_LZ,v_pal_dry+$20,$30			; 5 - LZ
 ptr_Pal_LZ_Easy:	palp	Pal_LZ_Easy,v_pal_dry+$20,$30		; 8 - LZ - Easy Mode
 ptr_Pal_LZ_Hard:	palp	Pal_LZ_Hard,v_pal_dry+$20,$30		; 8 - LZ - Hard Mode
-ptr_Pal_MZ:			palp	Pal_MZ,v_pal_dry+$20,$30		; 6 - MZ
+ptr_Pal_MZ:			palp	Pal_MZ,v_pal_dry+$20,$30			; 6 - MZ
 ptr_Pal_MZ_Easy:	palp	Pal_MZ_Easy,v_pal_dry+$20,$30		; 9 - MZ - Easy Mode
 ptr_Pal_MZ_Hard:	palp	Pal_MZ_Hard,v_pal_dry+$20,$30		; 9 - MZ - Hard Mode
-ptr_Pal_SLZ:		palp	Pal_SLZ,v_pal_dry+$20,$30		; 7 - SLZ
+ptr_Pal_SLZ:		palp	Pal_SLZ,v_pal_dry+$20,$30			; 7 - SLZ
 ptr_Pal_SLZ_Easy:	palp	Pal_SLZ_Easy,v_pal_dry+$20,$30		; $A - SLZ - Easy Mode
 ptr_Pal_SLZ_Hard:	palp	Pal_SLZ_Hard,v_pal_dry+$20,$30		; $A - SLZ - Hard Mode
-ptr_Pal_SYZ:		palp	Pal_SYZ,v_pal_dry+$20,$30		; 8 - SYZ
+ptr_Pal_SYZ:		palp	Pal_SYZ,v_pal_dry+$20,$30			; 8 - SYZ
 ptr_Pal_SYZ_Easy:	palp	Pal_SYZ_Easy,v_pal_dry+$20,$30		; $B - SYZ - Easy Mode
 ptr_Pal_SYZ_Hard:	palp	Pal_SYZ_Hard,v_pal_dry+$20,$30		; $B - SYZ - Hard Mode
-ptr_Pal_SBZ1:		palp	Pal_SBZ1,v_pal_dry+$20,$30		; 9 - SBZ1
+ptr_Pal_SBZ1:		palp	Pal_SBZ1,v_pal_dry+$20,$30			; 9 - SBZ1
 ptr_Pal_SBZ1_Easy:	palp	Pal_SBZ1_Easy,v_pal_dry+$20,$30		; $C - SBZ1 - Easy Mode
 ptr_Pal_SBZ1_Hard:	palp	Pal_SBZ1_Hard,v_pal_dry+$20,$30		; $C - SBZ1 - Hard Mode
+ptr_Pal_BZ:			palp	Pal_BZ,$FB20, $30					; $D - BZ
+ptr_Pal_BZ_Easy:	palp	Pal_BZ_Easy,$FB20, $30				; $D - BZ - Easy Mode
+ptr_Pal_BZ_Hard:	palp	Pal_BZ_Hard,$FB20, $30				; $D - BZ - Hard Mode
+ptr_Pal_JZ:			palp	Pal_JZ,$FB20, $30					; $D - JZ
+ptr_Pal_JZ_Easy:	palp	Pal_JZ_Easy,$FB20, $30				; $D - JZ - Easy Mode
+ptr_Pal_JZ_Hard:	palp	Pal_JZ_Hard,$FB20, $30				; $D - JZ - Hard Mode
+ptr_Pal_SKBZ:		palp	Pal_SKBZ,$FB20, $30					; $D - SKBZ
+ptr_Pal_SKBZ_Easy:	palp	Pal_SKBZ_Easy,$FB20, $30			; $D - SKBZ - Easy Mode
+ptr_Pal_SKBZ_Hard:	palp	Pal_SKBZ_Hard,$FB20, $30			; $D - SKBZ - Hard Mode
 
 ptr_Pal_Special:	palp	Pal_Special,v_pal_dry,$40			; $A (10) - special stage
 ptr_Pal_LZWater:	palp	Pal_LZWater,v_pal_dry,$40			; $B (11) - LZ underwater

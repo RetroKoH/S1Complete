@@ -942,11 +942,32 @@ TilemapToVRAM:
 		rts	
 ; End of function TilemapToVRAM
 
+
 		include	"_inc\DMA Queue.asm"
 
 		include	"_inc\Nemesis Decompression.asm"
 		include "_inc\Uncompressed Art Loading.asm"
 		include	"_inc\Comper Decompression.asm"
+
+; ---------------------------------------------------------------------------
+; Subroutine to load the art for the animals for the current zone
+; I FORGOT WHO HELPED WITH THIS... MAY HAVE BEEN FROM THE ADD NEW ZONE GUIDE
+; ---------------------------------------------------------------------------
+
+; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
+
+
+AddAnimalPLC:
+		moveq	#0,d0
+		move.b	(v_zone).w,d0
+		cmpi.w	#id_BZ,d0
+
+		blt.s	@notnewzone
+		subq	#1,d0          ; Add 1 to skip Ending
+	@notnewzone:
+		addi.w	#plcid_GHZAnimals,d0  ; index of GHZ Animals
+;		bra.s	AddPLC
+; ---------------------------------------------------------------------------
 
 
 ; ---------------------------------------------------------------------------
@@ -1194,12 +1215,12 @@ QuickPLC:
 
 		include	"_inc\PaletteCycle.asm"
 
-Pal_GHZCyc:	incbin	"palette\Cycle - GHZ.bin"
-Pal_LZCyc1:	incbin	"palette\Cycle - LZ Waterfall.bin"
-Pal_LZCyc2:	incbin	"palette\Cycle - LZ Conveyor Belt.bin"
-Pal_LZCyc3:	incbin	"palette\Cycle - LZ Conveyor Belt Underwater.bin"
+Pal_GHZCyc:		incbin	"palette\Cycle - GHZ.bin"
+Pal_LZCyc1:		incbin	"palette\Cycle - LZ Waterfall.bin"
+Pal_LZCyc2:		incbin	"palette\Cycle - LZ Conveyor Belt.bin"
+Pal_LZCyc3:		incbin	"palette\Cycle - LZ Conveyor Belt Underwater.bin"
 Pal_SBZ3Cyc1:	incbin	"palette\Cycle - SBZ3 Waterfall.bin"
-Pal_SLZCyc:	incbin	"palette\Cycle - SLZ.bin"
+Pal_SLZCyc:		incbin	"palette\Cycle - SLZ.bin"
 Pal_SYZCyc1:	incbin	"palette\Cycle - SYZ1.bin"
 Pal_SYZCyc2:	incbin	"palette\Cycle - SYZ2.bin"
 
@@ -1765,59 +1786,8 @@ PalLoad4_Water:
 		dbf	d7,@loop
 		rts	
 ; End of function PalLoad4_Water
-
 ; ===========================================================================
 
-		include	"_inc\Palette Pointers.asm"
-
-; ---------------------------------------------------------------------------
-; Palette data
-; ---------------------------------------------------------------------------
-Pal_Title:		incbin	"palette\Title Screen.bin"
-Pal_Options:	incbin	"palette\Options.bin"
-Pal_Sonic:		incbin	"palette\Sonic.bin"
-
-
-Pal_GHZ:			incbin	"palette\Green Hill Zone.bin"
-Pal_GHZ_Easy:		incbin	"palette\Green Hill Zone - Easy.bin"
-Pal_GHZ_Hard:		incbin	"palette\Green Hill Zone - Hard.bin"
-Pal_LZ:				incbin	"palette\Labyrinth Zone.bin"
-Pal_LZ_Easy:		incbin	"palette\Labyrinth Zone - Easy.bin"
-Pal_LZ_Hard:		incbin	"palette\Labyrinth Zone - Hard.bin"
-Pal_LZWater:		incbin	"palette\Labyrinth Zone Underwater.bin"
-Pal_LZWater_Easy:	incbin	"palette\Labyrinth Zone Underwater - Easy.bin"
-Pal_LZWater_Hard:	incbin	"palette\Labyrinth Zone Underwater - Hard.bin"
-Pal_MZ:				incbin	"palette\Marble Zone.bin"
-Pal_MZ_Easy:		incbin	"palette\Marble Zone - Easy.bin"
-Pal_MZ_Hard:		incbin	"palette\Marble Zone - Hard.bin"
-Pal_SLZ:			incbin	"palette\Star Light Zone.bin"
-Pal_SLZ_Easy:		incbin	"palette\Star Light Zone - Easy.bin"
-Pal_SLZ_Hard:		incbin	"palette\Star Light Zone - Hard.bin"
-Pal_SYZ:			incbin	"palette\Spring Yard Zone.bin"
-Pal_SYZ_Easy:		incbin	"palette\Spring Yard Zone - Easy.bin"
-Pal_SYZ_Hard:		incbin	"palette\Spring Yard Zone - Hard.bin"
-Pal_SBZ1:			incbin	"palette\SBZ Act 1.bin"
-Pal_SBZ1_Easy:		incbin	"palette\SBZ Act 1 - Easy.bin"
-Pal_SBZ1_Hard:		incbin	"palette\SBZ Act 1 - Hard.bin"
-Pal_SBZ2:			incbin	"palette\SBZ Act 2.bin"
-Pal_SBZ2_Easy:		incbin	"palette\SBZ Act 2 - Easy.bin"
-Pal_SBZ2_Hard:		incbin	"palette\SBZ Act 2 - Hard.bin"
-Pal_SBZ3:			incbin	"palette\SBZ Act 3.bin"
-Pal_SBZ3_Easy:		incbin	"palette\SBZ Act 3 - Easy.bin"
-Pal_SBZ3_Hard:		incbin	"palette\SBZ Act 3 - Hard.bin"
-Pal_SBZ3Water:		incbin	"palette\SBZ Act 3 Underwater.bin"
-Pal_SBZ3Water_Easy:	incbin	"palette\SBZ Act 3 Underwater - Easy.bin"
-Pal_SBZ3Water_Hard:	incbin	"palette\SBZ Act 3 Underwater - Hard.bin"
-
-
-Pal_Special:	incbin	"palette\Special Stage.bin"
-Pal_LZSonWater:	incbin	"palette\Sonic - LZ Underwater.bin"
-Pal_SBZ3SonWat:	incbin	"palette\Sonic - SBZ3 Underwater.bin"
-Pal_SSResult:	incbin	"palette\Special Stage Results.bin"
-Pal_Continue:	incbin	"palette\Special Stage Continue Bonus.bin"
-Pal_Ending:		incbin	"palette\Ending.bin"
-Pal_Menu:		incbin	"palette\Menu.bin"
-Pal_LevSelIcons: incbin "palette\Level Select Icons.bin"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to	wait for VBlank routines to complete
@@ -2387,10 +2357,10 @@ LevelSelect_Order:
 		dc.w	$0900	; SKBZ 1
 		dc.w	$0901	; SKBZ 2
 		dc.w	$0902	; SKBZ 3
-		dc.w	$0000	; GHZ 1 (WILL BE CCZ)
+		dc.w	$0000	; GHZ 1 (WILL BE River Cavern Zone)
 		dc.w	$4000	; 20 - special stage - WILL BE BONUS STAGE
 		dc.w	$4000	; 20 - special stage
-		dc.w	$0000	; GHZ 1 (CHAR SELECT)
+		dc.w	$FFFF	; CHAR SELECT
 		dc.w	$FFFF	; 21 - sound test
 ; ===========================================================================
 
@@ -3248,13 +3218,13 @@ MonitorText_S3K:	dc.b "S1/S3K  "
 ; ---------------------------------------------------------------------------
 MusicList:
 		dc.b bgm_GHZ	; GHZ
-		dc.b bgm_LZ	; LZ
-		dc.b bgm_MZ	; MZ
+		dc.b bgm_LZ		; LZ
+		dc.b bgm_MZ		; MZ
 		dc.b bgm_SLZ	; SLZ
 		dc.b bgm_SYZ	; SYZ
 		dc.b bgm_SBZ	; SBZ
-		zonewarning MusicList,1
-		dc.b bgm_FZ	; Ending
+		dc.b bgm_FZ		; Ending
+		dc.b bgm_GHZ	; BZ
 		even
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -3267,8 +3237,8 @@ MusicList2:
 		dc.b bgm_SLZ
 		dc.b bgm_SYZ
 		dc.b bgm_SBZ
-		zonewarning MusicList2,1
-		; The ending doesn't get an entry
+		dc.b bgm_GHZ
+		dc.b bgm_GHZ
 		even
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -3560,11 +3530,7 @@ Level_Delay:
 Level_ClrCardArt:
 		moveq	#plcid_Explode,d0
 		jsr		(AddPLC).l	; load explosion gfx
-		moveq	#0,d0
-		move.b	(v_zone).w,d0
-		addi.w	#plcid_GHZAnimals,d0
-		jsr		(AddPLC).l	; load animal gfx (level no. + $15)
-;		jsr	(AddAnimalPLC).l	; load animal gfx - REV C EDIT (FraGag)
+		jsr		(AddAnimalPLC).l	; load animal gfx (FraGag)
 
 Level_StartGame:
 		tst.w	(f_demo).w
@@ -3685,7 +3651,8 @@ ColIndexLoad:
 ; ---------------------------------------------------------------------------
 ; Collision index pointers
 ; ---------------------------------------------------------------------------
-ColPointers:	dc.l Col_GHZ_1	; MJ: each zone now has two entries
+ColPointers:
+		dc.l Col_GHZ_1	; MJ: each zone now has two entries
 		dc.l Col_GHZ_2
 		dc.l Col_LZ_1
 		dc.l Col_LZ_2
@@ -3697,9 +3664,14 @@ ColPointers:	dc.l Col_GHZ_1	; MJ: each zone now has two entries
 		dc.l Col_SYZ_2
 		dc.l Col_SBZ_1
 		dc.l Col_SBZ_2
-		zonewarning ColPointers,8
-;		dc.l Col_GHZ_1 ; Pointers for Ending are missing by default.
-;		dc.l Col_GHZ_2
+		dc.l Col_GHZ_1 ; Pointers for Ending are missing by default.
+		dc.l Col_GHZ_2
+		dc.l Col_BZ_1
+		dc.l Col_BZ_2
+		dc.l Col_JZ_1
+		dc.l Col_JZ_2
+		dc.l Col_SKBZ_1
+		dc.l Col_SKBZ_2
 
 		include	"_inc\Oscillatory Routines.asm"
 
@@ -4689,8 +4661,8 @@ GM_Credits:
 		moveq	#0,d0
 		move.b	(v_zone).w,d0
 		lsl.w	#4,d0
-		lea	(LevelHeaders).l,a2
-		lea	(a2,d0.w),a2
+		lea		(LevelHeaders).l,a2
+		lea		(a2,d0.w),a2
 		moveq	#0,d0
 		move.b	(a2),d0
 		beq.s	Cred_SkipObjGfx
@@ -5626,7 +5598,7 @@ LoadLevelArt:
         rts          		    			; return to subroutine
  
         ; list of art patterns used in levels
-LLA_ArtList:    dc.l LvlArt_GHZ, LvlArt_LZ, LvlArt_MZ, LvlArt_SLZ, LvlArt_SYZ, LvlArt_SBZ, LvlArt_GHZ, LvlArt_SBZ3
+LLA_ArtList:    dc.l LvlArt_GHZ, LvlArt_LZ, LvlArt_MZ, LvlArt_SLZ, LvlArt_SYZ, LvlArt_SBZ, LvlArt_GHZ, LvlArt_BZ, LvlArt_JZ, LvlArt_SKBZ, LvlArt_SBZ3
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to load basic level data
@@ -5640,7 +5612,7 @@ LevelDataLoad:
 		move.b	(v_zone).w,d0
 		cmpi.w	#(id_LZ<<8)+3,(v_zone).w	; is level SBZ3 (LZ4) ?
 		bne.s	@notSB3Art					; if not, branch
-		moveq	#$7,d0						; use SB3 art
+		moveq	#SBZ3_Art,d0				; use SBZ3 art
 
 	@notSB3Art:
 		bsr.s   LoadLevelArt		; load level tiles
@@ -6313,7 +6285,8 @@ Map_Push:	include	"_maps\Pushable Blocks.asm"
 ; ---------------------------------------------------------------------------
 ; Sprite mappings - zone title cards
 ; ---------------------------------------------------------------------------
-Map_Card:	dc.w M_Card_GHZ-Map_Card
+Map_Card:
+		dc.w M_Card_GHZ-Map_Card
 		dc.w M_Card_LZ-Map_Card
 		dc.w M_Card_MZ-Map_Card
 		dc.w M_Card_SLZ-Map_Card
@@ -6325,6 +6298,10 @@ Map_Card:	dc.w M_Card_GHZ-Map_Card
 		dc.w M_Card_Act3-Map_Card
 		dc.w M_Card_Oval-Map_Card
 		dc.w M_Card_FZ-Map_Card
+		dc.w M_Card_BZ-Map_Card
+		dc.w M_Card_JZ-Map_Card
+		dc.w M_Card_SKBZ-Map_Card
+
 M_Card_GHZ:	dc.b 9 			; GREEN HILL
 		dc.b $F8, 5, 0,	$18, $B4
 		dc.b $F8, 5, 0,	$3A, $C4
@@ -6389,6 +6366,31 @@ M_Card_SBZ:	dc.b $A			; SCRAP BRAIN
 		dc.b $F8, 5, 0,	0, $2C
 		dc.b $F8, 1, 0,	$20, $3C
 		dc.b $F8, 5, 0,	$2E, $44
+		even
+M_Card_BZ:	dc.b 6				; BRIDGE
+		dc.b $F8, 5, 0,	4, $D0
+		dc.b $F8, 5, 0,	$3A, $E0
+		dc.b $F8, 1, 0,	$20, $F0
+		dc.b $F8, 5, 0,	$C, $F8
+		dc.b $F8, 5, 0,	$18, $08
+		dc.b $F8, 5, 0,	$10, $18
+		even
+M_Card_JZ:	dc.b 6				; JUNGLE
+		dc.b $F8, 5, 0,	$80, $D0
+		dc.b $F8, 5, 0,	$46, $E0
+		dc.b $F8, 5, 0,	$2E, $F0
+		dc.b $F8, 5, 0,	$18, $00
+		dc.b $F8, 5, 0,	$26, $10
+		dc.b $F8, 5, 0,	$10, $20
+		even
+M_Card_SKBZ:	dc.b 7			; SKY BASE
+		dc.b $F8, 5, 0,	$3E, $C8
+		dc.b $F8, 5, 0,	$22, $D8
+		dc.b $F8, 5, 0,	$4A, $E8
+		dc.b $F8, 5, 0,	4, $08
+		dc.b $F8, 5, 0,	0, $18
+		dc.b $F8, 5, 0,	$3E, $28
+		dc.b $F8, 5, 0,	$10, $38
 		even
 M_Card_Zone:	dc.b 4			; ZONE
 		dc.b $F8, 5, 0,	$4E, $E0
@@ -8979,6 +8981,66 @@ Nem_LevSelIcons:	incbin	"artnem\Level Select Icons.bin"
 
 
 ; ---------------------------------------------------------------------------
+; Palette data
+; ---------------------------------------------------------------------------
+		include	"_inc\Palette Pointers.asm"
+
+Pal_Title:		incbin	"palette\Title Screen.bin"
+Pal_Options:	incbin	"palette\Options.bin"
+Pal_Sonic:		incbin	"palette\Sonic.bin"
+
+
+Pal_GHZ:			incbin	"palette\Green Hill Zone.bin"
+Pal_GHZ_Easy:		incbin	"palette\Green Hill Zone - Easy.bin"
+Pal_GHZ_Hard:		incbin	"palette\Green Hill Zone - Hard.bin"
+Pal_LZ:				incbin	"palette\Labyrinth Zone.bin"
+Pal_LZ_Easy:		incbin	"palette\Labyrinth Zone - Easy.bin"
+Pal_LZ_Hard:		incbin	"palette\Labyrinth Zone - Hard.bin"
+Pal_LZWater:		incbin	"palette\Labyrinth Zone Underwater.bin"
+Pal_LZWater_Easy:	incbin	"palette\Labyrinth Zone Underwater - Easy.bin"
+Pal_LZWater_Hard:	incbin	"palette\Labyrinth Zone Underwater - Hard.bin"
+Pal_MZ:				incbin	"palette\Marble Zone.bin"
+Pal_MZ_Easy:		incbin	"palette\Marble Zone - Easy.bin"
+Pal_MZ_Hard:		incbin	"palette\Marble Zone - Hard.bin"
+Pal_SLZ:			incbin	"palette\Star Light Zone.bin"
+Pal_SLZ_Easy:		incbin	"palette\Star Light Zone - Easy.bin"
+Pal_SLZ_Hard:		incbin	"palette\Star Light Zone - Hard.bin"
+Pal_SYZ:			incbin	"palette\Spring Yard Zone.bin"
+Pal_SYZ_Easy:		incbin	"palette\Spring Yard Zone - Easy.bin"
+Pal_SYZ_Hard:		incbin	"palette\Spring Yard Zone - Hard.bin"
+Pal_SBZ1:			incbin	"palette\SBZ Act 1.bin"
+Pal_SBZ1_Easy:		incbin	"palette\SBZ Act 1 - Easy.bin"
+Pal_SBZ1_Hard:		incbin	"palette\SBZ Act 1 - Hard.bin"
+Pal_SBZ2:			incbin	"palette\SBZ Act 2.bin"
+Pal_SBZ2_Easy:		incbin	"palette\SBZ Act 2 - Easy.bin"
+Pal_SBZ2_Hard:		incbin	"palette\SBZ Act 2 - Hard.bin"
+Pal_SBZ3:			incbin	"palette\SBZ Act 3.bin"
+Pal_SBZ3_Easy:		incbin	"palette\SBZ Act 3 - Easy.bin"
+Pal_SBZ3_Hard:		incbin	"palette\SBZ Act 3 - Hard.bin"
+Pal_SBZ3Water:		incbin	"palette\SBZ Act 3 Underwater.bin"
+Pal_SBZ3Water_Easy:	incbin	"palette\SBZ Act 3 Underwater - Easy.bin"
+Pal_SBZ3Water_Hard:	incbin	"palette\SBZ Act 3 Underwater - Hard.bin"
+Pal_BZ:				incbin	"palette\Bridge Zone.bin"
+Pal_BZ_Easy:		incbin	"palette\Bridge Zone - Easy.bin"
+Pal_BZ_Hard:		incbin	"palette\Bridge Zone - Hard.bin"
+Pal_JZ:				incbin	"palette\Jungle Zone.bin"
+Pal_JZ_Easy:		incbin	"palette\Jungle Zone - Easy.bin"
+Pal_JZ_Hard:		incbin	"palette\Jungle Zone - Hard.bin"
+Pal_SKBZ:			incbin	"palette\Sky Base Zone.bin"
+Pal_SKBZ_Easy:		incbin	"palette\Sky Base Zone - Easy.bin"
+Pal_SKBZ_Hard:		incbin	"palette\Sky Base Zone - Hard.bin"
+
+Pal_Special:	incbin	"palette\Special Stage.bin"
+Pal_LZSonWater:	incbin	"palette\Sonic - LZ Underwater.bin"
+Pal_SBZ3SonWat:	incbin	"palette\Sonic - SBZ3 Underwater.bin"
+Pal_SSResult:	incbin	"palette\Special Stage Results.bin"
+Pal_Continue:	incbin	"palette\Special Stage Continue Bonus.bin"
+Pal_Ending:		incbin	"palette\Ending.bin"
+Pal_Menu:		incbin	"palette\Menu.bin"
+Pal_LevSelIcons: incbin "palette\Level Select Icons.bin"
+
+
+; ---------------------------------------------------------------------------
 ; Sprite Animations
 ; ---------------------------------------------------------------------------
 
@@ -9135,19 +9197,17 @@ Nem_ResultEm:	incbin	"artnem\Special Result Emeralds.bin" ; chaos emeralds on sp
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - GHZ stuff
 ; ---------------------------------------------------------------------------
-Nem_Stalk:	incbin	"artnem\GHZ Flower Stalk.bin"
+Nem_Stalk:		incbin	"artnem\GHZ Flower Stalk.bin"
 		even
-Nem_Swing:	incbin	"artnem\GHZ Swinging Platform.bin"
+Nem_Swing:		incbin	"artnem\GHZ Swinging Platform.bin"
 		even
-Nem_Bridge:	incbin	"artnem\GHZ Bridge.bin"
+Nem_Bridge:		incbin	"artnem\GHZ Bridge.bin"
 		even
-Nem_GhzUnkBlock:incbin	"artnem\Unused - GHZ Block.bin"
+Nem_Ball:		incbin	"artnem\GHZ Giant Ball.bin"
 		even
-Nem_Ball:	incbin	"artnem\GHZ Giant Ball.bin"
+Nem_Spikes:		incbin	"artnem\Spikes.bin"
 		even
-Nem_Spikes:	incbin	"artnem\Spikes.bin"
-		even
-Nem_GhzLog:	incbin	"artnem\Unused - GHZ Log.bin"
+Nem_GhzLog:		incbin	"artnem\Unused - GHZ Log.bin"
 		even
 Nem_SpikePole:	incbin	"artnem\GHZ Spiked Log.bin"
 		even
@@ -9162,7 +9222,7 @@ Nem_GhzWall2:	incbin	"artnem\GHZ Edge Wall.bin"
 ; ---------------------------------------------------------------------------
 Nem_WaterSurface:	incbin	"artnem\LZ Water Surface.bin"
 		even
-Nem_Waterfall:	incbin	"artnem\LZ Water & Splashes.bin"
+Nem_Waterfall:		incbin	"artnem\LZ Water & Splashes.bin"
 		even
 ;Nem_Splash:	incbin	"artnem\Water Splash.bin"
 ;		even
@@ -9178,7 +9238,7 @@ Nem_LzDoor1:	incbin	"artnem\LZ Vertical Door.bin"
 		even
 Nem_Harpoon:	incbin	"artnem\LZ Harpoon.bin"
 		even
-Nem_LzPole:	incbin	"artnem\LZ Breakable Pole.bin"
+Nem_LzPole:		incbin	"artnem\LZ Breakable Pole.bin"
 		even
 Nem_LzDoor2:	incbin	"artnem\LZ Horizontal Door.bin"
 		even
@@ -9190,7 +9250,7 @@ Nem_LzBlock2:	incbin	"artnem\LZ Blocks.bin"
 		even
 Nem_LzPlatfm:	incbin	"artnem\LZ Rising Platform.bin"
 		even
-Nem_Cork:	incbin	"artnem\LZ Cork.bin"
+Nem_Cork:		incbin	"artnem\LZ Cork.bin"
 		even
 Nem_LzBlock1:	incbin	"artnem\LZ 32x32 Block.bin"
 		even
@@ -9205,9 +9265,9 @@ Nem_MzGlass:	incbin	"artnem\MZ Green Glass Block.bin"
 		even
 Nem_UnkGrass:	incbin	"artnem\Unused - Grass.bin"
 		even
-Nem_MzFire:	incbin	"artnem\Fireballs.bin"
+Nem_MzFire:		incbin	"artnem\Fireballs.bin"
 		even
-Nem_Lava:	incbin	"artnem\MZ Lava.bin"
+Nem_Lava:		incbin	"artnem\MZ Lava.bin"
 		even
 Nem_MzBlock:	incbin	"artnem\MZ Green Pushable Block.bin"
 		even
@@ -9216,15 +9276,15 @@ Nem_MzUnkBlock:	incbin	"artnem\Unused - MZ Background.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - SLZ stuff
 ; ---------------------------------------------------------------------------
-Nem_Seesaw:	incbin	"artnem\SLZ Seesaw.bin"
+Nem_Seesaw:		incbin	"artnem\SLZ Seesaw.bin"
 		even
 Nem_SlzSpike:	incbin	"artnem\SLZ Little Spikeball.bin"
 		even
-Nem_Fan:	incbin	"artnem\SLZ Fan.bin"
+Nem_Fan:		incbin	"artnem\SLZ Fan.bin"
 		even
 Nem_SlzWall:	incbin	"artnem\SLZ Breakable Wall.bin"
 		even
-Nem_Pylon:	incbin	"artnem\SLZ Pylon.bin"
+Nem_Pylon:		incbin	"artnem\SLZ Pylon.bin"
 		even
 Nem_SlzSwing:	incbin	"artnem\SLZ Swinging Platform.bin"
 		even
@@ -9235,7 +9295,7 @@ Nem_SlzCannon:	incbin	"artnem\SLZ Cannon.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - SYZ stuff
 ; ---------------------------------------------------------------------------
-Nem_Bumper:	incbin	"artnem\SYZ Bumper.bin"
+Nem_Bumper:		incbin	"artnem\SYZ Bumper.bin"
 		even
 Nem_SyzSpike2:	incbin	"artnem\SYZ Small Spikeball.bin"
 		even
@@ -9250,7 +9310,7 @@ Nem_SbzWheel1:	incbin	"artnem\SBZ Running Disc.bin"
 		even
 Nem_SbzWheel2:	incbin	"artnem\SBZ Junction Wheel.bin"
 		even
-Nem_Cutter:	incbin	"artnem\SBZ Pizza Cutter.bin"
+Nem_Cutter:		incbin	"artnem\SBZ Pizza Cutter.bin"
 		even
 Nem_Stomper:	incbin	"artnem\SBZ Stomper.bin"
 		even
@@ -9272,7 +9332,7 @@ Nem_SlideFloor:	incbin	"artnem\SBZ Sliding Floor Trap.bin"
 		even
 Nem_SbzDoor2:	incbin	"artnem\SBZ Large Horizontal Door.bin"
 		even
-Nem_Girder:	incbin	"artnem\SBZ Crushing Girder.bin"
+Nem_Girder:		incbin	"artnem\SBZ Crushing Girder.bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - enemies
@@ -9281,7 +9341,7 @@ Nem_BallHog:	incbin	"artnem\Enemy Ball Hog.bin"
 		even
 Nem_Crabmeat:	incbin	"artnem\Enemy Crabmeat.bin"
 		even
-Nem_Buzz:	incbin	"artnem\Enemy Buzz Bomber.bin"
+Nem_Buzz:		incbin	"artnem\Enemy Buzz Bomber.bin"
 		even
 Nem_UnkExplode:	incbin	"artnem\Unused - Explosion.bin"
 		even
@@ -9289,44 +9349,44 @@ Nem_Burrobot:	incbin	"artnem\Enemy Burrobot.bin"
 		even
 Nem_Chopper:	incbin	"artnem\Enemy Chopper.bin"
 		even
-Nem_Jaws:	incbin	"artnem\Enemy Jaws.bin"
+Nem_Jaws:		incbin	"artnem\Enemy Jaws.bin"
 		even
-Nem_Roller:	incbin	"artnem\Enemy Roller.bin"
+Nem_Roller:		incbin	"artnem\Enemy Roller.bin"
 		even
 Nem_Motobug:	incbin	"artnem\Enemy Motobug.bin"
 		even
 Nem_Newtron:	incbin	"artnem\Enemy Newtron.bin"
 		even
-Nem_Yadrin:	incbin	"artnem\Enemy Yadrin.bin"
+Nem_Yadrin:		incbin	"artnem\Enemy Yadrin.bin"
 		even
 Nem_Basaran:	incbin	"artnem\Enemy Basaran.bin"
 		even
-Nem_Splats:	incbin	"artnem\Enemy Splats.bin"
+Nem_Splats:		incbin	"artnem\Enemy Splats.bin"
 		even
-Nem_Bomb:	incbin	"artnem\Enemy Bomb.bin"
+Nem_Bomb:		incbin	"artnem\Enemy Bomb.bin"
 		even
 Nem_Orbinaut:	incbin	"artnem\Enemy Orbinaut.bin"
 		even
-Nem_Cater:	incbin	"artnem\Enemy Caterkiller.bin"
+Nem_Cater:		incbin	"artnem\Enemy Caterkiller.bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - various
 ; ---------------------------------------------------------------------------
 Art_TitleCard:	incbin	"artunc\Title Cards.bin"
 Art_TitleCard_End:		even
-Nem_Hud:	incbin	"artnem\HUD.bin"	; HUD (score, time, rings)
+Nem_Hud:		incbin	"artnem\HUD.bin"	; HUD (score, time, rings)
 		even
-Nem_Hud_SS:	incbin	"artnem\HUD - SS.bin"	; HUD (time, rings)
+Nem_Hud_SS:		incbin	"artnem\HUD - SS.bin"	; HUD (time, rings)
 		even
-Nem_Lives:	incbin	"artnem\HUD - Life Counter Icon.bin"
+Nem_Lives:		incbin	"artnem\HUD - Life Counter Icon.bin"
 		even
-Nem_Ring:	incbin	"artnem\Rings.bin"
+Nem_Ring:		incbin	"artnem\Rings.bin"
 		even
 Nem_Monitors:	incbin	"artnem\Monitors.bin"
 		even
 Nem_Explode:	incbin	"artnem\Explosion.bin"
 		even
-Nem_Points:	incbin	"artnem\Points.bin"	; points from destroyed enemy or object
+Nem_Points:		incbin	"artnem\Points.bin"	; points from destroyed enemy or object
 		even
 Nem_GameOver:	incbin	"artnem\Game Over.bin"	; game over / time over
 		even
@@ -9334,11 +9394,11 @@ Nem_HSpring:	incbin	"artnem\Spring Horizontal.bin"
 		even
 Nem_VSpring:	incbin	"artnem\Spring Vertical.bin"
 		even
-Nem_Lamp:	incbin	"artnem\Lamppost.bin"
+Nem_Lamp:		incbin	"artnem\Lamppost.bin"
 		even
 Nem_BigFlash:	incbin	"artnem\Giant Ring Flash.bin"
 		even
-Nem_Bonus:	incbin	"artnem\Hidden Bonuses.bin" ; hidden bonuses at end of a level
+Nem_Bonus:		incbin	"artnem\Hidden Bonuses.bin" ; hidden bonuses at end of a level
 		even
 Nem_ChaosEm:	incbin	"artnem\Emerald.bin" ; Chaos Emerald found in levels
 		even
@@ -9369,71 +9429,88 @@ Nem_Squirrel:	incbin	"artnem\Animal Squirrel.bin"
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - primary patterns and block mappings
 ; ---------------------------------------------------------------------------
-Nem_Title:	incbin	"artnem\Title Screen Background.bin"	; Title patterns
+Nem_Title:		incbin	"artnem\Title Screen Background.bin"	; Title patterns
 		even
-LvlArt_GHZ:	incbin	"lvlart\GHZ.bin"	; GHZ primary patterns
+LvlArt_GHZ:		incbin	"lvlart\GHZ.bin"	; GHZ primary patterns
 		even
-Blk16_GHZ:	incbin	"map16\GHZ.bin"
+Blk16_GHZ:		incbin	"map16\GHZ.bin"
 		even
-Blk128_GHZ:	incbin	"map128\GHZ.bin"
+Blk128_GHZ:		incbin	"map128\GHZ.bin"
 		even
-LvlArt_LZ:	incbin	"lvlart\LZ.bin"		; LZ primary patterns
+LvlArt_LZ:		incbin	"lvlart\LZ.bin"		; LZ primary patterns
 		even
-Blk16_LZ:	incbin	"map16\LZ.bin"
+Blk16_LZ:		incbin	"map16\LZ.bin"
 		even
-Blk128_LZ:	incbin	"map128\LZ.bin"
+Blk128_LZ:		incbin	"map128\LZ.bin"
 		even
-LvlArt_MZ:	incbin	"lvlart\MZ.bin"		; MZ primary patterns
+LvlArt_MZ:		incbin	"lvlart\MZ.bin"		; MZ primary patterns
 		even
-Blk16_MZ:	incbin	"map16\MZ.bin"
+Blk16_MZ:		incbin	"map16\MZ.bin"
 		even
-Blk128_MZ:	incbin	"map128\MZ.bin"
+Blk128_MZ:		incbin	"map128\MZ.bin"
 		even
-LvlArt_SLZ:	incbin	"lvlart\SLZ.bin" 	; SLZ primary patterns
+LvlArt_SLZ:		incbin	"lvlart\SLZ.bin" 	; SLZ primary patterns
 		even
-Blk16_SLZ:	incbin	"map16\SLZ.bin"
+Blk16_SLZ:		incbin	"map16\SLZ.bin"
 		even
-Blk128_SLZ:	incbin	"map128\SLZ.bin"
+Blk128_SLZ:		incbin	"map128\SLZ.bin"
 		even
-LvlArt_SYZ:	incbin	"lvlart\SYZ.bin"	; SYZ primary patterns
+LvlArt_SYZ:		incbin	"lvlart\SYZ.bin"	; SYZ primary patterns
 		even
-Blk16_SYZ:	incbin	"map16\SYZ.bin"
+Blk16_SYZ:		incbin	"map16\SYZ.bin"
 		even
-Blk128_SYZ:	incbin	"map128\SYZ.bin"
+Blk128_SYZ:		incbin	"map128\SYZ.bin"
 		even
-LvlArt_SBZ:	incbin	"lvlart\SBZ.bin"	; SBZ primary patterns
+LvlArt_SBZ:		incbin	"lvlart\SBZ.bin"	; SBZ primary patterns
 		even
-Blk16_SBZ:	incbin	"map16\SBZ.bin"
+Blk16_SBZ:		incbin	"map16\SBZ.bin"
 		even
-Blk128_SBZ:	incbin	"map128\SBZ.bin"
+Blk128_SBZ:		incbin	"map128\SBZ.bin"
 		even
-; Exclusive Act 3 Art
 LvlArt_SBZ3:	incbin	"lvlart\SBZ3.bin"	; SBZ Act 3 primary patterns
 		even
-Blk16_SBZ3:	incbin	"map16\SBZ3.bin"
+Blk16_SBZ3:		incbin	"map16\SBZ3.bin"
 		even
 Blk128_SBZ3:	incbin	"map128\SBZ3.bin"
+		even
+LvlArt_BZ:		incbin	"lvlart\BZ.bin"	; BZ primary patterns
+		even
+Blk16_BZ:		incbin	"map16\BZ.bin"
+		even
+Blk128_BZ:		incbin	"map128\BZ.bin"
+		even
+LvlArt_JZ:		incbin	"lvlart\JZ.bin"	; JZ primary patterns
+		even
+Blk16_JZ:		incbin	"map16\JZ.bin"
+		even
+Blk128_JZ:		incbin	"map128\JZ.bin"
+		even
+LvlArt_SKBZ:	incbin	"lvlart\SKBZ.bin"	; SKBZ primary patterns
+		even
+Blk16_SKBZ:		incbin	"map16\SKBZ.bin"
+		even
+Blk128_SKBZ:	incbin	"map128\SKBZ.bin"
 		even
 ; ---------------------------------------------------------------------------
 ; Compressed graphics - bosses and ending sequence
 ; ---------------------------------------------------------------------------
-Nem_Eggman:	incbin	"artnem\Boss - Main.bin"
+Nem_Eggman:		incbin	"artnem\Boss - Main.bin"
 		even
 Nem_Eggman_Alt: incbin	"artnem\Boss - Alt Bosses.bin"
 		even
 Nem_Weapons:	incbin	"artnem\Boss - Weapons.bin"
 		even
-Nem_Prison:	incbin	"artnem\Prison Capsule.bin"
+Nem_Prison:		incbin	"artnem\Prison Capsule.bin"
 		even
 Nem_Sbz2Eggman:	incbin	"artnem\Boss - Eggman in SBZ2 & FZ.bin"
 		even
-Nem_FzBoss:	incbin	"artnem\Boss - Final Zone.bin"
+Nem_FzBoss:		incbin	"artnem\Boss - Final Zone.bin"
 		even
 Nem_FzEggman:	incbin	"artnem\Boss - Eggman after FZ Fight.bin"
 		even
 Nem_Exhaust:	incbin	"artnem\Boss - Exhaust Flame.bin"
 		even
-Nem_EndEm:	incbin	"artnem\Ending - Emeralds.bin"
+Nem_EndEm:		incbin	"artnem\Ending - Emeralds.bin"
 		even
 Nem_EndSonic:	incbin	"artnem\Ending - Sonic.bin"
 		even
@@ -9445,7 +9522,7 @@ Nem_EndFlower:	incbin	"artnem\Ending - Flowers.bin"
 		even
 Nem_CreditText:	incbin	"artnem\Ending - Credits.bin"
 		even
-Nem_EndStH:	incbin	"artnem\Ending - StH Logo.bin"
+Nem_EndStH:		incbin	"artnem\Ending - StH Logo.bin"
 		even
 
 		dcb.b $40,$FF
@@ -9482,6 +9559,18 @@ Col_SYZ_2:	incbin	"collide\SYZ2.bin"	; SYZ index 2
 Col_SBZ_1:	incbin	"collide\SBZ1.bin"	; SBZ index 1
 		even
 Col_SBZ_2:	incbin	"collide\SBZ2.bin"	; SBZ index 2
+		even
+Col_BZ_1:	incbin	"collide\BZ1.bin"	; BZ index 1
+		even
+Col_BZ_2:	incbin	"collide\BZ2.bin"	; BZ index 2
+		even
+Col_JZ_1:	incbin	"collide\JZ1.bin"	; JZ index 1
+		even
+Col_JZ_2:	incbin	"collide\JZ2.bin"	; JZ index 2
+		even
+Col_SKBZ_1:	incbin	"collide\SKBZ1.bin"	; SKBZ index 1
+		even
+Col_SKBZ_2:	incbin	"collide\SKBZ2.bin"	; SKBZ index 2
 		even
 ; ---------------------------------------------------------------------------
 ; Special Stage layouts
@@ -9775,20 +9864,21 @@ ObjPos_Index:
 		dc.l ObjPos_End, ObjPos_End, ObjPos_End, ObjPos_Null
 		dc.l ObjPos_End, ObjPos_End, ObjPos_End, ObjPos_Null
 
-		; NEW OBJECT LAYOUTS HERE
-;		dc.l ObjPos_BZ1, ObjPos_BZ1E, ObjPos_BZ1H, ObjPos_Null
-;		dc.l ObjPos_BZ2, ObjPos_BZ2E, ObjPos_BZ2H, ObjPos_Null
-;		dc.l ObjPos_BZ3, ObjPos_BZ2E, ObjPos_BZ3H, ObjPos_Null
-;		dc.l ObjPos_BZ1, ObjPos_BZ1E, ObjPos_BZ1H, ObjPos_Null
-;		dc.l ObjPos_JZ1, ObjPos_JZ1E, ObjPos_JZ1H, ObjPos_Null
-;		dc.l ObjPos_JZ2, ObjPos_JZ2E, ObjPos_JZ2H, ObjPos_Null
-;		dc.l ObjPos_JZ3, ObjPos_JZ2E, ObjPos_JZ3H, ObjPos_Null
-;		dc.l ObjPos_JZ1, ObjPos_JZ1E, ObjPos_JZ1H, ObjPos_Null
-;		dc.l ObjPos_SKBZ1, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
-;		dc.l ObjPos_SKBZ2, ObjPos_SKBZ2E, ObjPos_SKBZ2H, ObjPos_Null
-;		dc.l ObjPos_SKBZ3, ObjPos_SKBZ2E, ObjPos_SKBZ3H, ObjPos_Null
-;		dc.l ObjPos_SKBZ2, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
-		; --- Put extra object data here. ---
+		dc.l ObjPos_BZ1, ObjPos_BZ1E, ObjPos_BZ1H, ObjPos_Null
+		dc.l ObjPos_BZ2, ObjPos_BZ2E, ObjPos_BZ2H, ObjPos_Null
+		dc.l ObjPos_BZ3, ObjPos_BZ2E, ObjPos_BZ3H, ObjPos_Null
+		dc.l ObjPos_BZ1, ObjPos_BZ1E, ObjPos_BZ1H, ObjPos_Null
+
+		dc.l ObjPos_JZ1, ObjPos_JZ1E, ObjPos_JZ1H, ObjPos_Null
+		dc.l ObjPos_JZ2, ObjPos_JZ2E, ObjPos_JZ2H, ObjPos_Null
+		dc.l ObjPos_JZ3, ObjPos_JZ2E, ObjPos_JZ3H, ObjPos_Null
+		dc.l ObjPos_JZ1, ObjPos_JZ1E, ObjPos_JZ1H, ObjPos_Null
+
+		dc.l ObjPos_SKBZ1, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
+		dc.l ObjPos_SKBZ2, ObjPos_SKBZ2E, ObjPos_SKBZ2H, ObjPos_Null
+		dc.l ObjPos_SKBZ3, ObjPos_SKBZ2E, ObjPos_SKBZ3H, ObjPos_Null
+		dc.l ObjPos_SKBZ2, ObjPos_SKBZ1E, ObjPos_SKBZ1H, ObjPos_Null
+
 ObjPosLZPlatform_Index:
 		dc.l ObjPos_LZ1pf1, ObjPos_LZ1pf2
 		dc.l ObjPos_LZ2pf1, ObjPos_LZ2pf2
@@ -9865,33 +9955,33 @@ ObjPos_MZ3:		incbin	"objpos\mz3.bin"
 		even
 ObjPos_MZ3H:	incbin	"objpos\mz3h.bin"
 		even
-ObjPos_SLZ1:	incbin	objpos\slz1.bin
+ObjPos_SLZ1:	incbin	"objpos\slz1.bin"
 		even
-ObjPos_SLZ1E:	incbin	objpos\slz1e.bin
+ObjPos_SLZ1E:	incbin	"objpos\slz1e.bin"
 		even
-ObjPos_SLZ1H:	incbin	objpos\slz1h.bin
+ObjPos_SLZ1H:	incbin	"objpos\slz1h.bin"
 		even
-ObjPos_SLZ2:	incbin	objpos\slz2.bin
+ObjPos_SLZ2:	incbin	"objpos\slz2.bin"
 		even
-ObjPos_SLZ2E:	incbin	objpos\slz2e.bin
+ObjPos_SLZ2E:	incbin	"objpos\slz2e.bin"
 		even
-ObjPos_SLZ2H:	incbin	objpos\slz2h.bin
+ObjPos_SLZ2H:	incbin	"objpos\slz2h.bin"
 		even
-ObjPos_SLZ3:	incbin	objpos\slz3.bin
+ObjPos_SLZ3:	incbin	"objpos\slz3.bin"
 		even
-ObjPos_SLZ3H:	incbin	objpos\slz3h.bin
+ObjPos_SLZ3H:	incbin	"objpos\slz3h.bin"
 		even
-ObjPos_SYZ1:	incbin	objpos\syz1.bin
+ObjPos_SYZ1:	incbin	"objpos\syz1.bin"
 		even
-ObjPos_SYZ1E:	incbin	objpos\syz1e.bin
+ObjPos_SYZ1E:	incbin	"objpos\syz1e.bin"
 		even
-ObjPos_SYZ1H:	incbin	objpos\syz1h.bin
+ObjPos_SYZ1H:	incbin	"objpos\syz1h.bin"
 		even
-ObjPos_SYZ2:	incbin	objpos\syz2.bin
+ObjPos_SYZ2:	incbin	"objpos\syz2.bin"
 		even
-ObjPos_SYZ2E:	incbin	objpos\syz2e.bin
+ObjPos_SYZ2E:	incbin	"objpos\syz2e.bin"
 		even
-ObjPos_SYZ2H:	incbin	objpos\syz2h.bin
+ObjPos_SYZ2H:	incbin	"objpos\syz2h.bin"
 		even
 ObjPos_SYZ3:	incbin	"objpos\syz3.bin"
 		even
@@ -9903,14 +9993,64 @@ ObjPos_SBZ1E:	incbin	"objpos\sbz1e.bin"
 		even
 ObjPos_SBZ1H:	incbin	"objpos\sbz1h.bin"
 		even
-ObjPos_SBZ2:	incbin	objpos\sbz2.bin
+ObjPos_SBZ2:	incbin	"objpos\sbz2.bin"
 		even
-ObjPos_SBZ2E:	incbin	objpos\sbz2e.bin
+ObjPos_SBZ2E:	incbin	"objpos\sbz2e.bin"
 		even
-ObjPos_SBZ2H:	incbin	objpos\sbz2h.bin
+ObjPos_SBZ2H:	incbin	"objpos\sbz2h.bin"
 		even
-ObjPos_FZ:	incbin	objpos\fz.bin
+ObjPos_FZ:		incbin	"objpos\fz.bin"
 		even
+
+ObjPos_BZ1:		incbin	"objpos\bz1.bin"
+		even
+ObjPos_BZ1E:	incbin	"objpos\bz1e.bin"
+		even
+ObjPos_BZ1H:	incbin	"objpos\bz1h.bin"
+		even
+ObjPos_BZ2:		incbin	"objpos\bz2.bin"
+		even
+ObjPos_BZ2E:	incbin	"objpos\bz2e.bin"
+		even
+ObjPos_BZ2H:	incbin	"objpos\bz2h.bin"
+		even
+ObjPos_BZ3:		incbin	"objpos\bz3.bin"
+		even
+ObjPos_BZ3H:	incbin	"objpos\bz3h.bin"
+		even
+ObjPos_JZ1:		incbin	"objpos\jz1.bin"
+		even
+ObjPos_JZ1E:	incbin	"objpos\jz1e.bin"
+		even
+ObjPos_JZ1H:	incbin	"objpos\jz1h.bin"
+		even
+ObjPos_JZ2:		incbin	"objpos\jz2.bin"
+		even
+ObjPos_JZ2E:	incbin	"objpos\jz2e.bin"
+		even
+ObjPos_JZ2H:	incbin	"objpos\jz2h.bin"
+		even
+ObjPos_JZ3:		incbin	"objpos\jz3.bin"
+		even
+ObjPos_JZ3H:	incbin	"objpos\jz3h.bin"
+		even
+ObjPos_SKBZ1:	incbin	"objpos\skbz1.bin"
+		even
+ObjPos_SKBZ1E:	incbin	"objpos\skbz1e.bin"
+		even
+ObjPos_SKBZ1H:	incbin	"objpos\skbz1h.bin"
+		even
+ObjPos_SKBZ2:	incbin	"objpos\skbz2.bin"
+		even
+ObjPos_SKBZ2E:	incbin	"objpos\skbz2e.bin"
+		even
+ObjPos_SKBZ2H:	incbin	"objpos\skbz2h.bin"
+		even
+ObjPos_SKBZ3:	incbin	"objpos\skbz3.bin"
+		even
+ObjPos_SKBZ3H:	incbin	"objpos\skbz3h.bin"
+		even
+
 ObjPos_SBZ1pf1:	incbin	"objpos\sbz1pf1.bin"
 		even
 ObjPos_SBZ1pf2:	incbin	"objpos\sbz1pf2.bin"
@@ -9966,20 +10106,20 @@ RingPos_Index:
 		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null
 		dc.l RingPos_Null, RingPos_Null, RingPos_Null, RingPos_Null
 
-;		dc.l RingPos_BZ1, RingPos_BZ1E, RingPos_BZ1H, RingPos_Null
-;		dc.l RingPos_BZ2, RingPos_BZ2E, RingPos_BZ2H, RingPos_Null
-;		dc.l RingPos_BZ3, RingPos_BZ2E, RingPos_BZ3H, RingPos_Null
-;		dc.l RingPos_BZ1, RingPos_BZ1E, RingPos_BZ1H, RingPos_Null
+		dc.l RingPos_BZ1, RingPos_BZ1E, RingPos_BZ1H, RingPos_Null
+		dc.l RingPos_BZ2, RingPos_BZ2E, RingPos_BZ2H, RingPos_Null
+		dc.l RingPos_BZ3, RingPos_BZ2E, RingPos_BZ3H, RingPos_Null
+		dc.l RingPos_BZ1, RingPos_BZ1E, RingPos_BZ1H, RingPos_Null
 
-;		dc.l RingPos_JZ1, RingPos_JZ1E, RingPos_JZ1H, RingPos_Null
-;		dc.l RingPos_JZ2, RingPos_JZ2E, RingPos_JZ2H, RingPos_Null
-;		dc.l RingPos_JZ3, RingPos_JZ2E, RingPos_JZ3H, RingPos_Null
-;		dc.l RingPos_JZ1, RingPos_JZ1E, RingPos_JZ1H, RingPos_Null
+		dc.l RingPos_JZ1, RingPos_JZ1E, RingPos_JZ1H, RingPos_Null
+		dc.l RingPos_JZ2, RingPos_JZ2E, RingPos_JZ2H, RingPos_Null
+		dc.l RingPos_JZ3, RingPos_JZ2E, RingPos_JZ3H, RingPos_Null
+		dc.l RingPos_JZ1, RingPos_JZ1E, RingPos_JZ1H, RingPos_Null
 
-;		dc.l RingPos_SKBZ1, RingPos_SKBZ1E, RingPos_SKBZ1H, RingPos_Null
-;		dc.l RingPos_SKBZ2, RingPos_SKBZ2E, RingPos_SKBZ2H, RingPos_Null
-;		dc.l RingPos_SKBZ3, RingPos_SKBZ2E, RingPos_SKBZ3H, RingPos_Null
-;		dc.l RingPos_SKBZ2, RingPos_SKBZ1E, RingPos_SKBZ1H, RingPos_Null
+		dc.l RingPos_SKBZ1, RingPos_SKBZ1E, RingPos_SKBZ1H, RingPos_Null
+		dc.l RingPos_SKBZ2, RingPos_SKBZ2E, RingPos_SKBZ2H, RingPos_Null
+		dc.l RingPos_SKBZ3, RingPos_SKBZ2E, RingPos_SKBZ3H, RingPos_Null
+		dc.l RingPos_SKBZ2, RingPos_SKBZ1E, RingPos_SKBZ1H, RingPos_Null
 
 RingPos_GHZ1:	incbin	ringpos\ghz1.bin
 		even

@@ -82,6 +82,22 @@ LevelSizeArray:
 		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
 		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
 
+		; BZ
+		dc.w $0004, $0000, $24BF, $0000, $0300, $0060
+		dc.w $0004, $0000, $1EBF, $0000, $0300, $0060
+		dc.w $0004, $0000, $2960, $0000, $0300, $0060
+		dc.w $0004, $0000, $2ABF, $0000, $0300, $0060
+		; MZ
+		dc.w $0004, $0000, $17BF, $0000, $01D0, $0060
+		dc.w $0004, $0000, $17BF, $0000, $0520, $0060
+		dc.w $0004, $0000, $1800, $0000, $0720, $0060
+		dc.w $0004, $0000, $16BF, $0000, $0720, $0060
+		; SLZ
+		dc.w $0004, $0000, $1FBF, $0000, $0640, $0060
+		dc.w $0004, $0000, $1FBF, $0000, $0640, $0060
+		dc.w $0004, $0000, $2000, $0000, $06C0, $0060
+		dc.w $0004, $0000, $3EC0, $0000, $0720, $0060
+
 ; ---------------------------------------------------------------------------
 ; Level size array
 ; ---------------------------------------------------------------------------
@@ -122,6 +138,22 @@ LevelSizeArray_Easy:
 		dc.w $0004, $0000, $0DC0, $0110, $0110, $0060
 		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
 		dc.w $0004, $0000, $2FFF, $0000, $0320, $0060
+
+		; BZ
+		dc.w $0004, $0000, $24BF, $0000, $0300, $0060
+		dc.w $0004, $0000, $21E0, $0000, $0300, $0060
+		dc.w $0004, $0000, $2960, $0000, $0300, $0060
+		dc.w $0004, $0000, $2ABF, $0000, $0300, $0060
+		; MZ
+		dc.w $0004, $0000, $17BF, $0000, $01D0, $0060
+		dc.w $0004, $0000, $1A80, $0000, $0520, $0060
+		dc.w $0004, $0000, $1800, $0000, $0720, $0060
+		dc.w $0004, $0000, $16BF, $0000, $0720, $0060
+		; SLZ
+		dc.w $0004, $0000, $1FBF, $0000, $0640, $0060
+		dc.w $0004, $0000, $1F80, $0000, $0640, $0060
+		dc.w $0004, $0000, $2000, $0000, $06C0, $0060
+		dc.w $0004, $0000, $3EC0, $0000, $0720, $0060
 
 LevSz_ChkLamp:
 		tst.b	(v_lastlamp).w	; have any lampposts been hit?
@@ -242,11 +274,12 @@ loc_6206:
 ; End of function BgScrollSpeed
 
 ; ===========================================================================
-BgScroll_Index:	dc.w BgScroll_GHZ-BgScroll_Index, BgScroll_LZ-BgScroll_Index
+BgScroll_Index:
+		dc.w BgScroll_GHZ-BgScroll_Index, BgScroll_LZ-BgScroll_Index
 		dc.w BgScroll_MZ-BgScroll_Index, BgScroll_SLZ-BgScroll_Index
 		dc.w BgScroll_SYZ-BgScroll_Index, BgScroll_SBZ-BgScroll_Index
-		zonewarning BgScroll_Index,2
-		dc.w BgScroll_End-BgScroll_Index
+		dc.w BgScroll_End-BgScroll_Index, BgScroll_GHZ-BgScroll_Index
+		dc.w BgScroll_MZ-BgScroll_Index, BgScroll_SLZ-BgScroll_Index
 ; ===========================================================================
 
 BgScroll_GHZ:

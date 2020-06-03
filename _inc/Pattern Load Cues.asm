@@ -21,7 +21,12 @@ ptr_PLC_SYZ:		dc.w PLC_SYZ-ArtLoadCues
 ptr_PLC_SYZ2:		dc.w PLC_SYZ2-ArtLoadCues
 ptr_PLC_SBZ:		dc.w PLC_SBZ-ArtLoadCues
 ptr_PLC_SBZ2:		dc.w PLC_SBZ2-ArtLoadCues
-			zonewarning PLC_Levels,4
+ptr_PLC_BZ:			dc.w PLC_GHZ-ArtLoadCues
+ptr_PLC_BZ2:		dc.w PLC_GHZ2-ArtLoadCues
+ptr_PLC_JZ:			dc.w PLC_MZ-ArtLoadCues
+ptr_PLC_JZ2:		dc.w PLC_MZ2-ArtLoadCues
+ptr_PLC_SKBZ:		dc.w PLC_SLZ-ArtLoadCues
+ptr_PLC_SKBZ2:		dc.w PLC_SLZ2-ArtLoadCues
 
 ptr_PLC_Boss:			dc.w PLC_Boss-ArtLoadCues
 ptr_PLC_BossAlt:		dc.w PLC_BossAlt-ArtLoadCues ; Adjust this.
@@ -30,13 +35,15 @@ ptr_PLC_EndofAct:		dc.w PLC_EndofAct-ArtLoadCues
 ptr_PLC_SpecialStage:	dc.w PLC_SpecialStage-ArtLoadCues
 
 PLC_Animals:
-ptr_PLC_GHZAnimals:	dc.w PLC_GHZAnimals-ArtLoadCues
-ptr_PLC_LZAnimals:	dc.w PLC_LZAnimals-ArtLoadCues
-ptr_PLC_MZAnimals:	dc.w PLC_MZAnimals-ArtLoadCues
-ptr_PLC_SLZAnimals:	dc.w PLC_SLZAnimals-ArtLoadCues
-ptr_PLC_SYZAnimals:	dc.w PLC_SYZAnimals-ArtLoadCues
-ptr_PLC_SBZAnimals:	dc.w PLC_SBZAnimals-ArtLoadCues
-			zonewarning PLC_Animals,2
+ptr_PLC_GHZAnimals:		dc.w PLC_GHZAnimals-ArtLoadCues
+ptr_PLC_LZAnimals:		dc.w PLC_LZAnimals-ArtLoadCues
+ptr_PLC_MZAnimals:		dc.w PLC_MZAnimals-ArtLoadCues
+ptr_PLC_SLZAnimals:		dc.w PLC_SLZAnimals-ArtLoadCues
+ptr_PLC_SYZAnimals:		dc.w PLC_SYZAnimals-ArtLoadCues
+ptr_PLC_SBZAnimals:		dc.w PLC_SBZAnimals-ArtLoadCues
+ptr_PLC_BZAnimals:		dc.w PLC_GHZAnimals-ArtLoadCues
+ptr_PLC_JZAnimals:		dc.w PLC_MZAnimals-ArtLoadCues
+ptr_PLC_SKBZAnimals:	dc.w PLC_SLZAnimals-ArtLoadCues
 
 ptr_PLC_SSResult:	dc.w PLC_SSResult-ArtLoadCues
 ptr_PLC_Ending:		dc.w PLC_Ending-ArtLoadCues
@@ -381,16 +388,29 @@ plcid_SYZ:			equ (ptr_PLC_SYZ-ArtLoadCues)/2			; $C
 plcid_SYZ2:			equ (ptr_PLC_SYZ2-ArtLoadCues)/2		; $D
 plcid_SBZ:			equ (ptr_PLC_SBZ-ArtLoadCues)/2			; $E
 plcid_SBZ2:			equ (ptr_PLC_SBZ2-ArtLoadCues)/2		; $F
+
+plcid_BZ:			equ (ptr_PLC_BZ-ArtLoadCues)/2		; $16
+plcid_BZ2:			equ (ptr_PLC_BZ2-ArtLoadCues)/2		; $17
+plcid_JZ:			equ (ptr_PLC_JZ-ArtLoadCues)/2		; $18
+plcid_JZ2:			equ (ptr_PLC_JZ2-ArtLoadCues)/2		; $19
+plcid_SKBZ:			equ (ptr_PLC_SKBZ-ArtLoadCues)/2	; $1A
+plcid_SKBZ2:		equ (ptr_PLC_SKBZ2-ArtLoadCues)/2	; $1B
+
 plcid_Boss:			equ (ptr_PLC_Boss-ArtLoadCues)/2		; $11
 plcid_BossAlt:		equ (ptr_PLC_BossAlt-ArtLoadCues)/2
 plcid_EndofAct:		equ (ptr_PLC_EndofAct-ArtLoadCues)/2	; $12
 plcid_SpecialStage:	equ (ptr_PLC_SpecialStage-ArtLoadCues)/2 ; $14
+
 plcid_GHZAnimals:	equ (ptr_PLC_GHZAnimals-ArtLoadCues)/2	; $15
 plcid_LZAnimals:	equ (ptr_PLC_LZAnimals-ArtLoadCues)/2	; $16
 plcid_MZAnimals:	equ (ptr_PLC_MZAnimals-ArtLoadCues)/2	; $17
 plcid_SLZAnimals:	equ (ptr_PLC_SLZAnimals-ArtLoadCues)/2	; $18
 plcid_SYZAnimals:	equ (ptr_PLC_SYZAnimals-ArtLoadCues)/2	; $19
 plcid_SBZAnimals:	equ (ptr_PLC_SBZAnimals-ArtLoadCues)/2	; $1A
+plcid_BZAnimals:	equ (ptr_PLC_BZAnimals-ArtLoadCues)/2	; $28
+plcid_JZAnimals:	equ (ptr_PLC_JZAnimals-ArtLoadCues)/2	; $29
+plcid_SKBZAnimals:	equ (ptr_PLC_SKBZAnimals-ArtLoadCues)/2	; $2A
+
 plcid_SSResult:		equ (ptr_PLC_SSResult-ArtLoadCues)/2	; $1B
 plcid_Ending:		equ (ptr_PLC_Ending-ArtLoadCues)/2		; $1C
 plcid_TryAgain:		equ (ptr_PLC_TryAgain-ArtLoadCues)/2	; $1D

@@ -32,11 +32,24 @@
 		incbin	"startpos\fz.bin"
 		dc.w	$80,$A8
 
-		zonewarning StartLocArray,$10
-
 		incbin	"startpos\end1.bin"
 		incbin	"startpos\end2.bin"
 		dc.w	$80,$A8
+		dc.w	$80,$A8
+
+		incbin	"startpos\ghz1.bin"
+		incbin	"startpos\ghz2.bin"
+		incbin	"startpos\ghz3.bin"
+		dc.w	$80,$A8
+
+		incbin	"startpos\mz1.bin"
+		incbin	"startpos\mz2.bin"
+		incbin	"startpos\mz3.bin"
+		dc.w	$80,$A8
+
+		incbin	"startpos\slz1.bin"
+		incbin	"startpos\slz2.bin"
+		incbin	"startpos\slz3.bin"
 		dc.w	$80,$A8
 
 		even

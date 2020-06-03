@@ -1,14 +1,16 @@
 ; ---------------------------------------------------------------------------
 ; Object 28 - animals
+; To-Do: Add fish for Labyrinth Zone
 ; ---------------------------------------------------------------------------
 
 Animals:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
 		move.w	Anml_Index(pc,d0.w),d1
-		jmp	Anml_Index(pc,d1.w)
+		jmp		Anml_Index(pc,d1.w)
 ; ===========================================================================
-Anml_Index:	dc.w Anml_Ending-Anml_Index, loc_912A-Anml_Index
+Anml_Index:
+		dc.w Anml_Ending-Anml_Index, loc_912A-Anml_Index
 		dc.w loc_9184-Anml_Index, loc_91C0-Anml_Index
 		dc.w loc_9184-Anml_Index, loc_9184-Anml_Index
 		dc.w loc_9184-Anml_Index, loc_91C0-Anml_Index
@@ -20,32 +22,45 @@ Anml_Index:	dc.w Anml_Ending-Anml_Index, loc_912A-Anml_Index
 		dc.w loc_9314-Anml_Index, loc_9370-Anml_Index
 		dc.w loc_92D6-Anml_Index
 
-Anml_VarIndex:	dc.b 0,	5, 2, 3, 6, 3, 4, 5, 4,	1, 0, 1
 
-Anml_Variables:	dc.w $FE00, $FC00
-		dc.l Map_Animal1
-		dc.w $FE00, $FD00	; horizontal speed, vertical speed
-		dc.l Map_Animal2	; mappings address
+Anml_VarIndex:	; GHZ	;LZ		;MZ     ;SLZ	;SYZ	;SBZ	;END	;BZ		;JZ		;SKBZ
+		dc.b 	0, 5,	2, 3,	6, 3,	4, 5,	4, 1,	0, 1,	0, 0,	4, 3,	2, 6,	1, 5
+
+Anml_Variables:
+		; #0 - Rabbit
+		dc.w $FE00, $FC00	; horizontal speed, vertical speed
+		dc.l Map_Animal1	; mappings address
+		; #1 - Chicken
+		dc.w $FE00, $FD00
+		dc.l Map_Animal2
+		; #2 - Penguin
 		dc.w $FE80, $FD00
 		dc.l Map_Animal1
+		; #3 - Seal
 		dc.w $FEC0, $FE80
 		dc.l Map_Animal2
+		; #4 - Pig
 		dc.w $FE40, $FD00
 		dc.l Map_Animal3
+		; #5 - Flicky
 		dc.w $FD00, $FC00
 		dc.l Map_Animal2
+		; #6 - Squirrel
 		dc.w $FD80, $FC80
 		dc.l Map_Animal3
 
-Anml_EndSpeed:	dc.w $FBC0, $FC00, $FBC0, $FC00, $FBC0,	$FC00, $FD00, $FC00
+Anml_EndSpeed:
+		dc.w $FBC0, $FC00, $FBC0, $FC00, $FBC0,	$FC00, $FD00, $FC00
 		dc.w $FD00, $FC00, $FE80, $FD00, $FE80,	$FD00, $FEC0, $FE80
 		dc.w $FE40, $FD00, $FE00, $FD00, $FD80,	$FC80
 
-Anml_EndMap:	dc.l Map_Animal2, Map_Animal2, Map_Animal2, Map_Animal1, Map_Animal1
+Anml_EndMap:
+		dc.l Map_Animal2, Map_Animal2, Map_Animal2, Map_Animal1, Map_Animal1
 		dc.l Map_Animal1, Map_Animal1, Map_Animal2, Map_Animal3, Map_Animal2
 		dc.l Map_Animal3
 
-Anml_EndVram:	dc.w $5A5, $5A5, $5A5, $553, $553, $573, $573, $585, $593
+Anml_EndVram:
+		dc.w $5A5, $5A5, $5A5, $553, $553, $573, $573, $585, $593
 		dc.w $565, $5B3
 ; ===========================================================================
 

@@ -60,8 +60,8 @@ DLE_Index:
 		dc.w DLE_GHZ-DLE_Index, DLE_LZ-DLE_Index
 		dc.w DLE_MZ-DLE_Index, DLE_SLZ-DLE_Index
 		dc.w DLE_SYZ-DLE_Index, DLE_SBZ-DLE_Index
-		zonewarning DLE_Index,2
-		dc.w DLE_Ending-DLE_Index
+		dc.w DLE_Ending-DLE_Index, DLE_GHZ-DLE_Index
+		dc.w DLE_MZ-DLE_Index, DLE_SLZ-DLE_Index
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Green	Hill Zone dynamic level events
@@ -678,7 +678,7 @@ DLE_SLZ2E_Boss:
 		move.w	#$228,obY(a1)
 
 	@music:
-		music	bgm_Boss,0,1,0	; play boss music
+		music	bgm_Boss,0,0,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
@@ -728,7 +728,7 @@ DLE_SLZ3N_Boss:
 		move.w	#$228,obY(a1)
 
 	@music:
-		music	bgm_Boss,0,1,0	; play boss music
+		music	bgm_Boss,0,0,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
@@ -830,7 +830,7 @@ DLE_SYZ2E_Boss:
 		move.w	#$42A,obY(a1) ; -$B0
 
 	@music:
-		music	bgm_Boss,0,1,0	; play boss music
+		music	bgm_Boss,0,0,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0
@@ -885,7 +885,7 @@ DLE_SYZ3N_Boss:
 		move.w	#$4DA,obY(a1)
 
 loc_71EC:
-		music	bgm_Boss,0,1,0	; play boss music
+		music	bgm_Boss,0,0,0	; play boss music
 		move.b	#1,(f_lockscreen).w ; lock screen
 		addq.b	#2,(v_dle_routine).w
 		moveq	#plcid_Boss,d0

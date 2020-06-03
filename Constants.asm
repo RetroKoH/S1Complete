@@ -90,7 +90,10 @@ id_SLZ:		equ 3
 id_SYZ:		equ 4
 id_SBZ:		equ 5
 id_EndZ:	equ 6
-id_SS:		equ 7
+id_BZ:		equ 7
+id_JZ:		equ 8
+id_SKBZ:	equ 9
+id_SS:		equ $A
 
 ; Colours
 cBlack:		equ $000		; colour black
