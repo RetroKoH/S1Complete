@@ -7550,18 +7550,18 @@ Map_WFall	include	"_maps\Waterfalls.asm"
 
 
 ResumeMusic:
-		cmpi.w	#12,(v_air).w	; more than 12 seconds of air left?
-		bhi.s	@over12		; if yes, branch
-		move.w	#bgm_LZ,d0	; play LZ music
-		cmpi.w	#(id_LZ<<8)+3,(v_zone).w ; check if level is 0103 (SBZ3)
+		cmpi.w	#12,(v_air).w		; more than 12 seconds of air left?
+		bhi.s	@over12				; if yes, branch
+		move.w	#bgm_LZ,d0			; play LZ music
+		cmpi.w	#id_SBZ3,(v_zone).w ; check if level is 0103 (SBZ3)
 		bne.s	@notsbz
-		move.w	#bgm_SBZ,d0	; play SBZ music
+		move.w	#bgm_SBZ,d0			; play SBZ music
 
 	@notsbz:
-		btst	#stsSuper,(v_status_secondary).w		; is player in Super Form?
-		bne.s	@invinc				; if yes, branch
-		btst	#stsInvinc,(v_status_secondary).w ; is Sonic invincible?
-		beq.s	@notinvinc ; if not, branch
+		btst	#stsSuper,(v_status_secondary).w	; is player in Super Form?
+		bne.s	@invinc								; if yes, branch
+		btst	#stsInvinc,(v_status_secondary).w 	; is Sonic invincible?
+		beq.s	@notinvinc							; if not, branch
 
 	@invinc:
 		move.w	#bgm_Invincible,d0
@@ -7571,7 +7571,7 @@ ResumeMusic:
 		move.w	#bgm_Boss,d0
 
 	@playselected:
-		jsr	(PlaySound).l
+		jsr		(PlaySound).l
 
 	@over12:
 		move.w	#30,(v_air).w	; reset air to 30 seconds
@@ -9604,6 +9604,147 @@ Art_MzTorch:	incbin	"artunc\MZ Background Torch.bin"
 		even
 Art_SbzSmoke:	incbin	"artunc\SBZ Background Smoke.bin"
 		even
+
+; ---------------------------------------------------------------------------
+; Level	order arrays
+; ---------------------------------------------------------------------------
+LevelOrder_Classic:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_GHZ3, id_MZ1, id_MZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_LZ3, id_SLZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble Zone
+		dc.w id_MZ2, id_MZ3, id_SYZ1, id_SYZ1
+		; Star Light Zone
+		dc.w id_SLZ2, id_SLZ3, id_SBZ1, id_SBZ1
+		; Spring Yard Zone
+		dc.w id_SYZ2, id_SYZ3, id_LZ1, id_LZ1
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SBZ3, 0, 0
+		; Bridge/Jungle/Sky Base Zone
+		dc.l 0, 0, 0, 0, 0, 0
+		even
+LevelOrderEasy_Classic:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_MZ1, id_MZ1, id_MZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_SLZ1, id_SLZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble Zone
+		dc.w id_MZ2, id_SYZ1, id_SYZ1, id_SYZ1
+		; Star Light Zone
+		dc.w id_SLZ2, id_SBZ1, id_SBZ1, id_SBZ1
+		; Spring Yard Zone
+		dc.w id_SYZ2, id_LZ1, id_LZ1, id_LZ1
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SBZ3, 0, 0
+		; Bridge/Jungle/Sky Base Zone
+		dc.l 0, 0, 0, 0, 0, 0
+		even
+LevelOrder_Original:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_GHZ3, id_LZ1, id_LZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_LZ3, id_MZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble Zone
+		dc.w id_MZ2, id_MZ3, id_SLZ1, id_SLZ1
+		; Star Light Zone
+		dc.w id_SLZ2, id_SLZ3, id_SYZ1, id_SYZ1
+		; Spring Yard Zone
+		dc.w id_SYZ2, id_SYZ3, id_SBZ1, id_SBZ1
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SBZ3, 0, 0
+		; Bridge/Jungle/Sky Base Zone
+		dc.l 0, 0, 0, 0, 0, 0
+		even
+LevelOrderEasy_Original:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_LZ1, id_LZ1, id_LZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_MZ1, id_MZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble Zone
+		dc.w id_MZ2, id_SLZ1, id_SLZ1, id_SLZ1
+		; Star Light Zone
+		dc.w id_SLZ2, id_SYZ1, id_SYZ1, id_SYZ1
+		; Spring Yard Zone
+		dc.w id_SYZ2, id_SBZ1, id_SBZ1, id_SBZ1
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SBZ3, 0, 0
+		; Bridge/Jungle/Sky Base Zone
+		dc.l 0, 0, 0, 0, 0, 0
+		even
+LevelOrder_Handheld:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_GHZ3, id_BZ1, id_BZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_LZ3, id_SBZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble/Star Light/Spring Yard Zone
+		dc.l 0, 0, 0, 0, 0, 0
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SBZ3, id_SKBZ1, id_SKBZ1
+		; Bridge Zone
+		dc.w id_BZ2, id_BZ3, id_JZ1, id_JZ1
+		; Jungle Zone
+		dc.w id_JZ2, id_JZ3, id_LZ1, id_LZ1
+		; Sky Base Zone
+		dc.w id_SKBZ2, id_SKBZ3, 0, 0
+		even
+LevelOrderEasy_Handheld:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_BZ1, id_BZ1, id_BZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_SBZ1, id_SBZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble/Star Light/Spring Yard Zone
+		dc.l 0, 0, 0, 0, 0, 0
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SKBZ1, id_SKBZ1, id_SKBZ1
+		; Bridge Zone
+		dc.w id_BZ2, id_JZ1, id_JZ1, id_JZ1
+		; Jungle Zone
+		dc.w id_JZ2, id_LZ1, id_LZ1, id_LZ1
+		; Sky Base Zone
+		dc.w id_SKBZ2, 0, 0, 0
+		even
+LevelOrder_Complete:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_GHZ3, id_BZ1, id_BZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_LZ3, id_SLZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble Zone
+		dc.w id_MZ2, id_MZ3, id_SYZ1, id_SYZ1
+		; Star Light Zone
+		dc.w id_SLZ2, id_SLZ3, id_SBZ1, id_SBZ1
+		; Spring Yard Zone
+		dc.w id_SYZ2, id_SYZ3, id_JZ1, id_JZ1
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SBZ3, id_SKBZ1, id_SKBZ1
+		; Bridge Zone
+		dc.w id_BZ2, id_BZ3, id_MZ1, id_MZ1
+		; Jungle Zone
+		dc.w id_JZ2, id_JZ3, id_LZ1, id_LZ1
+		; Sky Base Zone
+		dc.w id_SKBZ2, id_SKBZ3, 0, 0
+		even
+LevelOrderEasy_Complete:
+		; Green Hill Zone
+		dc.w id_GHZ2, id_BZ1, id_BZ1, id_BZ1
+		; Labyrinth Zone
+		dc.w id_LZ2, id_SLZ1, id_SLZ1, id_SBZF ; Act 4 is SBZ3
+		; Marble Zone
+		dc.w id_MZ2, id_SYZ1, id_SYZ1, id_SYZ1
+		; Star Light Zone
+		dc.w id_SLZ2, id_SBZ1, id_SBZ1, id_SBZ1
+		; Spring Yard Zone
+		dc.w id_SYZ2, id_JZ1, id_JZ1, id_JZ1
+		; Scrap Brain Zone
+		dc.w id_SBZ2, id_SKBZ1, id_SKBZ1, id_SKBZ1
+		; Bridge Zone
+		dc.w id_BZ2, id_MZ1, id_MZ1, id_MZ1
+		; Jungle Zone
+		dc.w id_JZ2, id_LZ1, id_LZ1, id_LZ1
+		; Sky Base Zone
+		dc.w id_SKBZ2, 0, 0, 0
+		even
+; ===========================================================================
 
 ; ---------------------------------------------------------------------------
 ; Level	layout index

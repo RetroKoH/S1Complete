@@ -181,20 +181,31 @@ Got_NextLevel:	; Routine $A
 		bra.s	Got_Display2
 
 	@notTimeAttack:
+		clr.b	(v_lifecount).w		; clear ring life counter for next zone.
 		move.b	(v_zone).w,d0
-		andi.w	#7,d0
+		cmpi.b 	#id_EndZ,d0
+		blt.s	@skip
+		subq.b	#1,d0
+
+	@skip:
+;		andi.w	#7,d0
 		lsl.w	#3,d0
 		move.b	(v_act).w,d1
 		andi.w	#3,d1
 		add.w	d1,d1
-		add.w	d1,d0
-		move.w	LevelOrder(pc,d0.w),d1 ; load level from level order array
-		cmpi.b	#difEasy,(v_difficulty).w	; is the game set on Easy?
-		bne.s	@skip
-		move.w	LevelOrderEasy(pc,d0.w),d1 ; load level from easy mode level order array
+		add.w	d1,d0				; d0 contains Zone+Act word
 
-	@skip:
-		move.w	d1,d0 ; load level from level order array
+		moveq	#0,d1
+		move.b	(v_optgamemode).w,d1
+		lsl.b	#3,d1
+		cmpi.b	#difEasy,(v_difficulty).w
+		bne.s	@skip2
+		addq.b	#4,d1
+	@skip2:	
+		lea		LevelOrderArrays(pc,d1.w),a2
+		movea.l (a2),a1			; load correct level array to a1
+		adda.l	d0,a1
+		move.w	(a1),d0			; load level from level order array
 		move.w	d0,(v_zone).w	; set level number
 		tst.w	d0
 		bne.s	Got_ChkSS
@@ -216,85 +227,12 @@ VBla_08A:
 Got_Display2:
 		bra.w	DisplaySprite
 ; ===========================================================================
-; ---------------------------------------------------------------------------
-; Level	order array
-; ---------------------------------------------------------------------------
-LevelOrder:
-		; Green Hill Zone
-		dc.b id_GHZ, 1	; Act 1
-		dc.b id_GHZ, 2	; Act 2
-		dc.b id_MZ, 0	; Act 3
-		dc.b 0, 0
 
-		; Labyrinth Zone
-		dc.b id_LZ, 1	; Act 1
-		dc.b id_LZ, 2	; Act 2
-		dc.b id_SLZ, 0	; Act 3
-		dc.b id_SBZ, 2	; Scrap Brain Zone Act 3
-
-		; Marble Zone
-		dc.b id_MZ, 1	; Act 1
-		dc.b id_MZ, 2	; Act 2
-		dc.b id_SYZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Star Light Zone
-		dc.b id_SLZ, 1	; Act 1
-		dc.b id_SLZ, 2	; Act 2
-		dc.b id_SBZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Spring Yard Zone
-		dc.b id_SYZ, 1	; Act 1
-		dc.b id_SYZ, 2	; Act 2
-		dc.b id_LZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Scrap Brain Zone
-		dc.b id_SBZ, 1	; Act 1
-		dc.b id_LZ, 3	; Act 2
-		dc.b 0, 0	; Final Zone
-		dc.b 0, 0
-		even
-; ===========================================================================
-LevelOrderEasy:
-		; Green Hill Zone
-		dc.b id_GHZ, 1	; Act 1
-		dc.b id_MZ, 0	; Act 2
-		dc.b id_MZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Labyrinth Zone
-		dc.b id_LZ, 1	; Act 1
-		dc.b id_SLZ, 0	; Act 2
-		dc.b id_SLZ, 0	; Act 3
-		dc.b id_SBZ, 2	; Scrap Brain Zone Act 3
-
-		; Marble Zone
-		dc.b id_MZ, 1	; Act 1
-		dc.b id_SYZ, 0	; Act 2
-		dc.b id_SYZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Star Light Zone
-		dc.b id_SLZ, 1	; Act 1
-		dc.b id_SBZ, 0	; Act 2
-		dc.b id_SBZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Spring Yard Zone
-		dc.b id_SYZ, 1	; Act 1
-		dc.b id_LZ, 0	; Act 2
-		dc.b id_LZ, 0	; Act 3
-		dc.b 0, 0
-
-		; Scrap Brain Zone
-		dc.b id_SBZ, 1	; Act 1
-		dc.b id_SBZ, 2	; Act 2
-		dc.b 0, 0	; Final Zone
-		dc.b 0, 0
-		even
-
+LevelOrderArrays:
+		dc.l LevelOrder_Classic, LevelOrderEasy_Classic
+		dc.l LevelOrder_Original, LevelOrderEasy_Original
+		dc.l LevelOrder_Handheld, LevelOrderEasy_Handheld
+		dc.l LevelOrder_Complete, LevelOrderEasy_Complete
 ; ===========================================================================
 
 Got_Move2:	; Routine $E
@@ -332,6 +270,7 @@ loc_C766:	; Routine $10
 		beq.w	DeleteObject
 		rts	
 ; ===========================================================================
+
 		;    x-start,	x-main,	y-main,
 		;				routine, frame number
 
@@ -355,3 +294,4 @@ Got_Config:	dc.w 4,		$124,	$BC		; "_____ HAS"		$D5C0
 
 		dc.w $560,	$120,	$10C		; ring bonus		$D740
 		dc.b 				2,	4
+; ===========================================================================

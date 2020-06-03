@@ -84,15 +84,43 @@ id_MenuScreen:	equ ptr_GM_MenuScreen-GameModeArray		; $24
 
 ; Levels
 id_GHZ:		equ 0
+	id_GHZ1:	equ (id_GHZ<<8)
+	id_GHZ2:	equ (id_GHZ<<8)+1
+	id_GHZ3:	equ (id_GHZ<<8)+2
 id_LZ:		equ 1
+	id_LZ1:		equ (id_LZ<<8)+0
+	id_LZ2:		equ (id_LZ<<8)+1
+	id_LZ3:		equ (id_LZ<<8)+2
 id_MZ:		equ 2
+	id_MZ1:		equ (id_MZ<<8)+0
+	id_MZ2:		equ (id_MZ<<8)+1
+	id_MZ3:		equ (id_MZ<<8)+2
 id_SLZ:		equ 3
+	id_SLZ1:	equ (id_SLZ<<8)+0
+	id_SLZ2:	equ (id_SLZ<<8)+1
+	id_SLZ3:	equ (id_SLZ<<8)+2
 id_SYZ:		equ 4
+	id_SYZ1:	equ (id_SYZ<<8)+0
+	id_SYZ2:	equ (id_SYZ<<8)+1
+	id_SYZ3:	equ (id_SYZ<<8)+2
 id_SBZ:		equ 5
+	id_SBZ1:	equ (id_SBZ<<8)+0
+	id_SBZ2:	equ (id_SBZ<<8)+1
+	id_SBZ3:	equ (id_LZ<<8)+3
+	id_SBZF:	equ (id_SBZ<<8)+2
 id_EndZ:	equ 6
 id_BZ:		equ 7
+	id_BZ1:		equ (id_BZ<<8)+0
+	id_BZ2:		equ (id_BZ<<8)+1
+	id_BZ3:		equ (id_BZ<<8)+2
 id_JZ:		equ 8
+	id_JZ1:		equ (id_JZ<<8)+0
+	id_JZ2:		equ (id_JZ<<8)+1
+	id_JZ3:		equ (id_JZ<<8)+2
 id_SKBZ:	equ 9
+	id_SKBZ1:	equ (id_SKBZ<<8)+0
+	id_SKBZ2:	equ (id_SKBZ<<8)+1
+	id_SKBZ3:	equ (id_SKBZ<<8)+2
 id_SS:		equ $A
 
 ; Colours
