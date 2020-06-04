@@ -95,20 +95,24 @@ FFloor_Solid2:
 loc_19C62:	; Routine 6
 		bclr	#3,obStatus(a0)
 		bclr	#3,(v_player+obStatus).w
-		bra.w	loc_1982C
+		bra.s	loc_1982C
 ; ===========================================================================
 
 loc_19C72:	; Routine 8
 		cmpi.w	#$474F,obSubtype(a0) ; is object set to disintegrate?
 		beq.s	FFloor_Break	; if yes, branch
-		jmp	(DisplaySprite).l
+		jmp		(DisplaySprite).l
 ; ===========================================================================
 
 loc_19C80:	; Routine $A
 		tst.b	obRender(a0)
-		bpl.w	loc_1982C
+		bpl.s	loc_1982C
 		jsr	(ObjectFall).l
 		jmp	(DisplaySprite).l
+; ===========================================================================
+
+loc_1982C:
+		jmp	(DeleteObject).l
 ; ===========================================================================
 
 FFloor_Break:

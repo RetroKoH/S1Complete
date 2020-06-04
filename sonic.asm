@@ -26,7 +26,8 @@ DebugPathSwappers:	equ 1
 ; ===========================================================================
 
 StartOfRom:
-Vectors:	dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
+Vectors:
+		dc.l v_systemstack&$FFFFFF	; Initial stack pointer value
 		dc.l EntryPoint			; Start of program
 		dc.l BusError			; Bus error
 		dc.l AddressError		; Address error (4)
@@ -2799,7 +2800,7 @@ loc_33E4:
 		bne.w	Tit_ChkMenu	; if yes, branch
 		tst.w	(v_demolength).w
 		bne.w	loc_33B6
-		sfx	bgm_Fade,0,1,1 ; fade out music
+		sfx		bgm_Fade,0,1,1 ; fade out music
 		move.w	(v_demonum).w,d0 ; load	demo number
 		andi.w	#7,d0
 		add.w	d0,d0
@@ -2808,7 +2809,7 @@ loc_33E4:
 		addq.w	#1,(v_demonum).w ; add 1 to demo number
 		cmpi.w	#4,(v_demonum).w ; is demo number less than 4?
 		blo.s	loc_3422	; if yes, branch
-		move.w	#0,(v_demonum).w ; reset demo number to	0
+		clr.w	(v_demonum).w ; reset demo number to	0
 
 loc_3422:
 		move.w	#1,(f_demo).w	; turn demo mode on
@@ -3131,8 +3132,6 @@ Options_CharOk:
 
 ; ===========================================================================
 
-OptionsTextData:
-
 ModeText:
 		dc.l	ModeText_Classic
 		dc.l	ModeText_Original
@@ -3149,98 +3148,6 @@ MonitorText:
 		dc.l	MonitorText_S1
 		dc.l	MonitorText_S3K
 
-; ---------------------------------------------------------------------------
-; Level	select menu text - Easier editing thanks to SoullessSentinel
-; ---------------------------------------------------------------------------
-OptionMenuText:
-		;incbin	"misc\Level Select Text.bin"
-		dc.b "GAME MODE               " ; Dictates levels, emeralds... etc.
-		dc.b "                        " ; ORIGINAL, MASTER SYSTEM, COMPLETE
-		dc.b "CHARACTER               "
-		dc.b "                        " ; SONIC, TAILS, KNUCKLES, MIGHTY, AMY, METAL
-		dc.b "ABILITES                "
-		dc.b "                        " ; BASIC, COMPLETE
-		dc.b "DIFFICULTY              " ; LAYOUTS AND GAMEPLAY
-		dc.b "                        " ; CASUAL, NORMAL, EXPERT
-		dc.b "MONITORS                " ; SHIELD MONITOR SETTING
-		dc.b "                        " ; CLASSIC, SONIC 3K, RANDOM
-		dc.b "EMERALD COUNT           " ; TOTAL EMERALD SETTING
-		dc.b "                        " ; 6 EMERALDS/7 EMERALDS - 7 EMERALDS=SUPER SONIC
-		dc.b "ZONE MUSIC              "
-		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
-		dc.b "SUPER MUSIC             "
-		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
-		dc.b "SOUND TEST              "
-		dc.b "                        " ; FAST ZONE MUSIC, INVINCIBILITY, SONIC 2 JINGLE
-		dc.b "START GAME              "
-		dc.b "                        "
-		dc.b "RESET TO TITLE SCREEN   "
-		even
-
-; ---------------------------------------------------------------------------
-; Mode select menu text - Easier editing thanks to SoullessSentinel
-; ---------------------------------------------------------------------------
-ModeText_Classic:	dc.b "CLASSIC " ; Normal Sonic 1
-ModeText_Original:	dc.b "ORIGINAL" ; Original (Beta) Sonic 1
-ModeText_Handheld:	dc.b "HANDHELD" ; 8-bit Sonic 1
-ModeText_Complete:	dc.b "COMPLETE" ; 8x16 (Complete)
-; ===========================================================================
-
-; ---------------------------------------------------------------------------
-; Player select menu text - Easier editing thanks to SoullessSentinel
-; ---------------------------------------------------------------------------
-CharText_Sonic:		dc.b "SONIC   "
-CharText_Tails:		dc.b "TAILS   "
-CharText_Knuckles:	dc.b "KNUCKLES"
-CharText_Mighty:	dc.b "MIGHTY  "
-CharText_Ray:		dc.b "RAY     "
-CharText_Amy:		dc.b "AMY     "
-CharText_Metal:		dc.b "METAL   "
-; ===========================================================================
-
-; ---------------------------------------------------------------------------
-; Difficulty select menu text - Easier editing thanks to SoullessSentinel
-; ---------------------------------------------------------------------------
-DifficultyText_Norm:	dc.b "NORMAL"
-DifficultyText_Easy:	dc.b "CASUAL"
-DifficultyText_Hard:	dc.b "EXPERT"
-; ===========================================================================
-
-; ---------------------------------------------------------------------------
-; Difficulty select menu text - Easier editing thanks to SoullessSentinel
-; ---------------------------------------------------------------------------
-MonitorText_S1:		dc.b "ORIGINAL"
-MonitorText_S3K:	dc.b "S1/S3K  "
-; ===========================================================================
-
-; ---------------------------------------------------------------------------
-; Music	playlist
-; ---------------------------------------------------------------------------
-MusicList:
-		dc.b bgm_GHZ	; GHZ
-		dc.b bgm_LZ		; LZ
-		dc.b bgm_MZ		; MZ
-		dc.b bgm_SLZ	; SLZ
-		dc.b bgm_SYZ	; SYZ
-		dc.b bgm_SBZ	; SBZ
-		dc.b bgm_FZ		; Ending
-		dc.b bgm_GHZ	; BZ
-		even
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Music	to play	after invincibility wears off
-; ---------------------------------------------------------------------------
-MusicList2:
-		dc.b bgm_GHZ
-		dc.b bgm_LZ
-		dc.b bgm_MZ
-		dc.b bgm_SLZ
-		dc.b bgm_SYZ
-		dc.b bgm_SBZ
-		dc.b bgm_GHZ
-		dc.b bgm_GHZ
-		even
-; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Level
 ; ---------------------------------------------------------------------------
@@ -4378,7 +4285,6 @@ Cont_GotoLevel:
 
 		include	"_incObj\80 Continue Screen Elements.asm"
 		include	"_incObj\81 Continue Screen Sonic.asm"
-Map_ContScr:	include	"_maps\Continue Screen.asm"
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -4610,9 +4516,6 @@ End_MoveSonExit:
 		include	"_incObj\87 Ending Sequence Sonic.asm"
 		include	"_incObj\88 Ending Sequence Emeralds.asm"
 		include	"_incObj\89 Ending Sequence STH.asm"
-Map_ESon:	include	"_maps\Ending Sequence Sonic.asm"
-Map_ECha:	include	"_maps\Ending Sequence Emeralds.asm"
-Map_ESth:	include	"_maps\Ending Sequence STH.asm"
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -4818,7 +4721,8 @@ TryAg_Exit:
 
 		include	"_incObj\8B Try Again & End Eggman.asm"
 		include	"_incObj\8C Try Again Emeralds.asm"
-Map_EEgg:	include	"_maps\Try Again & End Eggman.asm"
+
+
 
 ; ---------------------------------------------------------------------------
 ; Ending sequence demos
@@ -5695,7 +5599,7 @@ LevelLayoutLoad:
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
 PlatformObject:
-		lea	(v_player).w,a1
+		lea		(v_player).w,a1
 		tst.w	obVelY(a1)	; is Sonic moving up/jumping?
 		bmi.w	Plat_Exit	; if yes, branch
 
@@ -5839,7 +5743,7 @@ ExitPlatform:
 
 ExitPlatform2:
 		add.w	d2,d2
-		lea	(v_player).w,a1
+		lea		(v_player).w,a1
 		btst	#1,obStatus(a1)
 		bne.s	loc_75E0
 		move.w	obX(a1),d0
@@ -5859,7 +5763,6 @@ locret_75F2:
 ; End of function ExitPlatform
 
 		include	"_incObj\11 Bridge (part 3).asm"
-Map_Bri:	include	"_maps\Bridge.asm"
 
 		include	"_incObj\15 Swinging Platforms (part 1).asm"
 
@@ -5908,17 +5811,12 @@ locret_7B62:
 ; End of function MvSonicOnPtfm2
 
 		include	"_incObj\15 Swinging Platforms (part 2).asm"
-Map_Swing_GHZ:	include	"_maps\Swinging Platforms (GHZ).asm"
-Map_Swing_SLZ:	include	"_maps\Swinging Platforms (SLZ).asm"
+
 		include	"_incObj\17 Spiked Pole Helix.asm"
-Map_Hel:	include	"_maps\Spiked Pole Helix.asm"
+
 		include	"_incObj\18 Platforms.asm"
-Map_Plat_Unused:include	"_maps\Platforms (unused).asm"
-Map_Plat_GHZ:	include	"_maps\Platforms (GHZ).asm"
-Map_Plat_SYZ:	include	"_maps\Platforms (SYZ).asm"
-Map_Plat_SLZ:	include	"_maps\Platforms (SLZ).asm"
 		include	"_incObj\19.asm"
-Map_GBall:	include	"_maps\GHZ Ball.asm"
+
 		include	"_incObj\1A Collapsing Ledge (part 1).asm"
 		include	"_incObj\53 Collapsing Floors.asm"
 
@@ -6048,18 +5946,14 @@ Ledge_SlopeData:
 		incbin	"misc\GHZ Collapsing Ledge Heightmap.bin"
 		even
 
-Map_Ledge:	include	"_maps\Collapsing Ledge.asm"
-Map_CFlo:	include	"_maps\Collapsing Floors.asm"
 
 		include	"_incObj\1C Scenery.asm"
-Map_Scen:	include	"_maps\Scenery.asm"
 
 		include	"_incObj\1D Unused Switch.asm"
-Map_Swi:	include	"_maps\Unused Switch.asm"
 
 		include	"_incObj\2A SBZ Small Door.asm"
 
-Map_ADoor:	include	"_maps\SBZ Small Door.asm"
+
 
 ; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -6195,389 +6089,75 @@ loc_8B48:
 ; ===========================================================================
 
 		include	"_incObj\1E Ball Hog.asm"
+
 		include	"_incObj\20 Cannonball.asm"
+
 		include	"_incObj\24, 27 & 3F Explosions.asm"
 
-Map_Hog:	include	"_maps\Ball Hog.asm"
-Map_MisDissolve:include	"_maps\Buzz Bomber Missile Dissolve.asm"
-		include	"_maps\Explosions.asm"
-
 		include	"_incObj\28 Animals.asm"
+
 		include	"_incObj\29 Points.asm"
-Map_Animal1:	include	"_maps\Animals 1.asm"
-Map_Animal2:	include	"_maps\Animals 2.asm"
-Map_Animal3:	include	"_maps\Animals 3.asm"
-Map_Poi:	include	"_maps\Points.asm"
 
 		include	"_incObj\1F Crabmeat.asm"
 
-Map_Crab:	include	"_maps\Crabmeat.asm"
 		include	"_incObj\22 Buzz Bomber.asm"
+
 		include	"_incObj\23 Buzz Bomber Missile.asm"
 
-		include	"_maps\Buzz Bomber.asm"
-		include	"_maps\Buzz Bomber Missile.asm"
-
 		include	"_incObj\25 & 37 Rings.asm"
+
 		include	"_incObj\4B Giant Ring.asm"
+
 		include	"_incObj\7C Ring Flash.asm"
 
-		include	"_maps\Rings.asm" ; THESE normal mappings are for debug rings, lost rings, and SS rings
-
-Map_RingBIN:
-		incbin	"_maps\Rings.bin" ; THESE special mappings are for the S2 Rings Manager
-		even
-
-		include	"_maps\Giant Ring.asm"
-		include "_maps\Giant Ring - Dynamic Gfx Script.asm"
-
-Map_Flash:	include	"_maps\Ring Flash.asm"
 		include	"_incObj\26 Monitor.asm"
+
 		include	"_incObj\2E Monitor Content Power-Up.asm"
+
 		include	"_incObj\26 Monitor (SolidSides subroutine).asm"
 
-
-Map_Monitor:	include	"_maps\Monitor.asm"
-
 		include	"_incObj\0E Title Screen Sonic.asm"
+
 		include	"_incObj\0F Press Start and TM.asm"
 
 		include	"_incObj\sub AnimateSprite.asm"
 
-Map_PSB:	include	"_maps\Press Start and TM.asm"
-Map_TSon:	include	"_maps\Title Screen Sonic.asm"
-
 		include	"_incObj\2B Chopper.asm"
 
-Map_Chop:	include	"_maps\Chopper.asm"
 		include	"_incObj\2C Jaws.asm"
 
-
-Map_Jaws:	include	"_maps\Jaws.asm"
 		include	"_incObj\2D Burrobot.asm"
 
-Map_Burro:	include	"_maps\Burrobot.asm"
-
 		include	"_incObj\2F MZ Large Grassy Platforms.asm"
+
 		include	"_incObj\35 Burning Grass.asm"
 
-Map_LGrass:	include	"_maps\MZ Large Grassy Platforms.asm"
-Map_Fire:	include	"_maps\Fireballs.asm"
 		include	"_incObj\30 MZ Large Green Glass Blocks.asm"
-Map_Glass:	include	"_maps\MZ Large Green Glass Blocks.asm"
+
 		include	"_incObj\31 Chained Stompers.asm"
+
 		include	"_incObj\45 Sideways Stomper.asm"
-Map_CStom:	include	"_maps\Chained Stompers.asm"
-Map_SStom:	include	"_maps\Sideways Stomper.asm"
 
 		include	"_incObj\32 Button.asm"
-Map_But:	include	"_maps\Button.asm"
 
 		include	"_incObj\33 Pushable Blocks.asm"
-Map_Push:	include	"_maps\Pushable Blocks.asm"
 
 		include	"_incObj\34 Title Cards.asm"
+
 		include	"_incObj\39 Game Over.asm"
+
 		include	"_incObj\3A Got Through Card.asm"
+
 		include	"_incObj\7E Special Stage Results.asm"
+
 		include	"_incObj\7F SS Result Chaos Emeralds.asm"
 
-; ---------------------------------------------------------------------------
-; Sprite mappings - zone title cards
-; ---------------------------------------------------------------------------
-Map_Card:
-		dc.w M_Card_GHZ-Map_Card
-		dc.w M_Card_LZ-Map_Card
-		dc.w M_Card_MZ-Map_Card
-		dc.w M_Card_SLZ-Map_Card
-		dc.w M_Card_SYZ-Map_Card
-		dc.w M_Card_SBZ-Map_Card
-		dc.w M_Card_Zone-Map_Card
-		dc.w M_Card_Act1-Map_Card
-		dc.w M_Card_Act2-Map_Card
-		dc.w M_Card_Act3-Map_Card
-		dc.w M_Card_Oval-Map_Card
-		dc.w M_Card_FZ-Map_Card
-		dc.w M_Card_BZ-Map_Card
-		dc.w M_Card_JZ-Map_Card
-		dc.w M_Card_SKBZ-Map_Card
-
-M_Card_GHZ:	dc.b 9 			; GREEN HILL
-		dc.b $F8, 5, 0,	$18, $B4
-		dc.b $F8, 5, 0,	$3A, $C4
-		dc.b $F8, 5, 0,	$10, $D4
-		dc.b $F8, 5, 0,	$10, $E4
-		dc.b $F8, 5, 0,	$2E, $F4
-		dc.b $F8, 5, 0,	$1C, $14
-		dc.b $F8, 1, 0,	$20, $24
-		dc.b $F8, 5, 0,	$26, $2C
-		dc.b $F8, 5, 0,	$26, $3C
-		even
-M_Card_LZ:	dc.b 9			; LABYRINTH
-		dc.b $F8, 5, 0,	$26, $BC
-		dc.b $F8, 5, 0,	0, $CC
-		dc.b $F8, 5, 0,	4, $DC
-		dc.b $F8, 5, 0,	$4A, $EC
-		dc.b $F8, 5, 0,	$3A, $FC
-		dc.b $F8, 1, 0,	$20, $C
-		dc.b $F8, 5, 0,	$2E, $14
-		dc.b $F8, 5, 0,	$42, $24
-		dc.b $F8, 5, 0,	$1C, $34
-		even
-M_Card_MZ:	dc.b 6			; MARBLE
-		dc.b $F8, 5, 0,	$2A, $CF
-		dc.b $F8, 5, 0,	0, $E0
-		dc.b $F8, 5, 0,	$3A, $F0
-		dc.b $F8, 5, 0,	4, 0
-		dc.b $F8, 5, 0,	$26, $10
-		dc.b $F8, 5, 0,	$10, $20
-		even
-M_Card_SLZ:	dc.b 9			; STAR LIGHT
-		dc.b $F8, 5, 0,	$3E, $B4
-		dc.b $F8, 5, 0,	$42, $C4
-		dc.b $F8, 5, 0,	0, $D4
-		dc.b $F8, 5, 0,	$3A, $E4
-		dc.b $F8, 5, 0,	$26, 4
-		dc.b $F8, 1, 0,	$20, $14
-		dc.b $F8, 5, 0,	$18, $1C
-		dc.b $F8, 5, 0,	$1C, $2C
-		dc.b $F8, 5, 0,	$42, $3C
-		even
-M_Card_SYZ:	dc.b $A			; SPRING YARD
-		dc.b $F8, 5, 0,	$3E, $AC
-		dc.b $F8, 5, 0,	$36, $BC
-		dc.b $F8, 5, 0,	$3A, $CC
-		dc.b $F8, 1, 0,	$20, $DC
-		dc.b $F8, 5, 0,	$2E, $E4
-		dc.b $F8, 5, 0,	$18, $F4
-		dc.b $F8, 5, 0,	$4A, $14
-		dc.b $F8, 5, 0,	0, $24
-		dc.b $F8, 5, 0,	$3A, $34
-		dc.b $F8, 5, 0,	$C, $44
-		even
-M_Card_SBZ:	dc.b $A			; SCRAP BRAIN
-		dc.b $F8, 5, 0,	$3E, $AC
-		dc.b $F8, 5, 0,	8, $BC
-		dc.b $F8, 5, 0,	$3A, $CC
-		dc.b $F8, 5, 0,	0, $DC
-		dc.b $F8, 5, 0,	$36, $EC
-		dc.b $F8, 5, 0,	4, $C
-		dc.b $F8, 5, 0,	$3A, $1C
-		dc.b $F8, 5, 0,	0, $2C
-		dc.b $F8, 1, 0,	$20, $3C
-		dc.b $F8, 5, 0,	$2E, $44
-		even
-M_Card_BZ:	dc.b 6				; BRIDGE
-		dc.b $F8, 5, 0,	4, $D0
-		dc.b $F8, 5, 0,	$3A, $E0
-		dc.b $F8, 1, 0,	$20, $F0
-		dc.b $F8, 5, 0,	$C, $F8
-		dc.b $F8, 5, 0,	$18, $08
-		dc.b $F8, 5, 0,	$10, $18
-		even
-M_Card_JZ:	dc.b 6				; JUNGLE
-		dc.b $F8, 5, 0,	$80, $D0
-		dc.b $F8, 5, 0,	$46, $E0
-		dc.b $F8, 5, 0,	$2E, $F0
-		dc.b $F8, 5, 0,	$18, $00
-		dc.b $F8, 5, 0,	$26, $10
-		dc.b $F8, 5, 0,	$10, $20
-		even
-M_Card_SKBZ:	dc.b 7			; SKY BASE
-		dc.b $F8, 5, 0,	$3E, $C8
-		dc.b $F8, 5, 0,	$22, $D8
-		dc.b $F8, 5, 0,	$4A, $E8
-		dc.b $F8, 5, 0,	4, $08
-		dc.b $F8, 5, 0,	0, $18
-		dc.b $F8, 5, 0,	$3E, $28
-		dc.b $F8, 5, 0,	$10, $38
-		even
-M_Card_Zone:	dc.b 4			; ZONE
-		dc.b $F8, 5, 0,	$4E, $E0
-		dc.b $F8, 5, 0,	$32, $F0
-		dc.b $F8, 5, 0,	$2E, 0
-		dc.b $F8, 5, 0,	$10, $10
-		even
-M_Card_Act1:	dc.b 2			; ACT 1
-		dc.b 4,	$C, 0, $53, $EC
-		dc.b $F4, 2, 0,	$57, $C
-M_Card_Act2:	dc.b 2			; ACT 2
-		dc.b 4,	$C, 0, $53, $EC
-		dc.b $F4, 6, 0,	$5A, 8
-M_Card_Act3:	dc.b 2			; ACT 3
-		dc.b 4,	$C, 0, $53, $EC
-		dc.b $F4, 6, 0,	$60, 8
-M_Card_Oval:	dc.b $D			; Oval
-		dc.b $E4, $C, 0, $70, $F4
-		dc.b $E4, 2, 0,	$74, $14
-		dc.b $EC, 4, 0,	$77, $EC
-		dc.b $F4, 5, 0,	$79, $E4
-		dc.b $14, $C, $18, $70,	$EC
-		dc.b 4,	2, $18,	$74, $E4
-		dc.b $C, 4, $18, $77, 4
-		dc.b $FC, 5, $18, $79, $C
-		dc.b $EC, 8, 0,	$7D, $FC
-		dc.b $F4, $C, 0, $7C, $F4
-		dc.b $FC, 8, 0,	$7C, $F4
-		dc.b 4,	$C, 0, $7C, $EC
-		dc.b $C, 8, 0, $7C, $EC
-		even
-M_Card_FZ:	dc.b 5			; FINAL
-		dc.b $F8, 5, 0,	$14, $DC
-		dc.b $F8, 1, 0,	$20, $EC
-		dc.b $F8, 5, 0,	$2E, $F4
-		dc.b $F8, 5, 0,	0, 4
-		dc.b $F8, 5, 0,	$26, $14
-		even
-
-Map_Over:	include	"_maps\Game Over.asm"
-
-; ---------------------------------------------------------------------------
-; Sprite mappings - "SONIC HAS PASSED" title card
-; ---------------------------------------------------------------------------
-Map_Got:
-		dc.w M_Got_SonicHas-Map_Got
-		dc.w M_Got_Passed-Map_Got
-		dc.w M_Got_Score-Map_Got
-		dc.w M_Got_TBonus-Map_Got
-		dc.w M_Got_RBonus-Map_Got
-		dc.w M_Card_Oval-Map_Got
-		dc.w M_Card_Act1-Map_Got
-		dc.w M_Card_Act2-Map_Got
-		dc.w M_Card_Act3-Map_Got
-M_Got_SonicHas:	dc.b 8			; SONIC HAS
-		dc.b $F8, 5, 0,	$3E, $B8
-		dc.b $F8, 5, 0,	$32, $C8
-		dc.b $F8, 5, 0,	$2E, $D8
-		dc.b $F8, 1, 0,	$20, $E8
-		dc.b $F8, 5, 0,	8, $F0
-		dc.b $F8, 5, 0,	$1C, $10
-		dc.b $F8, 5, 0,	0, $20
-		dc.b $F8, 5, 0,	$3E, $30
-M_Got_Passed:	dc.b 6			; PASSED
-		dc.b $F8, 5, 0,	$36, $D0
-		dc.b $F8, 5, 0,	0, $E0
-		dc.b $F8, 5, 0,	$3E, $F0
-		dc.b $F8, 5, 0,	$3E, 0
-		dc.b $F8, 5, 0,	$10, $10
-		dc.b $F8, 5, 0,	$C, $20
-M_Got_Score:	dc.b 6					; SCORE
-		dc.b $F8, $D, $21, $4A, $B0		; SCOR
-		dc.b $F8, 1, $21, $62, $D0		; E
-		dc.b $F8, 9, 1,	$64, $18		; Score Value
-		dc.b $F8, $D, 1, $6A, $30		; Score Value
-		dc.b $F7, 4, 0,	$6E, $CD		; Small Oval (Top Half)
-		dc.b $FF, 4, $18, $6E, $CD		; Small Oval (Bottom Half)
-M_Got_TBonus:	dc.b 7			; TIME BONUS
-		dc.b $F8, $D, $21, $5A, $B0		; TIME
-		dc.b $F8, $D, $20, $66, $D9		; BONU
-		dc.b $F8, 1, $21, $4A, $F9		; S
-		dc.b $F7, 4, 0,	$6E, $F6		; Small Oval (Top Half)
-		dc.b $FF, 4, $18, $6E, $F6		; Small Oval (Bottom Half)
-		dc.b $F8, $D, $FF, $F0,	$28		; Bonus Value
-		dc.b $F8, 1, 1,	$70, $48		; Bonus Value
-M_Got_RBonus:	dc.b 7			; RING BONUS
-		dc.b $F8, $D, $21, $52, $B0		; RING
-		dc.b $F8, $D, $20, $66, $D9		; BONU
-		dc.b $F8, 1, $21, $4A, $F9		; S
-		dc.b $F7, 4, 0,	$6E, $F6		; Small Oval (Top Half)
-		dc.b $FF, 4, $18, $6E, $F6		; Small Oval (Bottom Half)
-		dc.b $F8, $D, $FF, $F8,	$28		; Bonus Value
-		dc.b $F8, 1, 1,	$70, $48		; Bonus Value
-		even
-; ---------------------------------------------------------------------------
-; Sprite mappings - special stage results screen
-; ---------------------------------------------------------------------------
-Map_SSR:	dc.w M_SSR_Chaos-Map_SSR
-		dc.w M_SSR_Score-Map_SSR
-		dc.w byte_CD0D-Map_SSR
-		dc.w M_Card_Oval-Map_SSR
-		dc.w byte_CD31-Map_SSR
-		dc.w byte_CD46-Map_SSR
-		dc.w byte_CD5B-Map_SSR
-		dc.w byte_CD6B-Map_SSR
-		dc.w byte_CDA8-Map_SSR
-M_SSR_Chaos:	dc.b $D			; "CHAOS EMERALDS"
-		dc.b $F8, 5, 0,	8, $90
-		dc.b $F8, 5, 0,	$1C, $A0
-		dc.b $F8, 5, 0,	0, $B0
-		dc.b $F8, 5, 0,	$32, $C0
-		dc.b $F8, 5, 0,	$3E, $D0
-		dc.b $F8, 5, 0,	$10, $F0
-		dc.b $F8, 5, 0,	$2A, 0
-		dc.b $F8, 5, 0,	$10, $10
-		dc.b $F8, 5, 0,	$3A, $20
-		dc.b $F8, 5, 0,	0, $30
-		dc.b $F8, 5, 0,	$26, $40
-		dc.b $F8, 5, 0,	$C, $50
-		dc.b $F8, 5, 0,	$3E, $60
-M_SSR_Score:	dc.b 6			; "SCORE"
-		dc.b $F8, $D, 1, $4A, $B0
-		dc.b $F8, 1, 1,	$62, $D0
-		dc.b $F8, 9, 1,	$64, $18
-		dc.b $F8, $D, 1, $6A, $30
-		dc.b $F7, 4, 0,	$6E, $CD
-		dc.b $FF, 4, $18, $6E, $CD
-byte_CD0D:	dc.b 7
-		dc.b $F8, $D, 1, $52, $B0
-		dc.b $F8, $D, 0, $66, $D9
-		dc.b $F8, 1, 1,	$4A, $F9
-		dc.b $F7, 4, 0,	$6E, $F6
-		dc.b $FF, 4, $18, $6E, $F6
-		dc.b $F8, $D, $FF, $F8,	$28
-		dc.b $F8, 1, 1,	$70, $48
-byte_CD31:	dc.b 4
-		dc.b $F8, $D, $FF, $D1,	$B0
-		dc.b $F8, $D, $FF, $D9,	$D0
-		dc.b $F8, 1, $FF, $E1, $F0
-		dc.b $F8, 6, $1F, $E3, $40
-byte_CD46:	dc.b 4
-		dc.b $F8, $D, $FF, $D1,	$B0
-		dc.b $F8, $D, $FF, $D9,	$D0
-		dc.b $F8, 1, $FF, $E1, $F0
-		dc.b $F8, 6, $1F, $E9, $40
-byte_CD5B:	dc.b 3
-		dc.b $F8, $D, $FF, $D1,	$B0
-		dc.b $F8, $D, $FF, $D9,	$D0
-		dc.b $F8, 1, $FF, $E1, $F0
-byte_CD6B:	dc.b $C			; "SPECIAL STAGE"
-		dc.b $F8, 5, 0,	$3E, $9C
-		dc.b $F8, 5, 0,	$36, $AC
-		dc.b $F8, 5, 0,	$10, $BC
-		dc.b $F8, 5, 0,	8, $CC
-		dc.b $F8, 1, 0,	$20, $DC
-		dc.b $F8, 5, 0,	0, $E4
-		dc.b $F8, 5, 0,	$26, $F4
-		dc.b $F8, 5, 0,	$3E, $14
-		dc.b $F8, 5, 0,	$42, $24
-		dc.b $F8, 5, 0,	0, $34
-		dc.b $F8, 5, 0,	$18, $44
-		dc.b $F8, 5, 0,	$10, $54
-byte_CDA8:	dc.b $F			; "SONIC GOT THEM ALL"
-		dc.b $F8, 5, 0,	$3E, $88
-		dc.b $F8, 5, 0,	$32, $98
-		dc.b $F8, 5, 0,	$2E, $A8
-		dc.b $F8, 1, 0,	$20, $B8
-		dc.b $F8, 5, 0,	8, $C0
-		dc.b $F8, 5, 0,	$18, $D8
-		dc.b $F8, 5, 0,	$32, $E8
-		dc.b $F8, 5, 0,	$42, $F8
-		dc.b $F8, 5, 0,	$42, $10
-		dc.b $F8, 5, 0,	$1C, $20
-		dc.b $F8, 5, 0,	$10, $30
-		dc.b $F8, 5, 0,	$2A, $40
-		dc.b $F8, 5, 0,	0, $58
-		dc.b $F8, 5, 0,	$26, $68
-		dc.b $F8, 5, 0,	$26, $78
-		even
-
-Map_SSRC:	include	"_maps\SS Result Chaos Emeralds.asm"
-
 		include	"_incObj\36 Spikes.asm"
-Map_Spike:	include	"_maps\Spikes.asm"
+
 		include	"_incObj\3B Purple Rock.asm"
+
 		include	"_incObj\49 Waterfall Sound.asm"
-Map_PRock:	include	"_maps\Purple Rock.asm"
+
 		include	"_incObj\3C Smashable Wall.asm"
 
 		include	"_incObj\sub SmashObject.asm"
@@ -6602,8 +6182,6 @@ Smash_FragSpd2:	dc.w -$600, -$600
 		dc.w -$600, -$100
 		dc.w -$600, $100
 		dc.w -$400, $500
-
-Map_Smash:	include	"_maps\Smashable Walls.asm"
 
 ; ---------------------------------------------------------------------------
 ; Object code execution subroutine
@@ -6664,957 +6242,132 @@ Obj_Index:
 		include	"_inc\Object Pointers.asm"
 
 		include	"_incObj\sub ObjectFall.asm"
+
 		include	"_incObj\sub SpeedToPos.asm"
+
 		include	"_incObj\sub DisplaySprite.asm"
+
 		include	"_incObj\sub DeleteObject.asm"
 
-; ===========================================================================
-BldSpr_ScrPos:	dc.l 0				; blank
-		dc.l v_screenposx&$FFFFFF	; main screen x-position
-		dc.l v_bgscreenposx&$FFFFFF	; background x-position	1
-		dc.l v_bg3screenposx&$FFFFFF	; background x-position	2
-; ---------------------------------------------------------------------------
-; Subroutine to	convert	mappings (etc) to proper Megadrive sprites
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-BuildSprites:
-		lea		(v_spritetablebuffer).w,a2 ; set address for sprite table
-		moveq	#0,d5
-		moveq	#0,d4
-		tst.b	(f_level_started).w
-		beq.s	@noRingsorHUD
-		bsr.w	BuildHUD	; Sonic 2 HUD Manager
-
-	@noRingsorHUD:
-		lea		(v_spritequeue).w,a4
-		moveq	#7,d7
-
-BuildSprites_LevelLoop: ; The first part of this is for when we add S2 or S3K rings
-		cmpi.b	#2,d7
-		bne.s	@notpriority2
-		move.l	a4,-(sp)
-		jsr		BuildRings
-		move.l	(sp)+,a4
-
-	@notpriority2:
-		tst.w	(a4)
-		beq.w	loc_D72E
-		moveq	#2,d6
-
-loc_D672:
-		movea.w	(a4,d6.w),a0
-		tst.b	(a0)
-		beq.w	loc_D726
-		bclr	#7,obRender(a0)
-		move.b	obRender(a0),d0
-		move.b	d0,d4
-		btst	#6,d0 						; is the multi-draw flag set?
-		bne.w	BuildSprites_MultiDraw		; if it is, branch
-		andi.w	#$C,d0 						; is this to be positioned by screen coordinates?
-		beq.s	BuildSprites_ScreenSpaceObj	; if it is, branch
-		movea.l	BldSpr_ScrPos(pc,d0.w),a1
-		moveq	#0,d0
-		move.b	obActWid(a0),d0
-		move.w	obX(a0),d3
-		sub.w	(a1),d3
-		move.w	d3,d1
-		add.w	d0,d1
-		bmi.w	loc_D726
-		move.w	d3,d1
-		sub.w	d0,d1
-		cmpi.w	#$140,d1
-		bge.s	loc_D726
-		addi.w	#$80,d3
-		btst	#4,d4
-		beq.s	loc_D6E8
-		moveq	#0,d0
-		move.b	obHeight(a0),d0
-		move.w	obY(a0),d2
-		sub.w	4(a1),d2
-		move.w	d2,d1
-		add.w	d0,d1
-		bmi.s	loc_D726
-		move.w	d2,d1
-		sub.w	d0,d1
-		cmpi.w	#$E0,d1
-		bge.s	loc_D726
-		addi.w	#$80,d2
-		bra.s	loc_D700
-; ===========================================================================
-
-BuildSprites_ScreenSpaceObj: ;loc_D6DE:
-		move.w	$A(a0),d2
-		move.w	obX(a0),d3
-		bra.s	loc_D700
-; ===========================================================================
-
-loc_D6E8:
-		move.w	obY(a0),d2
-		sub.w	obMap(a1),d2
-		addi.w	#$80,d2
-		cmpi.w	#$60,d2
-		blo.s	loc_D726
-		cmpi.w	#$180,d2
-		bhs.s	loc_D726
-
-loc_D700:
-		movea.l	obMap(a0),a1
-		moveq	#0,d1
-		btst	#5,d4
-		bne.s	loc_D71C
-		move.b	obFrame(a0),d1
-		add.w	d1,d1					; MJ: changed from byte to word (we want more than 7F sprites)
-		adda.w	(a1,d1.w),a1
-		moveq	#0,d1					; MJ: clear d1 (because of our byte to word change)
-		move.b	(a1)+,d1
-		subq.b	#1,d1
-		bmi.s	loc_D720
-
-loc_D71C:
-		bsr.w	sub_D750
-
-loc_D720:
-		bset	#7,obRender(a0)
-
-loc_D726:
-		addq.w	#2,d6
-		subq.w	#2,(a4)
-		bne.w	loc_D672
-
-loc_D72E:
-		lea		$80(a4),a4
-		dbf		d7,BuildSprites_LevelLoop
-		move.b	d5,(v_spritecount).w
-		cmpi.b	#$50,d5
-		beq.s	loc_D748
-		move.l	#0,(a2)
-		rts	
-; ===========================================================================
-
-loc_D748:
-		move.b	#0,-5(a2)
-		rts	
-; End of function BuildSprites
-
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-BuildSprites_MultiDraw:
-		move.l	a4,-(sp)
-		lea		(v_screenposx).w,a4
-		movea.w	obGfx(a0),a3
-		movea.l	obMap(a0),a5
-		moveq	#0,d0
-
-		 ; check if object is within X bounds
-		move.b mainspr_width(a0),d0 ; load pixel width
-		move.w obX(a0),d3
-		sub.w (a4),d3
-		move.w d3,d1
-		add.w d0,d1
-		bmi.w BuildSprites_MultiDraw_NextObj
-		move.w d3,d1
-		sub.w d0,d1
-		cmpi.w #320,d1
-		bge.w BuildSprites_MultiDraw_NextObj
-		addi.w #128,d3
-
-		; check if object is within Y bounds
-		btst    #4,d4
-		beq.s    @a
-		moveq    #0,d0
-		move.b    mainspr_height(a0),d0    ; load pixel height
-		move.w    obY(a0),d2
-		sub.w    4(a4),d2
-		move.w    d2,d1
-		add.w    d0,d1
-		bmi.w    BuildSprites_MultiDraw_NextObj
-		move.w    d2,d1
-		sub.w    d0,d1
-		cmpi.w    #224,d1
-		bge.w    BuildSprites_MultiDraw_NextObj
-		addi.w    #128,d2
-		bra.s    @b
-
-	@a:
-		move.w    obY(a0),d2
-		sub.w    4(a4),d2
-		addi.w    #128,d2
-		cmpi.w    #-32+128,d2
-		blo.s    BuildSprites_MultiDraw_NextObj
-		cmpi.w    #32+128+224,d2
-		bhs.s    BuildSprites_MultiDraw_NextObj
-
-	@b:
-		moveq    #0,d1
-		move.b    mainspr_mapframe(a0),d1    ; get current frame
-		beq.s    @c
-		add.w    d1,d1
-		movea.l    a5,a1
-		adda.w    (a1,d1.w),a1
-		move.b   (a1)+,d1
-		subq.w    #1,d1
-		bmi.s    @c
-		move.w    d4,-(sp)
-		bsr.w    ChkDrawSprite    ; draw the sprite
-		move.w    (sp)+,d4
-
-	@c:
-		ori.b    #$80,obRender(a0)    ; set onscreen flag
-		lea    sub2_x_pos(a0),a6
-		moveq    #0,d0
-		move.b    mainspr_childsprites(a0),d0    ; get child sprite count
-		subq.w    #1,d0        ; if there are 0, go to next object
-		bcs.s    BuildSprites_MultiDraw_NextObj
-	@loop:
-		swap    d0
-		move.w    (a6)+,d3    ; get X pos
-		sub.w    (a4),d3
-		addi.w    #128,d3
-		move.w    (a6)+,d2    ; get Y pos
-		sub.w    4(a4),d2
-		addi.w    #128,d2
-		andi.w    #$7FF,d2
-		addq.w    #1,a6
-		moveq    #0,d1
-		move.b    (a6)+,d1    ; get mapping frame
-		add.w    d1,d1
-		movea.l    a5,a1
-		adda.w    (a1,d1.w),a1
-		move.b    (a1)+,d1
-		subq.b    #1,d1
-		bmi.s    @skip
-		move.w    d4,-(sp)
-		bsr.w    ChkDrawSprite
-		move.w    (sp)+,d4
-	@skip:
-		swap    d0
-		dbf    d0,@loop    ; repeat for number of child sprites
-
-BuildSprites_MultiDraw_NextObj:
-		movea.l    (sp)+,a4
-		bra.w    loc_D726
-
-DrawSprite_Done:
-        rts
-
-; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
- 
-; sub_1680A:
-ChkDrawSprite:
-    cmpi.b    #$50,d5        ; has the sprite limit been reached?
-    blo.s    DrawSprite_Cont    ; if it hasn't, branch
-    rts    ; otherwise, return
-; End of function ChkDrawSprite
-
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-sub_D750:
-		movea.w	obGfx(a0),a3
-        cmpi.b    #$50,d5
-        bhs.s    DrawSprite_Done
-
-DrawSprite_Cont:
-		btst	#0,d4
-		bne.s	loc_D796
-		btst	#1,d4
-		bne.w	loc_D7E4
-; End of function sub_D750
-
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-DrawSprite_Loop: ;sub_D762:
-		cmpi.b	#$50,d5
-		beq.s	locret_D794
-		move.b	(a1)+,d0
-		ext.w	d0
-		add.w	d2,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,(a2)+
-		addq.b	#1,d5
-		move.b	d5,(a2)+
-		move.b	(a1)+,d0
-		lsl.w	#8,d0
-		move.b	(a1)+,d0
-		add.w	a3,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,d0
-		ext.w	d0
-		add.w	d3,d0
-		andi.w	#$1FF,d0
-		bne.s	loc_D78E
-		addq.w	#1,d0
-
-loc_D78E:
-		move.w	d0,(a2)+
-		dbf		d1,DrawSprite_Loop
-
-locret_D794:
-		rts	
-; End of function DrawSprite_Loop
-
-; ===========================================================================
-
-loc_D796:
-		btst	#1,d4
-		bne.w	loc_D82A
-
-loc_D79E:
-		cmpi.b	#$50,d5
-		beq.s	locret_D7E2
-		move.b	(a1)+,d0
-		ext.w	d0
-		add.w	d2,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,d4
-		move.b	d4,(a2)+
-		addq.b	#1,d5
-		move.b	d5,(a2)+
-		move.b	(a1)+,d0
-		lsl.w	#8,d0
-		move.b	(a1)+,d0
-		add.w	a3,d0
-		eori.w	#$800,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,d0
-		ext.w	d0
-		neg.w	d0
-		add.b	d4,d4
-		andi.w	#$18,d4
-		addq.w	#8,d4
-		sub.w	d4,d0
-		add.w	d3,d0
-		andi.w	#$1FF,d0
-		bne.s	loc_D7DC
-		addq.w	#1,d0
-
-loc_D7DC:
-		move.w	d0,(a2)+
-		dbf	d1,loc_D79E
-
-locret_D7E2:
-		rts	
-; ===========================================================================
-
-loc_D7E4:
-		cmpi.b	#$50,d5
-		beq.s	locret_D828
-		move.b	(a1)+,d0
-		move.b	(a1),d4
-		ext.w	d0
-		neg.w	d0
-		lsl.b	#3,d4
-		andi.w	#$18,d4
-		addq.w	#8,d4
-		sub.w	d4,d0
-		add.w	d2,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,(a2)+
-		addq.b	#1,d5
-		move.b	d5,(a2)+
-		move.b	(a1)+,d0
-		lsl.w	#8,d0
-		move.b	(a1)+,d0
-		add.w	a3,d0
-		eori.w	#$1000,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,d0
-		ext.w	d0
-		add.w	d3,d0
-		andi.w	#$1FF,d0
-		bne.s	loc_D822
-		addq.w	#1,d0
-
-loc_D822:
-		move.w	d0,(a2)+
-		dbf	d1,loc_D7E4
-
-locret_D828:
-		rts	
-; ===========================================================================
-
-loc_D82A:
-		cmpi.b	#$50,d5
-		beq.s	locret_D87C
-		move.b	(a1)+,d0
-		move.b	(a1),d4
-		ext.w	d0
-		neg.w	d0
-		lsl.b	#3,d4
-		andi.w	#$18,d4
-		addq.w	#8,d4
-		sub.w	d4,d0
-		add.w	d2,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,d4
-		move.b	d4,(a2)+
-		addq.b	#1,d5
-		move.b	d5,(a2)+
-		move.b	(a1)+,d0
-		lsl.w	#8,d0
-		move.b	(a1)+,d0
-		add.w	a3,d0
-		eori.w	#$1800,d0
-		move.w	d0,(a2)+
-		move.b	(a1)+,d0
-		ext.w	d0
-		neg.w	d0
-		add.b	d4,d4
-		andi.w	#$18,d4
-		addq.w	#8,d4
-		sub.w	d4,d0
-		add.w	d3,d0
-		andi.w	#$1FF,d0
-		bne.s	loc_D876
-		addq.w	#1,d0
-
-loc_D876:
-		move.w	d0,(a2)+
-		dbf	d1,loc_D82A
-
-locret_D87C:
-		rts	
+		include "_inc\BuildSprites.asm"
 
 		include	"_inc\RingsManager.asm"
+
 		include "_inc\BuildHUD.asm"
+
 		include	"_incObj\sub ChkObjectVisible.asm"
 
-; ---------------------------------------------------------------------------
-; SONIC 2 OBJECTS MANAGER
-; Subroutine that keeps track of any objects that need to remember
-; their state, such as monitors or enemies.
-; Made this into a 1:1 port of the S2 Object Manager
-;
-; writes:
-;  d0, d1
-;  d2 = respawn index of object to load
-;  d6 = camera position
-;
-;  a0 = address in object placement list
-;  a2 = respawn table
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-ObjPosLoad:
-		moveq	#0,d0
-		move.b	(v_opl_routine).w,d0
-		move.w	OPL_Index(pc,d0.w),d0
-		jmp		OPL_Index(pc,d0.w)
-; End of function ObjPosLoad
-
-; ===========================================================================
-OPL_Index:
-		dc.w OPL_Main-OPL_Index
-		dc.w OPL_Next-OPL_Index
-; ===========================================================================
-
-OPL_Main:
-		addq.b	#2,(v_opl_routine).w
-		move.b	(v_zone).w,d0
-		lsl.l	#6,d0					; zones are separated in multiples of $80
-		move.b	(v_act).w,d1
-		lsl.b	#4,d1					; acts are separated in multiples of $20
-		add.b	d1,d0
-		move.b	(v_difficulty).w,d1
-		lsl.b	#2,d1					; difficulties are separated in multiples of 8
-		add.b	d1,d0
-		lea		(ObjPos_Index).l,a0		; Next, we load the first pointer in the object layout list pointer index,
-		movea.l	a0,a1					; then copy it for quicker use later.
-		movea.l (a0,d0.w),a0			; Changed from adda.w to movea.l for new object layout pointers
-		; initialize each object load address with the first object in the layout
-		move.l	a0,(v_opl_data).w
-		move.l	a0,(v_opl_data+4).w
-		move.l	a1,(v_opl_data+8).w
-		move.l	a1,(v_opl_data+$C).w
-		lea		(v_objstate).w,a2
-		move.w	#$101,(a2)+	; the first two bytes are not used as respawn values
-		; instead, they are used to keep track of the current respawn indexes
-		move.w	#$5E,d0		; set loop counter
-
-OPL_ClrList:
-		clr.l	(a2)+
-		dbf		d0,OPL_ClrList				; clear	pre-destroyed object list
-		cmpi.b	#id_SLZ,(v_zone).w			; are we currently in Star Light Zone?
-		bne.s	@notSLZ						; if not, branch
-		move.b	#id_Pylon,(v_lvlobjspace).w	; manually load pylons
-
-	@notSLZ:
-		lea	(v_objstate).w,a2	; reset a2
-		moveq	#0,d2
-		move.w	(v_screenposx).w,d6
-		subi.w	#$80,d6			; look one chunk (128 pixels) to the left
-		bhs.s	loc_D93C		; if the result is negative
-		moveq	#0,d6			; cap at zero
-
-loc_D93C:
-		andi.w	#$FF80,d6			; limit to increments of $80 (width of a chunk)
-		movea.l	(v_opl_data).w,a0	; load address of object placement list
-
-loc_D944:		; at the beginning of a level this gives respawn table entries to any object that is one chunk
-				; behind the left edge of the screen that needs to remember its state (Monitors, Badniks, etc.)
-		cmp.w	(a0),d6				; is object's x position >= d6?
-		bls.s	loc_D956			; if yes, branch
-		tst.b	2(a0)				; does the object get a respawn table entry - WAS 4
-		bpl.s	loc_D952			; if not, branch
-		move.b	(a2),d2
-		addq.b	#1,(a2)				; respawn index of next object to the right.
-
-loc_D952:
-		addq.w	#6,a0				; next object
-		bra.s	loc_D944
-; ===========================================================================
-
-loc_D956:
-		move.l	a0,(v_opl_data).w		; remember rightmost object that has been processed, so far (we still need to look forward)
-		move.l	a0,(v_opl_data+8).w
-		movea.l	(v_opl_data+4).w,a0		; reset a0
-		subi.w	#$80,d6					; look even farther left (any object behind this is out of range)
-		bcs.s	loc_D976				; branch, if camera position would be behind level's left boundary
-
-loc_D964:	; count how many objects are behind the screen that are not in range and need to remember their state
-		cmp.w	(a0),d6		; is object's x position >= d6?
-		bls.s	loc_D976	; if yes, branch
-		tst.b	2(a0)		; does the object get a respawn table entry? (MAKE THIS 2(a0)?)
-		bpl.s	loc_D972	; if not, branch
-		addq.b	#1,1(a2)	; respawn index of current object to the left
-
-loc_D972:
-		addq.w	#6,a0
-		bra.s	loc_D964	; continue with next object
-; ===========================================================================
-
-loc_D976:
-		move.l	a0,(v_opl_data+4).w
-		move.l	a0,(v_opl_data+$C).w
-		move.w	#-1,(v_opl_screen).w
-
-OPL_Next:
-		move.w	(v_screenposx).w,d1
-		subi.w	#$80,d1
-		andi.w	#$FF80,d1
-		move.w	d1,(v_screenposx_coarse).w
-
-		lea	(v_objstate).w,a2
-		moveq	#0,d2
-		move.w	(v_screenposx).w,d6
-		andi.w	#$FF80,d6
-		cmp.w	(v_opl_screen).w,d6	; is the X range the same as last time?
-		beq.w	locret_DA3A		; if yes, branch (rts)
-		bge.s	loc_D9F6		; if new pos is greater than old pos, branch
-		; if the player is moving back
-		move.w	d6,(v_opl_screen).w	; remember current position for next time
-		movea.l	(v_opl_data+4).w,a0	; get current object from the left
-		subi.w	#$80,d6			; look one chunk to the left
-		bcs.s	loc_D9D2		; branch, if camera position would be behind level's left boundary
-
-loc_D9A6:	; load all objects left of the screen that are now in range
-		cmp.w	-6(a0),d6
-		bge.s	loc_D9D2
-		subq.w	#6,a0
-		tst.b	2(a0)		; does the object get a respawn table entry?
-		bpl.s	loc_D9BC
-		subq.b	#1,1(a2)
-		move.b	1(a2),d2
-
-loc_D9BC:
-		bsr.w	OPL_ChkLoad
-		bne.s	loc_D9C6
-		subq.w	#6,a0
-		bra.s	loc_D9A6
-; ===========================================================================
-
-loc_D9C6:
-		tst.b	2(a0)		; does the object get a respawn table entry?
-		bpl.s	loc_D9D0
-		addq.b	#1,1(a2)
-
-loc_D9D0:
-		addq.w	#6,a0
-
-loc_D9D2:
-		move.l	a0,(v_opl_data+4).w
-		movea.l	(v_opl_data).w,a0
-		addi.w	#$300,d6
-
-loc_D9DE:
-		cmp.w	-6(a0),d6
-		bgt.s	loc_D9F0
-		tst.b	-4(a0)		; does the previous object get a respawn table entry?
-		bpl.s	loc_D9EC
-		subq.b	#1,(a2)
-
-loc_D9EC:
-		subq.w	#6,a0
-		bra.s	loc_D9DE
-; ===========================================================================
-
-loc_D9F0:
-		move.l	a0,(v_opl_data).w
-		rts	
-; ===========================================================================
-
-loc_D9F6:
-		move.w	d6,(v_opl_screen).w
-		movea.l	(v_opl_data).w,a0
-		addi.w	#$280,d6
-
-loc_DA02:	; load all objects right of the screen that are now in range
-		cmp.w	(a0),d6
-		bls.s	loc_DA16
-		tst.b	2(a0)	; does the object get a respawn table entry?
-		bpl.s	loc_DA10
-		move.b	(a2),d2
-		addq.b	#1,(a2)
-
-loc_DA10:
-		bsr.w	OPL_ChkLoad
-		beq.s	loc_DA02
-
-loc_DA16:
-		move.l	a0,(v_opl_data).w
-		movea.l	(v_opl_data+4).w,a0
-		subi.w	#$300,d6
-		blo.s	loc_DA36
-
-loc_DA24:	; subtract number of objects that have been moved out of range (from the left)
-		cmp.w	(a0),d6
-		bls.s	loc_DA36
-		tst.b	2(a0)		; does the object get a respawn table entry?
-		bpl.s	loc_DA32
-		addq.b	#1,1(a2)
-
-loc_DA32:
-		addq.w	#6,a0
-		bra.s	loc_DA24
-; ===========================================================================
-
-loc_DA36:
-		move.l	a0,(v_opl_data+4).w
-
-locret_DA3A:
-		rts	
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Subroutine to check if an object needs to be loaded.
-;
-; input variables:
-;  d2 = respawn index of object to be loaded
-;
-;  a0 = address in object placement list
-;  a2 = object respawn table
-;
-; writes:
-;  d0, d1
-;  a1 = object
-; ---------------------------------------------------------------------------
-OPL_ChkLoad: ;loc_DA3C:
-		tst.b	2(a0)         ; does the object get a respawn table entry? WAS 4
-		bpl.s	OPL_MakeItem  ; if not, branch
-		bset	#7,2(a2,d2.w) ; mark object as loaded
-		beq.s	OPL_MakeItem  ; branch if it wasn't already loaded
-		addq.w	#6,a0         ; next object
-		moveq	#0,d0         ; let the objects manager know that it can keep going
-		rts
-; ===========================================================================
-
-OPL_MakeItem:
-		bsr.w	FindFreeObj		; find empty slot
-		bne.s	locret_DA8A		; branch, if there is no room to load an object
-		move.w	(a0)+,obX(a1)
-		move.w	(a0)+,d0		; there are three things stored in this word
-		bpl.s	@norespawn		; branch, if the object doesn't get a respawn table entry
-		move.b	d2,obRespawnNo(a1)
-
-	@norespawn:
-		move.w	d0,d1
-		andi.w	#$FFF,d0             ; get y-position
-		move.w	d0,obY(a1)
-		rol.w	#3,d1                ; adjust bits
-		andi.b	#3,d1                ; get render flags & status
-		move.b	d1,obRender(a1)
-		move.b	d1,obStatus(a1)
-		move.b	(a0)+,obID(a1)          ; load obj
-		move.b	(a0)+,obSubtype(a1)
-
-	; S3K Monitor setting check
-		moveq	#0,d0
-		cmpi.b	#id_Monitor,obID(a1)	; is the current object a monitor?
-		bne.s	@return					; if not, exit now
-		move.b	obSubtype(a1),d0
-		andi.b	#$F,d0					; Omit extra monitor flag
-		cmpi.b	#$B,d0					; $B-D = Elemental Shield
-		blt.s	@return
-		cmpi.b	#$E,d0					; $E = Broken Monitor
-		beq.s	@return
-		tst.b	(f_optmonitor).w		; Are elemental shields enabled?
-		bne.s	@return					; if yes, branch and exit
-; at this point, we don't want elemental shields. We can revert it or destroy it.
-		move.b	obSubtype(a1),d0
-		btst	#7,d0 					; should this monitor be destroyed?
-		beq.s	@revert	 	 	 	 	; if not, branch
-		move.b	#$FF,obSubtype(a1)		; to be deleted
-		bra.s	@return
-
-	@revert:
-		move.b	#4,obSubtype(a1)		; if not, default to blue shield
-
-	@return:
-		moveq	#0,d0
-
-locret_DA8A:
-		rts	
+		include	"_inc\Object Manager.asm"
 
 		include	"_incObj\sub FindFreeObj.asm"
-		include	"_incObj\41 Springs.asm"
 
-Map_Spring:	include	"_maps\Springs.asm"
+		include	"_incObj\41 Springs.asm"
 
 		include	"_incObj\42 Newtron.asm"
 
-Map_Newt:	include	"_maps\Newtron.asm"
 		include	"_incObj\43 Roller.asm"
 
-
-Map_Roll:	include	"_maps\Roller.asm"
-
 		include	"_incObj\44 GHZ Edge Walls.asm"
-Map_Edge:	include	"_maps\GHZ Edge Walls.asm"
 
 		include	"_incObj\13 Lava Ball Maker.asm"
+
 		include	"_incObj\14 Lava Ball.asm"
-
-
 
 		include	"_incObj\6D Flamethrower.asm"
 
-
-Map_Flame:	include	"_maps\Flamethrower.asm"
-
 		include	"_incObj\46 MZ Bricks.asm"
-Map_Brick:	include	"_maps\MZ Bricks.asm"
 
 		include	"_incObj\12 Light.asm"
-Map_Light	include	"_maps\Light.asm"
+
 		include	"_incObj\47 Bumper.asm"
-
-
-
-Map_Bump:	include	"_maps\Bumper.asm"
 
 		include	"_incObj\0D Signpost.asm" ; includes "GotThroughAct" subroutine
 
-
-
-		include	"_maps\Signpost.asm"
-		include	"_maps\Signpost - Dynamic Gfx Script.asm"
-
 		include	"_incObj\4C & 4D Lava Geyser Maker.asm"
+
 		include	"_incObj\4E Wall of Lava.asm"
+
 		include	"_incObj\54 Lava Tag.asm"
-Map_LTag:	include	"_maps\Lava Tag.asm"
-
-
-
-
-Map_Geyser:	include	"_maps\Lava Geyser.asm"
-Map_LWall:	include	"_maps\Wall of Lava.asm"
-
-
 
 		include	"_incObj\40 Moto Bug.asm" ; includes "_incObj\sub RememberState.asm"
 
-
-Map_Moto:	include	"_maps\Moto Bug.asm"
-
 		include	"_incObj\50 Yadrin.asm"
-
-
-
-
-Map_Yad:	include	"_maps\Yadrin.asm"
 
 		include	"_incObj\sub SolidObject.asm"
 
 		include	"_incObj\51 Smashable Green Block.asm"
-Map_Smab:	include	"_maps\Smashable Green Block.asm"
 
 		include	"_incObj\52 Moving Blocks.asm"
-Map_MBlock:	include	"_maps\Moving Blocks (MZ and SBZ).asm"
-Map_MBlockLZ:	include	"_maps\Moving Blocks (LZ).asm"
 
 		include	"_incObj\55 Basaran.asm"
 
-
-
-
-Map_Bas:	include	"_maps\Basaran.asm"
-
 		include	"_incObj\56 Floating Blocks and Doors.asm"
-Map_FBlock:	include	"_maps\Floating Blocks and Doors.asm"
 
 		include	"_incObj\57 Spiked Ball and Chain.asm"
-Map_SBall:	include	"_maps\Spiked Ball and Chain (SYZ).asm"
-Map_SBall2:	include	"_maps\Spiked Ball and Chain (LZ).asm"
+
 		include	"_incObj\58 Big Spiked Ball.asm"
-Map_BBall:	include	"_maps\Big Spiked Ball.asm"
+
 		include	"_incObj\59 SLZ Elevators.asm"
-Map_Elev:	include	"_maps\SLZ Elevators.asm"
+
 		include	"_incObj\5A SLZ Circling Platform.asm"
-Map_Circ:	include	"_maps\SLZ Circling Platform.asm"
+
 		include	"_incObj\5B Staircase.asm"
-Map_Stair:	include	"_maps\Staircase.asm"
+
 		include	"_incObj\5C Pylon.asm"
-Map_Pylon:	include	"_maps\Pylon.asm"
 
 		include	"_incObj\1B Water Surface.asm"
-Map_Surf:	include	"_maps\Water Surface.asm"
+
 		include	"_incObj\0B Pole that Breaks.asm"
-Map_Pole:	include	"_maps\Pole that Breaks.asm"
+
 		include	"_incObj\0C Flapping Door.asm"
 
-
-
-
-Map_Flap:	include	"_maps\Flapping Door.asm"
-
 		include	"_incObj\71 Invisible Barriers.asm"
-Map_Invis:	include	"_maps\Invisible Barriers.asm"
 
 		include	"_incObj\5D Fan.asm"
-Map_Fan:	include	"_maps\Fan.asm"
+
 		include	"_incObj\5E Seesaw.asm"
-Map_Seesaw:	include	"_maps\Seesaw.asm"
-Map_SSawBall:	include	"_maps\Seesaw Ball.asm"
+
 		include	"_incObj\5F Bomb Enemy.asm"
-
-
-
-
-
-Map_Bomb:	include	"_maps\Bomb Enemy.asm"
 
 		include	"_incObj\60 Orbinaut.asm"
 
-
-
-
-Map_Orb:	include	"_maps\Orbinaut.asm"
-
 		include	"_incObj\16 Harpoon.asm"
 
-
-
-Map_Harp:	include	"_maps\Harpoon.asm"
 		include	"_incObj\61 LZ Blocks.asm"
-Map_LBlock:	include	"_maps\LZ Blocks.asm"
+
 		include	"_incObj\62 Gargoyle.asm"
-Map_Gar:	include	"_maps\Gargoyle.asm"
+
 		include	"_incObj\63 LZ Conveyor.asm"
-Map_LConv:	include	"_maps\LZ Conveyor.asm"
+
 		include	"_incObj\64 Bubbles.asm"
 
-
-
-		include	"_maps\Bubbles.asm"
 		include	"_incObj\65 Waterfalls.asm"
-
-
-
-Map_WFall	include	"_maps\Waterfalls.asm"
 
 		include "_incObj\Sonic Effects.asm"
 
-
 		include "_players\00 Sonic.asm"
 
-
 		include "_incObj\sub ApplySpeedSettings.asm"
+
 		include	"_incObj\0A Drowning Countdown.asm"
 
-
-; ---------------------------------------------------------------------------
-; Subroutine to	play music for LZ/SBZ3 after a countdown
-; ---------------------------------------------------------------------------
-
-; ||||||||||||||| S U B	R O U T	I N E |||||||||||||||||||||||||||||||||||||||
-
-
-ResumeMusic:
-		cmpi.w	#12,(v_air).w		; more than 12 seconds of air left?
-		bhi.s	@over12				; if yes, branch
-		move.w	#bgm_LZ,d0			; play LZ music
-		cmpi.w	#id_SBZ3,(v_zone).w ; check if level is 0103 (SBZ3)
-		bne.s	@notsbz
-		move.w	#bgm_SBZ,d0			; play SBZ music
-
-	@notsbz:
-		btst	#stsSuper,(v_status_secondary).w	; is player in Super Form?
-		bne.s	@invinc								; if yes, branch
-		btst	#stsInvinc,(v_status_secondary).w 	; is Sonic invincible?
-		beq.s	@notinvinc							; if not, branch
-
-	@invinc:
-		move.w	#bgm_Invincible,d0
-	@notinvinc:
-		tst.b	(f_lockscreen).w ; is Sonic at a boss?
-		beq.s	@playselected ; if not, branch
-		move.w	#bgm_Boss,d0
-
-	@playselected:
-		jsr		(PlaySound).l
-
-	@over12:
-		move.w	#30,(v_air).w	; reset air to 30 seconds
-		clr.b	(v_objspace+$340+$32).w ; which object was this?
-		rts	
-; End of function ResumeMusic
-
-; ===========================================================================
-
-
-Map_Drown:	include	"_maps\Drowning Countdown.asm"
-
-
-
-		include	"_maps\Shield and Invincibility.asm"
-		include "_maps\Shield - Dynamic Gfx Script.asm" ; AND INVINCIBILITY
-		include "_maps\Shield - Flame.asm"
-		include "_maps\Shield - Flame - Dynamic Gfx Script.asm"
-		include "_maps\Shield - Bubble.asm"
-		include "_maps\Shield - Bubble - Dynamic Gfx Script.asm"
-		include "_maps\Shield - Lightning.asm"
-		include "_maps\Shield - Lightning - Dynamic Gfx Script.asm"
-		include "_maps\Shield - Insta.asm"
-		include "_maps\Shield - Insta - Dynamic Gfx Script.asm"
-
+		include "_incObj\sub ResumeMusic.asm"
 
 		include	"_incObj\38 Shield and Invincibility.asm"
+
 		include	"_incObj\4A Special Stage Entry (Unused).asm"
+
 		include	"_incObj\03 Collision Switcher.asm"
+
 		include	"_incObj\08 Water Splash.asm"
 
-
-
-Map_Vanish:	include	"_maps\Special Stage Entry (Unused).asm"
-
-Map_Splash:	include	"_maps\Water Splash.asm"
-
-
 		include	"_players\Player AnglePos.asm"
-		include	"_incObj\sub FindNearestTile.asm"
-		include	"_incObj\sub FindFloor.asm"
-		include	"_incObj\sub FindWall.asm"
 
+		include	"_incObj\sub FindNearestTile.asm"
+
+		include	"_incObj\sub FindFloor.asm"
+
+		include	"_incObj\sub FindWall.asm"
 
 ; ---------------------------------------------------------------------------
 ; Subroutine to calculate how much space is in front of the player on the ground
@@ -8089,56 +6842,34 @@ locret_15098:
 ; ===========================================================================
 
 		include	"_incObj\66 Rotating Junction.asm"
-Map_Jun:	include	"_maps\Rotating Junction.asm"
+
 		include	"_incObj\67 Running Disc.asm"
-Map_Disc:	include	"_maps\Running Disc.asm"
+
 		include	"_incObj\68 Conveyor Belt.asm"
+
 		include	"_incObj\69 SBZ Spinning Platforms.asm"
 
-
-
-Map_Trap:	include	"_maps\Trapdoor.asm"
-Map_Spin:	include	"_maps\SBZ Spinning Platforms.asm"
 		include	"_incObj\6A Saws and Pizza Cutters.asm"
-Map_Saw:	include	"_maps\Saws and Pizza Cutters.asm"
+
 		include	"_incObj\6B SBZ Stomper and Door.asm"
-Map_Stomp:	include	"_maps\SBZ Stomper and Door.asm"
+
 		include	"_incObj\6C SBZ Vanishing Platforms.asm"
 
-
-Map_VanP:	include	"_maps\SBZ Vanishing Platforms.asm"
 		include	"_incObj\6E Electrocuter.asm"
 
-
-Map_Elec:	include	"_maps\Electrocuter.asm"
 		include	"_incObj\6F SBZ Spin Platform Conveyor.asm"
 
-
-off_164A6:	dc.w word_164B2-off_164A6, word_164C6-off_164A6, word_164DA-off_164A6
-		dc.w word_164EE-off_164A6, word_16502-off_164A6, word_16516-off_164A6
-word_164B2:	dc.w $10, $E80,	$E14, $370, $EEF, $302,	$EEF, $340, $E14, $3AE
-word_164C6:	dc.w $10, $F80,	$F14, $2E0, $FEF, $272,	$FEF, $2B0, $F14, $31E
-word_164DA:	dc.w $10, $1080, $1014,	$270, $10EF, $202, $10EF, $240,	$1014, $2AE
-word_164EE:	dc.w $10, $F80,	$F14, $570, $FEF, $502,	$FEF, $540, $F14, $5AE
-word_16502:	dc.w $10, $1B80, $1B14,	$670, $1BEF, $602, $1BEF, $640,	$1B14, $6AE
-word_16516:	dc.w $10, $1C80, $1C14,	$5E0, $1CEF, $572, $1CEF, $5B0,	$1C14, $61E
-; ===========================================================================
-
 		include	"_incObj\70 Girder Block.asm"
-Map_Gird:	include	"_maps\Girder Block.asm"
+
 		include	"_incObj\72 Teleporter.asm"
 
 		include	"_incObj\78 Caterkiller.asm"
 
-Map_Cat:	include	"_maps\Caterkiller.asm"
-
 		include	"_incObj\79 Lamppost.asm"
-Map_Lamp:	include	"_maps\Lamppost.asm"
+
 		include	"_incObj\7D Hidden Bonuses.asm"
-Map_Bonus:	include	"_maps\Hidden Bonuses.asm"
 
 		include	"_incObj\8A Credits.asm"
-Map_Cred:	include	"_maps\Credits.asm"
 
 		include	"_incObj\3D Boss - Green Hill (part 1).asm"
 
@@ -8195,55 +6926,36 @@ BossMove:
 ; ===========================================================================
 
 		include	"_incObj\3D Boss - Green Hill (part 2).asm"
-		include	"_incObj\48 Eggman's Swinging Ball.asm"
 
+		include	"_incObj\48 Eggman's Swinging Ball.asm"
 
 		include	"_incObj\82 Eggman - Scrap Brain 2.asm"
 
-
-
-Map_Eggman:		include	"_maps\Eggman.asm"
-
-Map_BossItems:	include	"_maps\Boss Items.asm"
-
-				include "_maps\Eggman - Bridge Boss.asm"
-
 		include	"_incObj\77 Boss - Labyrinth.asm"
+
 		include	"_incObj\73 Boss - Marble.asm"
+
 		include	"_incObj\74 MZ Boss Fire.asm"
+
 		include	"_incObj\8E Boss - Labyrinth 2.asm"
 
-	Obj7A_Delete:
-		jmp	(DeleteObject).l
-
 		include	"_incObj\7A Boss - Star Light.asm"
+
 		include	"_incObj\7B SLZ Boss Spikeball.asm"
-Map_BSBall:	include	"_maps\SLZ Boss Spikeball.asm"
+
 		include	"_incObj\75 Boss - Spring Yard.asm"
+
 		include	"_incObj\76 SYZ Boss Blocks.asm"
-Map_BossBlock:	include	"_maps\SYZ Boss Blocks.asm"
 
-loc_1982C:
-		jmp	(DeleteObject).l
-
-Map_SEgg:	include	"_maps\Eggman - Scrap Brain 2.asm"
 		include	"_incObj\83 SBZ Eggman's Crumbling Floor.asm"
-Map_FFloor:	include	"_maps\SBZ Eggman's Crumbling Floor.asm"
+
 		include	"_incObj\85 Boss - Final.asm"
 
-Map_FZDamaged:	include	"_maps\FZ Damaged Eggmobile.asm"
-Map_FZLegs:	include	"_maps\FZ Eggmobile Legs.asm"
 		include	"_incObj\84 FZ Eggman's Cylinders.asm"
-Map_EggCyl:	include	"_maps\FZ Eggman's Cylinders.asm"
+
 		include	"_incObj\86 FZ Plasma Ball Launcher.asm"
 
-Map_PLaunch:	include	"_maps\Plasma Ball Launcher.asm"
-
-Map_Plasma:	include	"_maps\Plasma Balls.asm"
-
 		include	"_incObj\3E Prison Capsule.asm"
-
-Map_Pri:	include	"_maps\Prison Capsule.asm"
 
 		include	"_incObj\sub ReactToItem.asm"
 
@@ -8567,7 +7279,8 @@ loc_1B4EA:
 ; End of function SS_AniItems
 
 ; ===========================================================================
-SS_AniIndex:	dc.l SS_AniRingSparks
+SS_AniIndex:
+		dc.l SS_AniRingSparks
 		dc.l SS_AniBumper
 		dc.l SS_Ani1Up
 		dc.l SS_AniReverse
@@ -8821,12 +7534,6 @@ loc_1B730:
 SS_MapIndex:
 		include	"_inc\Special Stage Mappings & VRAM Pointers.asm"
 
-Map_SS_R:	include	"_maps\SS R Block.asm"
-Map_SS_Glass:	include	"_maps\SS Glass Block.asm"
-Map_SS_Up:	include	"_maps\SS UP Block.asm"
-Map_SS_Down:	include	"_maps\SS DOWN Block.asm"
-		include	"_maps\SS Chaos Emeralds.asm"
-
 		include	"_incObj\09 Sonic in Special Stage.asm"
 
 		include	"_incObj\10.asm"
@@ -8835,9 +7542,7 @@ Map_SS_Down:	include	"_maps\SS DOWN Block.asm"
 
 			include "_incObj\21.asm"
 
-		include	"_maps\HUD.asm"
-		include	"_maps\HUD SS.asm"
-		include	"_maps\HUD TA.asm"
+
 
 ; ---------------------------------------------------------------------------
 ; Add points subroutine
@@ -8979,6 +7684,102 @@ Eni_LevSelIcons:	incbin	"tilemaps\Level Select Icons.bin"
 Nem_LevSelIcons:	incbin	"artnem\Level Select Icons.bin"
 		even
 
+; ---------------------------------------------------------------------------
+; Level	select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+OptionMenuText:
+		;incbin	"misc\Level Select Text.bin"
+		dc.b "GAME MODE               " ; Dictates levels, emeralds... etc.
+		dc.b "                        " ; ORIGINAL, MASTER SYSTEM, COMPLETE
+		dc.b "CHARACTER               "
+		dc.b "                        " ; SONIC, TAILS, KNUCKLES, MIGHTY, AMY, METAL
+		dc.b "ABILITES                "
+		dc.b "                        " ; BASIC, COMPLETE
+		dc.b "DIFFICULTY              " ; LAYOUTS AND GAMEPLAY
+		dc.b "                        " ; CASUAL, NORMAL, EXPERT
+		dc.b "MONITORS                " ; SHIELD MONITOR SETTING
+		dc.b "                        " ; CLASSIC, SONIC 3K, RANDOM
+		dc.b "EMERALD COUNT           " ; TOTAL EMERALD SETTING
+		dc.b "                        " ; 6 EMERALDS/7 EMERALDS - 7 EMERALDS=SUPER SONIC
+		dc.b "ZONE MUSIC              "
+		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
+		dc.b "SUPER MUSIC             "
+		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
+		dc.b "SOUND TEST              "
+		dc.b "                        " ; FAST ZONE MUSIC, INVINCIBILITY, SONIC 2 JINGLE
+		dc.b "START GAME              "
+		dc.b "                        "
+		dc.b "RESET TO TITLE SCREEN   "
+		even
+
+; ---------------------------------------------------------------------------
+; Mode select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+ModeText_Classic:	dc.b "CLASSIC " ; Normal Sonic 1
+ModeText_Original:	dc.b "ORIGINAL" ; Original (Beta) Sonic 1
+ModeText_Handheld:	dc.b "HANDHELD" ; 8-bit Sonic 1
+ModeText_Complete:	dc.b "COMPLETE" ; 8x16 (Complete)
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Player select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+CharText_Sonic:		dc.b "SONIC   "
+CharText_Tails:		dc.b "TAILS   "
+CharText_Knuckles:	dc.b "KNUCKLES"
+CharText_Mighty:	dc.b "MIGHTY  "
+CharText_Ray:		dc.b "RAY     "
+CharText_Amy:		dc.b "AMY     "
+CharText_Metal:		dc.b "METAL   "
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Difficulty select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+DifficultyText_Norm:	dc.b "NORMAL"
+DifficultyText_Easy:	dc.b "CASUAL"
+DifficultyText_Hard:	dc.b "EXPERT"
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Difficulty select menu text - Easier editing thanks to SoullessSentinel
+; ---------------------------------------------------------------------------
+MonitorText_S1:		dc.b "ORIGINAL"
+MonitorText_S3K:	dc.b "S1/S3K  "
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Music	playlist
+; ---------------------------------------------------------------------------
+MusicList:
+		dc.b bgm_GHZ	; GHZ
+		dc.b bgm_LZ		; LZ
+		dc.b bgm_MZ		; MZ
+		dc.b bgm_SLZ	; SLZ
+		dc.b bgm_SYZ	; SYZ
+		dc.b bgm_SBZ	; SBZ
+		dc.b bgm_FZ		; Ending
+		dc.b bgm_GHZ	; BZ
+		dc.b bgm_MZ		; JZ
+		dc.b bgm_SLZ	; SKBZ
+		even
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Music	to play	after invincibility wears off
+; ---------------------------------------------------------------------------
+MusicList2:
+		dc.b bgm_GHZ
+		dc.b bgm_LZ
+		dc.b bgm_MZ
+		dc.b bgm_SLZ
+		dc.b bgm_SYZ
+		dc.b bgm_SBZ
+		dc.b bgm_GHZ
+		dc.b bgm_GHZ	; BZ
+		dc.b bgm_MZ		; JZ
+		dc.b bgm_SLZ	; SKBZ
+		even
+; ===========================================================================
 
 ; ---------------------------------------------------------------------------
 ; Palette data
@@ -9103,8 +7904,177 @@ Pal_LevSelIcons: incbin "palette\Level Select Icons.bin"
 ; ---------------------------------------------------------------------------
 
 		include	"_maps\Sonic.asm"
-		include	"_maps\Sonic - Dynamic Gfx Script.asm"
+		include	"_maps\Sonic - DPLC.asm"
 
+Map_ContScr:	include	"_maps\Continue Screen.asm"
+Map_ESon:	include	"_maps\Ending Sequence Sonic.asm"
+Map_ECha:	include	"_maps\Ending Sequence Emeralds.asm"
+Map_ESth:	include	"_maps\Ending Sequence STH.asm"
+Map_EEgg:	include	"_maps\Try Again & End Eggman.asm"
+Map_Bri:	include	"_maps\Bridge.asm"
+Map_Swing_GHZ:	include	"_maps\Swinging Platforms (GHZ).asm"
+Map_Swing_SLZ:	include	"_maps\Swinging Platforms (SLZ).asm"
+Map_Hel:	include	"_maps\Spiked Pole Helix.asm"
+Map_Plat_Unused:include	"_maps\Platforms (unused).asm"
+Map_Plat_GHZ:	include	"_maps\Platforms (GHZ).asm"
+Map_Plat_SYZ:	include	"_maps\Platforms (SYZ).asm"
+Map_Plat_SLZ:	include	"_maps\Platforms (SLZ).asm"
+Map_GBall:	include	"_maps\GHZ Ball.asm"
+Map_Scen:	include	"_maps\Scenery.asm"
+Map_Swi:	include	"_maps\Unused Switch.asm"
+Map_ADoor:	include	"_maps\SBZ Small Door.asm"
+
+
+Map_Ledge:	include	"_maps\Collapsing Ledge.asm"
+Map_CFlo:	include	"_maps\Collapsing Floors.asm"
+Map_Hog:	include	"_maps\Ball Hog.asm"
+Map_MisDissolve:include	"_maps\Buzz Bomber Missile Dissolve.asm"
+		include	"_maps\Explosions.asm"
+Map_Animal1:	include	"_maps\Animals 1.asm"
+Map_Animal2:	include	"_maps\Animals 2.asm"
+Map_Animal3:	include	"_maps\Animals 3.asm"
+Map_Poi:	include	"_maps\Points.asm"
+
+Map_Crab:	include	"_maps\Crabmeat.asm"
+		include	"_maps\Buzz Bomber.asm"
+		include	"_maps\Buzz Bomber Missile.asm"
+
+
+		include	"_maps\Rings.asm" ; THESE normal mappings are for debug rings, lost rings, and SS rings
+
+Map_RingBIN:
+		incbin	"_maps\Rings.bin" ; THESE special mappings are for the S2 Rings Manager
+		even
+
+		include	"_maps\Giant Ring.asm"
+		include "_maps\Giant Ring - Dynamic Gfx Script.asm"
+
+Map_Flash:	include	"_maps\Ring Flash.asm"
+
+Map_Monitor:	include	"_maps\Monitor.asm"
+
+Map_PSB:	include	"_maps\Press Start and TM.asm"
+Map_TSon:	include	"_maps\Title Screen Sonic.asm"
+Map_Chop:	include	"_maps\Chopper.asm"
+Map_Jaws:	include	"_maps\Jaws.asm"
+Map_Burro:	include	"_maps\Burrobot.asm"
+Map_LGrass:	include	"_maps\MZ Large Grassy Platforms.asm"
+Map_Fire:	include	"_maps\Fireballs.asm"
+Map_Glass:	include	"_maps\MZ Large Green Glass Blocks.asm"
+
+Map_CStom:	include	"_maps\Chained Stompers.asm"
+Map_SStom:	include	"_maps\Sideways Stomper.asm"
+Map_But:	include	"_maps\Button.asm"
+Map_Push:	include	"_maps\Pushable Blocks.asm"
+
+			include "_maps\Zone Title Cards.asm"
+Map_Over:	include	"_maps\Game Over.asm"
+			include "_maps\Got Through Cards.asm"
+
+Map_SSRC:	include	"_maps\SS Result Chaos Emeralds.asm"
+
+Map_Spike:	include	"_maps\Spikes.asm"
+Map_PRock:	include	"_maps\Purple Rock.asm"
+Map_Smash:	include	"_maps\Smashable Walls.asm"
+Map_Spring:	include	"_maps\Springs.asm"
+Map_Newt:	include	"_maps\Newtron.asm"
+Map_Roll:	include	"_maps\Roller.asm"
+Map_Edge:	include	"_maps\GHZ Edge Walls.asm"
+
+Map_Flame:	include	"_maps\Flamethrower.asm"
+Map_Brick:	include	"_maps\MZ Bricks.asm"
+Map_Light	include	"_maps\Light.asm"
+Map_Bump:	include	"_maps\Bumper.asm"
+
+		include	"_maps\Signpost.asm"
+		include	"_maps\Signpost - Dynamic Gfx Script.asm"
+
+Map_LTag:	include	"_maps\Lava Tag.asm"
+
+Map_Geyser:	include	"_maps\Lava Geyser.asm"
+Map_LWall:	include	"_maps\Wall of Lava.asm"
+Map_Moto:	include	"_maps\Moto Bug.asm"
+Map_Yad:	include	"_maps\Yadrin.asm"
+Map_Smab:	include	"_maps\Smashable Green Block.asm"
+Map_MBlock:	include	"_maps\Moving Blocks (MZ and SBZ).asm"
+Map_MBlockLZ:	include	"_maps\Moving Blocks (LZ).asm"
+Map_Bas:	include	"_maps\Basaran.asm"
+Map_FBlock:	include	"_maps\Floating Blocks and Doors.asm"
+Map_SBall:	include	"_maps\Spiked Ball and Chain (SYZ).asm"
+Map_SBall2:	include	"_maps\Spiked Ball and Chain (LZ).asm"
+Map_BBall:	include	"_maps\Big Spiked Ball.asm"
+Map_Elev:	include	"_maps\SLZ Elevators.asm"
+Map_Circ:	include	"_maps\SLZ Circling Platform.asm"
+Map_Stair:	include	"_maps\Staircase.asm"
+Map_Pylon:	include	"_maps\Pylon.asm"
+Map_Surf:	include	"_maps\Water Surface.asm"
+Map_Pole:	include	"_maps\Pole that Breaks.asm"
+Map_Flap:	include	"_maps\Flapping Door.asm"
+Map_Invis:	include	"_maps\Invisible Barriers.asm"
+Map_Fan:	include	"_maps\Fan.asm"
+Map_Seesaw:	include	"_maps\Seesaw.asm"
+Map_SSawBall:	include	"_maps\Seesaw Ball.asm"
+Map_Bomb:	include	"_maps\Bomb Enemy.asm"
+Map_Orb:	include	"_maps\Orbinaut.asm"
+Map_Harp:	include	"_maps\Harpoon.asm"
+Map_LBlock:	include	"_maps\LZ Blocks.asm"
+
+Map_Gar:	include	"_maps\Gargoyle.asm"
+Map_LConv:	include	"_maps\LZ Conveyor.asm"
+		include	"_maps\Bubbles.asm"
+
+Map_WFall	include	"_maps\Waterfalls.asm"
+
+Map_Drown:	include	"_maps\Drowning Countdown.asm"
+
+Map_Vanish:	include	"_maps\Special Stage Entry (Unused).asm"
+
+Map_Splash:	include	"_maps\Water Splash.asm"
+
+Map_Jun:	include	"_maps\Rotating Junction.asm"
+Map_Disc:	include	"_maps\Running Disc.asm"
+Map_Trap:	include	"_maps\Trapdoor.asm"
+Map_Spin:	include	"_maps\SBZ Spinning Platforms.asm"
+Map_Saw:	include	"_maps\Saws and Pizza Cutters.asm"
+Map_Stomp:	include	"_maps\SBZ Stomper and Door.asm"
+Map_VanP:	include	"_maps\SBZ Vanishing Platforms.asm"
+Map_Elec:	include	"_maps\Electrocuter.asm"
+Map_Gird:	include	"_maps\Girder Block.asm"
+Map_Cat:	include	"_maps\Caterkiller.asm"
+Map_Lamp:	include	"_maps\Lamppost.asm"
+Map_Bonus:	include	"_maps\Hidden Bonuses.asm"
+Map_Cred:	include	"_maps\Credits.asm"
+
+Map_Eggman:		include	"_maps\Eggman.asm"
+
+Map_BossItems:	include	"_maps\Boss Items.asm"
+
+				include "_maps\Eggman - Bridge Boss.asm"
+
+Map_BSBall:	include	"_maps\SLZ Boss Spikeball.asm"
+
+Map_BossBlock:	include	"_maps\SYZ Boss Blocks.asm"
+
+Map_SEgg:	include	"_maps\Eggman - Scrap Brain 2.asm"
+
+Map_FFloor:	include	"_maps\SBZ Eggman's Crumbling Floor.asm"
+
+Map_FZDamaged:	include	"_maps\FZ Damaged Eggmobile.asm"
+Map_FZLegs:	include	"_maps\FZ Eggmobile Legs.asm"
+Map_EggCyl:	include	"_maps\FZ Eggman's Cylinders.asm"
+Map_PLaunch:	include	"_maps\Plasma Ball Launcher.asm"
+Map_Plasma:	include	"_maps\Plasma Balls.asm"
+Map_Pri:	include	"_maps\Prison Capsule.asm"
+
+Map_SS_R:	include	"_maps\SS R Block.asm"
+Map_SS_Glass:	include	"_maps\SS Glass Block.asm"
+Map_SS_Up:	include	"_maps\SS UP Block.asm"
+Map_SS_Down:	include	"_maps\SS DOWN Block.asm"
+		include	"_maps\SS Chaos Emeralds.asm"
+
+		include	"_maps\HUD.asm"
+		include	"_maps\HUD SS.asm"
+		include	"_maps\HUD TA.asm"
 
 ; ---------------------------------------------------------------------------
 ; Uncompressed graphics
@@ -9134,6 +8104,17 @@ Art_BigRing:	incbin	"artunc\Giant Ring.bin"
 Art_RedRing:	incbin	"artunc\Red Ring.bin"
 		even
 
+
+		include	"_maps\Shield and Invincibility.asm"
+		include "_maps\Shield - Dynamic Gfx Script.asm" ; AND INVINCIBILITY
+		include "_maps\Shield - Flame.asm"
+		include "_maps\Shield - Flame - Dynamic Gfx Script.asm"
+		include "_maps\Shield - Bubble.asm"
+		include "_maps\Shield - Bubble - Dynamic Gfx Script.asm"
+		include "_maps\Shield - Lightning.asm"
+		include "_maps\Shield - Lightning - Dynamic Gfx Script.asm"
+		include "_maps\Shield - Insta.asm"
+		include "_maps\Shield - Insta - Dynamic Gfx Script.asm"
 
 		include "_maps\Effects.asm"
 		include "_maps\Effects - Dynamic Gfx Script.asm"

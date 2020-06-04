@@ -14,12 +14,10 @@ Hack To-Do List:
 - SBZ3's issue is a result of me porting the new art in via SonLvl. I don't wanna pin all the blame on that app, perhaps I made an error somewhere. It'll be a simple fix, just time-consuming... As for the points, I had no idea. Nice catch.
 - On that note, Ralakimus pointed out a bug in that zone related to floor collision. IDK how that happened and plan on fixing it ASAP.
 - Flower art is broken, AND palettes when NOT in normal mode. I will get to that later on.
-- Cheers for pointing out the rings in the END screen. The level_started flag must not be getting cleared at the end of the credits. I'll look through that and get that fixed.
-
+- Fix the rings in the ENDGAME screen. The level_started flag must not be getting cleared at the end of the credits.
 * Fix bug with executing Peelout at the right edge of the screen (similar to the spindash bug)
 	Noticable in bosses.
 * Add underwater and cycling palettes for Easy/Hard Mode
-* Fix minor palette errors (Buzz Bomber Missile, SLZ Boss spikeball)
 * Finish Easy Mode layouts. Need feedback from others.
 * Improve Drop Dash physics
 

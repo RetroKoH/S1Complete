@@ -2,6 +2,8 @@
 ; Object 7A - Eggman (SLZ)
 ; ---------------------------------------------------------------------------
 
+
+
 BossStarLight:
 		moveq	#0,d0
 		move.b	obRoutine(a0),d0
@@ -451,10 +453,14 @@ Obj7A_TubeMain:	; Routine 8
 		cmpi.b	#$A,ob2ndRout(a1)
 		bne.s	loc_18CB8
 		tst.b	obRender(a0)
-		bpl.w	Obj7A_Delete
+		bpl.s	Obj7A_Delete
 
 loc_18CB8:
 		move.l	#Map_BossItems,obMap(a0)
 		move.w	#ArtNem_Weapons,obGfx(a0)
 		move.b	#3,obFrame(a0)
 		bra.s	loc_18C78
+; ===========================================================================
+
+Obj7A_Delete:
+		jmp	(DeleteObject).l
