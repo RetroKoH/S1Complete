@@ -332,6 +332,20 @@ GameInit:
 		bsr.w	JoypadInit
 		move.b	#id_Sega,(v_gamemode).w ; set Game Mode to Sega Screen
 
+InitSRAM:
+		move.b  #1,($A130F1).l	; Enable SRAM writing
+		lea 	($200001).l,a0	; Load SRAM memory into a0 (Change the last digit to 0 if you're using even SRAM)
+		movep.l 0(a0),d0		; Get the existing string at the start of SRAM
+		move.l  #"SRAM",d1		; Write the string "SRAM" to d1
+		cmp.l   d0,d1			; Was it already in SRAM?
+		beq.s   @Continue		; If so, skip
+		movep.l d1,0(a0)		; Write string "SRAM"
+		; Here is where you initialize values like lives or level. If you're using 8 bit values, you can only use every other byte.
+		; Example - 8(a0) => $A(a0)
+ 
+	@Continue:
+        clr.b    ($A130F1).l	; Disable SRAM writing
+
 MainGameLoop:
 		move.b	(v_gamemode).w,d0		; load Game Mode
 		andi.w	#$7C,d0					; limit Game Mode value to $1C max (change to a maximum of 7C to add more game modes)
@@ -1891,8 +1905,6 @@ Sega_GotoTitle:
 ; ---------------------------------------------------------------------------
 
 GM_Title:
-		;move.b	#difEasy,(v_difficulty).w ; TESTING PURPOSES
-
 		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
 		bsr.w	PaletteFadeOut
@@ -2070,7 +2082,7 @@ Tit_MenuChoice:
 		moveq	#0,d0
 		move.b	(v_objspace+$80+obTitleOption).w,d0
 		bne.s	Tit_ChkOptions
-		bra.w	PlayLevel	; if not, play level
+		bra.w	PlayLevel_Load	; if not, play level
 
 Tit_ChkOptions:
 		subq	#1,d0
@@ -2131,7 +2143,7 @@ Option_CheckBack:			; XREF: OptionMenu
 		beq.s	OptionMenu			; if not, branch and go back
 		cmpi.b	#$12,d0
 		bne.s	@reset
-		bra.w	PlayLevel
+		bra.w	PlayLevel_New
 
 	@reset:
 		clr.b	(v_gamemode).w
@@ -2152,12 +2164,54 @@ Option_PlaySnd:
 		bra.s	OptionMenu
 ; ===========================================================================
 
-PlayLevel:
+PlayLevel_Load:
+		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
+		move.b	#1,($A130F1).l			; enable SRAM (required)
+		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
+		movep.l	2(a1),d0				; load to d0 (cannot do directly)
+		move.l	d0,(v_optgamemode).w	; load correct game mode
+										; load correct player mode
+										; load correct difficulty
+										; load correct monitor setting
+		movep.w	$A(a1),d0
+		move.w	d0,(v_zone).w			; load correct zone and act
+		move.b	$1E(a1),d0
+		move.b	d0,(v_lives).w
+		clr.b	($A130F1).l		; disable SRAM (required)
+
+		moveq	#0,d0
+		move.w	d0,(v_rings).w	; clear rings
+		move.l	d0,(v_time).w	; clear time
+		move.b	d0,(v_centstep).w
+		move.l	d0,(v_score).w	; clear score
+		move.b	d0,(v_lastspecial).w ; clear special stage number
+		move.b	d0,(v_emeralds).w ; clear emerald count
+		move.b	d0,(v_emeraldlist).w ; clear emeralds
+		move.b	d0,(v_continues).w ; clear continues
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
+
+		sfx		bgm_Fade,0,1,1 ; fade out music
+		rts	
+; ===========================================================================
+
+
+PlayLevel_New:
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
 		move.b	#3,(v_lives).w	; set lives to 3
 		cmpi.b	#difEasy,(v_difficulty).w
 		bne.s	@clear
 		move.b	#5,(v_lives).w	; set lives to 5
+
+		move.b	#1,($A130F1).l			; enable SRAM (required)
+		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
+		moveq	#0,d0
+		move.b	d0,0(a1) 				; init new game
+		move.l	(v_optgamemode).w,d0	; load correct game mode
+										; load correct player mode
+										; load correct difficulty
+										; load correct monitor setting
+		movep.l	d0,2(a1)				; load to d0 (cannot do directly)
+		clr.b	($A130F1).l				; disable SRAM (required)
 
 	@clear:
 		moveq	#0,d0
@@ -3159,6 +3213,19 @@ GM_Level:
 		sfx		bgm_Fade,0,1,1 ; fade out music
 
 	Level_NoMusicFade:
+		cmpi.b	#$8C,(v_gamemode).w	; is game mode = $0C (standard level)?
+		bne.s	@NoSRAM				; if yes, branch
+		tst.b	(f_timeattack).w
+		bne.s	@NoSRAM
+		move.b	#1,($A130F1).l	; enable SRAM (required)
+		lea		($200009).l,a1	; base of SRAM + 1
+		move.w	(v_zone).w,d0	; move zone and act number to d0 (we can't do it directly)
+		movep.w	d0,$A(a1)		; save zone and act to SRAM
+		move.b	(v_lives).w,d0
+		move.b	d0,$1E(a1)
+		clr.b	($A130F1).l		; disable SRAM (required)
+
+	@NoSRAM:
 		bsr.w	ClearPLC
 		bsr.w	PaletteFadeOut
 		tst.w	(f_demo).w	; is an ending sequence demo running?
@@ -7693,21 +7760,21 @@ OptionMenuText:
 		dc.b "                        " ; ORIGINAL, MASTER SYSTEM, COMPLETE
 		dc.b "CHARACTER               "
 		dc.b "                        " ; SONIC, TAILS, KNUCKLES, MIGHTY, AMY, METAL
-		dc.b "ABILITES                "
+		dc.b "NULL OPTION             "
 		dc.b "                        " ; BASIC, COMPLETE
 		dc.b "DIFFICULTY              " ; LAYOUTS AND GAMEPLAY
 		dc.b "                        " ; CASUAL, NORMAL, EXPERT
 		dc.b "MONITORS                " ; SHIELD MONITOR SETTING
 		dc.b "                        " ; CLASSIC, SONIC 3K, RANDOM
-		dc.b "EMERALD COUNT           " ; TOTAL EMERALD SETTING
+		dc.b "NULL OPTION             " ; TOTAL EMERALD SETTING
 		dc.b "                        " ; 6 EMERALDS/7 EMERALDS - 7 EMERALDS=SUPER SONIC
-		dc.b "ZONE MUSIC              "
+		dc.b "NULL OPTION             "
 		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
-		dc.b "SUPER MUSIC             "
+		dc.b "NULL OPTION             "
 		dc.b "                        " ; ORIGINAL, MASTER SYSTEM
 		dc.b "SOUND TEST              "
 		dc.b "                        " ; FAST ZONE MUSIC, INVINCIBILITY, SONIC 2 JINGLE
-		dc.b "START GAME              "
+		dc.b "START NEW GAME          "
 		dc.b "                        "
 		dc.b "RESET TO TITLE SCREEN   "
 		even
