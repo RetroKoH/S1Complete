@@ -8078,7 +8078,7 @@ Map_Light	include	"_maps\Light.asm"
 Map_Bump:	include	"_maps\Bumper.asm"
 
 		include	"_maps\Signpost.asm"
-		include	"_maps\Signpost - Dynamic Gfx Script.asm"
+		include	"_maps\Signpost - DPLC.asm"
 
 Map_LTag:	include	"_maps\Lava Tag.asm"
 
