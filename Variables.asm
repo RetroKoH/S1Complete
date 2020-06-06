@@ -342,9 +342,10 @@ v_lamp_wtrpos:	equ v_lastlamp+$20 ; water position at lamppost (2 bytes)
 v_lamp_wtrrout:	equ v_lastlamp+$22 ; water routine at lamppost
 v_lamp_wtrstat:	equ v_lastlamp+$23 ; water state at lamppost
 v_lamp_lives:	equ v_lastlamp+$24 ; lives counter at lamppost
-v_emeralds:		equ $FFFFFE57	; number of chaos emeralds
-v_emeraldlist:	equ $FFFFFE58	; which individual emeralds you have (bitfield)
-; 59-5d UNUSED
+;57 unused
+v_emeralds:		equ $FFFFFE58	; number of chaos emeralds
+v_emeraldlist:	equ $FFFFFE59	; which individual emeralds you have (bitfield)
+; 5a-5d UNUSED
 v_oscillate:	equ $FFFFFE5E	; values which oscillate - for swinging platforms, et al ($42 bytes)
 
 v_spindashsfx1:	= $FFFFFEB0
@@ -393,12 +394,12 @@ f_timeattack:	equ $FFFFFF8E 	; time attack flag
 
 v_menuanimtimer: = $FFFFFF90
 v_menuanimcounter: = $FFFFFF91
-                 ;$FFFFFF92-BF  ; ***UNUSED***
+                 ;$FFFFFF92-BB  ; ***UNUSED***
 
 f_level_started: 	equ $FFFFFF98	; Level started. Rings and HUD can be drawn
 v_hudscrollpos:		equ $FFFFFF99	; Scrolling x-position for the HUD.
 
-v_scorecopy:	equ $FFFFFFC0	; score, duplicate (4 bytes)
+v_startscore:	equ $FFFFFFBC	; starting level score. When dying or loading a game, your score will reset to this. (4 bytes)
 v_scorelife:	equ $FFFFFFC0	; points required for an extra life (4 bytes)
 v_colladdr1:	equ $FFFFFFD0	; (4 bytes)
 v_colladdr2:	equ $FFFFFFD4	; (4 bytes)

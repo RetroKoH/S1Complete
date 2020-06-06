@@ -382,10 +382,10 @@ DLE_SBZ3N_Main:
 		cmpi.w	#$18,(v_player+obY).w ; has Sonic reached the top of the level?
 		bcc.s	@end	; if not, branch
 
+		move.b	#1,(f_lockmulti).w	; freeze Sonic
 		tst.b	(f_timeattack).w 	; is this a Time Attack run?
 		beq.s	@notTA
 		addq.b	#2,(v_dle_routine).w
-		move.b	#1,(f_lockmulti).w	; freeze Sonic
 		clr.w	(v_player+obVelX).w
 		clr.w	(v_player+obVelY).w
 		clr.b	(f_timecount).w		; stop time counter
@@ -393,9 +393,10 @@ DLE_SBZ3N_Main:
 
 	@notTA:
 		clr.b	(v_lastlamp).w
-		move.w	#1,(f_restart).w ; restart level
-		move.w	#(id_SBZ<<8)+2,(v_zone).w ; set level number to 0502 (FZ)
-		move.b	#1,(f_lockmulti).w ; freeze Sonic
+		move.l  (v_score).w,(v_startscore).w	; set level starting score.
+		clr.b   (v_lifecount).w					; Reset ring life count at the end of the level.
+		move.w	#1,(f_restart).w				; restart level
+		move.w	#(id_SBZ<<8)+2,(v_zone).w		; set level number to 0502 (FZ)
 
 	@end:
 		rts

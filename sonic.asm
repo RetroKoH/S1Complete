@@ -2165,7 +2165,14 @@ Option_PlaySnd:
 ; ===========================================================================
 
 PlayLevel_Load:
-		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
+		move.b	#1,($A130F1).l			; enable SRAM (required)
+		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
+		move.b	0(a1),d0	
+		clr.b	($A130F1).l				; disable SRAM (required)
+
+		cmpi.b	#$FF,d0
+		beq.s	PlayLevel_New			; if no save game exists, make a new one
+
 		move.b	#1,($A130F1).l			; enable SRAM (required)
 		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
 		movep.l	2(a1),d0				; load to d0 (cannot do directly)
@@ -2175,20 +2182,25 @@ PlayLevel_Load:
 										; load correct monitor setting
 		movep.w	$A(a1),d0
 		move.w	d0,(v_zone).w			; load correct zone and act
+		movep.l	$E(a1),d0
+		move.l	d0,(v_startscore).w		; load last saved score
+		movep.l	$16(a1),d0
+		move.l	d0,(v_scorelife).w		; extra life is awarded at _____ points 
 		move.b	$1E(a1),d0
-		move.b	d0,(v_lives).w
+		move.b	d0,(v_lives).w			; lives
+		move.b	$20(a1),d0
+		move.b	d0,(v_lastspecial).w
+		movep.w	$22(a1),d0
+		move.w	d0,(v_emeralds).w
+		movep.w	$26(a1),d0
+		move.w	d0,(v_redrings).w
 		clr.b	($A130F1).l		; disable SRAM (required)
 
-		moveq	#0,d0
-		move.w	d0,(v_rings).w	; clear rings
-		move.l	d0,(v_time).w	; clear time
-		move.b	d0,(v_centstep).w
-		move.l	d0,(v_score).w	; clear score
-		move.b	d0,(v_lastspecial).w ; clear special stage number
-		move.b	d0,(v_emeralds).w ; clear emerald count
-		move.b	d0,(v_emeraldlist).w ; clear emeralds
-		move.b	d0,(v_continues).w ; clear continues
-		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
+		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
+		clr.w	(v_rings).w	; clear rings
+		clr.l	(v_time).w	; clear time
+		clr.b	(v_centstep).w
+		clr.b	(v_continues).w ; clear continues
 
 		sfx		bgm_Fade,0,1,1 ; fade out music
 		rts	
@@ -2199,9 +2211,10 @@ PlayLevel_New:
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
 		move.b	#3,(v_lives).w	; set lives to 3
 		cmpi.b	#difEasy,(v_difficulty).w
-		bne.s	@clear
+		bne.s	@notEasy
 		move.b	#5,(v_lives).w	; set lives to 5
 
+	@notEasy:
 		move.b	#1,($A130F1).l			; enable SRAM (required)
 		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
 		moveq	#0,d0
@@ -2213,27 +2226,20 @@ PlayLevel_New:
 		movep.l	d0,2(a1)				; load to d0 (cannot do directly)
 		clr.b	($A130F1).l				; disable SRAM (required)
 
-	@clear:
-		moveq	#0,d0
-		move.w	d0,(v_rings).w	; clear rings
-		move.l	d0,(v_time).w	; clear time
-		move.b	d0,(v_centstep).w
-		move.l	d0,(v_score).w	; clear score
-		move.b	d0,(v_lastspecial).w ; clear special stage number
-		move.b	d0,(v_emeralds).w ; clear emerald count
-		move.b	d0,(v_emeraldlist).w ; clear emeralds
-		move.b	d0,(v_continues).w ; clear continues
+		clr.w	(v_rings).w	; clear rings
+		clr.l	(v_time).w	; clear time
+		clr.b	(v_centstep).w
+		clr.l	(v_score).w	; clear score
+		clr.l	(v_startscore).w	; clear start score
+		clr.b	(v_lastspecial).w ; clear special stage number
+		clr.w	(v_emeralds).w ; clear emerald count and list
+		clr.w	(v_redrings).w ; clear red rings count and list
+		clr.b	(v_continues).w ; clear continues
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		sfx		bgm_Fade,0,1,1 ; fade out music
 		rts	
 ; ===========================================================================
 
-; ---------------------------------------------------------------------------
-; Level	select codes
-; ---------------------------------------------------------------------------
-LevSelCode:	dc.b btnUp,btnDn,btnL,btnR,0,$FF
-		even
-; ===========================================================================
 
 ; ---------------------------------------------------------------------------
 ; NEW Menu Screen for S2 Level Select
@@ -2363,7 +2369,7 @@ LevelSelect_PressStart:
 		clr.l	(v_time).w	; clear time
 		clr.b	(v_centstep).w
 		clr.l	(v_score).w	; clear score
-;		clr.l	(v_startscore).w ; clear starting score
+		clr.l	(v_startscore).w ; clear starting score
 		clr.b	(v_lastspecial).w ; clear special stage number
 		clr.b	(v_emeralds).w ; clear emerald count
 		clr.b	(v_emeraldlist).w ; clear emeralds
@@ -2434,7 +2440,7 @@ LevelSelect_StartZone:
 		clr.l	(v_time).w		; clear time
 		clr.b	(v_centstep).w
 		clr.l	(v_score).w		; clear score
-;		clr.l	(v_startscore).w	; clear start score <- KingofHarts Level Select Mod (REV C EDIT)
+		clr.l	(v_startscore).w	; clear start score <- KingofHarts Level Select Mod (REV C EDIT)
 		clr.b	(v_lastspecial).w	; clear special stage number
 		clr.b	(v_emeralds).w		; clear emerald count
 		clr.b	(v_emeraldlist).w	; clear emeralds list
@@ -2886,6 +2892,8 @@ Demo_Level:
 		move.l	d0,(v_time).w	; clear time
 		move.b	d0,(v_centstep).w
 		move.l	d0,(v_score).w	; clear score
+		move.l  d0,(v_startscore).w ; clear start score
+		move.b	d0,(v_continues).w ; clear continues
 		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		rts	
 ; ===========================================================================
@@ -3218,11 +3226,24 @@ GM_Level:
 		tst.b	(f_timeattack).w
 		bne.s	@NoSRAM
 		move.b	#1,($A130F1).l	; enable SRAM (required)
-		lea		($200009).l,a1	; base of SRAM + 1
+		lea		($200009).l,a1	; base of usable SRAM + 1
 		move.w	(v_zone).w,d0	; move zone and act number to d0 (we can't do it directly)
 		movep.w	d0,$A(a1)		; save zone and act to SRAM
+
+		tst.b 	(v_lastlamp).w
+		bne.s	@skipscore
+		move.l	(v_startscore).w,d0
+		movep.l	d0,$E(a1)
+
+	@skipscore:		
 		move.b	(v_lives).w,d0
 		move.b	d0,$1E(a1)
+		move.b	(v_lastspecial).w,d0
+		move.b	d0,$20(a1)
+		move.w	(v_emeralds).w,d0
+		movep.w	d0,$22(a1)
+		move.w	(v_redrings).w,d0
+		movep.w	d0,$26(a1)
 		clr.b	($A130F1).l		; disable SRAM (required)
 
 	@NoSRAM:
@@ -3436,7 +3457,7 @@ Level_LoadObj:
 		bmi.s   @skiptimeclear    ; if negative, branch
 		move.b  d0,(f_timeover).w ; clear time over flag
 	@skiptimeclear: ; end of mod
-;		move.l  (v_startscore).w,(v_score).w
+		move.l  (v_startscore).w,(v_score).w
 		move.b	d0,(v_status_secondary).w
 		move.w	d0,(v_debuguse).w
 		move.w	d0,(f_restart).w
@@ -4344,8 +4365,10 @@ Cont_GotoLevel:
 		move.w	d0,(v_rings).w	; clear rings
 		move.l	d0,(v_time).w	; clear time
 		move.b	d0,(v_centstep).w
+		move.l  d0,(v_startscore).w ; clear start score
 		move.l	d0,(v_score).w	; clear score
 		move.b	d0,(v_lastlamp).w ; clear lamppost count
+		move.l	#5000,(v_scorelife).w ; extra life is awarded at 50000 points
 		subq.b	#1,(v_continues).w ; subtract 1 from continues
 		rts	
 ; ===========================================================================
@@ -4684,6 +4707,7 @@ EndingDemoLoad:
 		move.l	d0,(v_time).w	; clear time
 		move.b	d0,(v_centstep).w
 		move.l	d0,(v_score).w	; clear score
+		move.l  d0,(v_startscore).w ; clear start score
 		move.b	d0,(v_lastlamp).w ; clear lamppost counter
 		cmpi.w	#4,(v_creditsnum).w ; is SLZ demo running?
 		bne.s	EndDemo_Exit	; if not, branch

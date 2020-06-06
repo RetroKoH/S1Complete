@@ -38,7 +38,7 @@ SSR_Main:
 		addq.w	#1,d1		; if yes, add 1	to d1 (number of sprites)
 
 	SSR_Loop:
-		move.b	#id_SSResult,0(a1)
+		move.b	#id_SSResult,obID(a1)
 		move.w	(a2)+,obX(a1)	; load start x-position
 		move.w	(a2)+,ssr_mainX(a1) ; load main x-position
 		move.w	(a2)+,obScreenY(a1) ; load y-position
@@ -130,6 +130,8 @@ locret_C8EA:
 ; ===========================================================================
 
 SSR_Exit:	; Routine $A, $12
+		move.l  (v_score).w,(v_startscore).w ; set level starting score to prevent score padding.
+		clr.b   (v_lifecount).w              ; clear ring life counter
 		move.w	#1,(f_restart).w ; restart level
 		bra.w	DisplaySprite
 ; ===========================================================================

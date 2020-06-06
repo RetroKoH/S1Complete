@@ -181,14 +181,14 @@ Got_NextLevel:	; Routine $A
 		bra.s	Got_Display2
 
 	@notTimeAttack:
-		clr.b	(v_lifecount).w		; clear ring life counter for next zone.
+		move.l	(v_score).w,(v_startscore).w	; set starting score
+		clr.b	(v_lifecount).w					; clear ring life counter for next zone.
 		move.b	(v_zone).w,d0
 		cmpi.b 	#id_EndZ,d0
 		blt.s	@skip
 		subq.b	#1,d0
 
 	@skip:
-;		andi.w	#7,d0
 		lsl.w	#3,d0
 		move.b	(v_act).w,d1
 		andi.w	#3,d1
@@ -260,6 +260,8 @@ Got_SBZ2:
 		cmpi.b	#4,obFrame(a0)
 		bne.w	DeleteObject
 		addq.b	#2,obRoutine(a0)
+		move.l  (v_score).w,(v_startscore).w ; set level starting score for SBZ3
+		clr.b   (v_lifecount).w ; clear ring life count
 		clr.b	(f_lockctrl).w	; unlock controls
 		music	bgm_FZ,1,0,0	; play FZ music
 ; ===========================================================================
@@ -274,7 +276,8 @@ loc_C766:	; Routine $10
 		;    x-start,	x-main,	y-main,
 		;				routine, frame number
 
-Got_Config:	dc.w 4,		$124,	$BC		; "_____ HAS"		$D5C0
+Got_Config:
+		dc.w 4,		$124,	$BC		; "_____ HAS"		$D5C0
 		dc.b 				2,	0
 
 		dc.w -$120,	$120,	$D0			; "PASSED"			$D600
