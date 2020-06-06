@@ -57,13 +57,13 @@ M_Got_RBonus:	dc.b 7			; RING BONUS
 ; ---------------------------------------------------------------------------
 Map_SSR:	dc.w M_SSR_Chaos-Map_SSR
 		dc.w M_SSR_Score-Map_SSR
-		dc.w byte_CD0D-Map_SSR
+		dc.w M_SSR_RBonus-Map_SSR
 		dc.w M_Card_Oval-Map_SSR
-		dc.w byte_CD31-Map_SSR
-		dc.w byte_CD46-Map_SSR
-		dc.w byte_CD5B-Map_SSR
-		dc.w byte_CD6B-Map_SSR
-		dc.w byte_CDA8-Map_SSR
+		dc.w M_SSR_ContIcon1-Map_SSR
+		dc.w M_SSR_ContIcon2-Map_SSR
+		dc.w M_SSR_Continue-Map_SSR
+		dc.w M_SSR_SStage-Map_SSR
+		dc.w M_SSR_SonicGTA-Map_SSR
 M_SSR_Chaos:	dc.b $D			; "CHAOS EMERALDS"
 		dc.b $F8, 5, 0,	8, $90
 		dc.b $F8, 5, 0,	$1C, $A0
@@ -79,35 +79,35 @@ M_SSR_Chaos:	dc.b $D			; "CHAOS EMERALDS"
 		dc.b $F8, 5, 0,	$C, $50
 		dc.b $F8, 5, 0,	$3E, $60
 M_SSR_Score:	dc.b 6			; "SCORE"
-		dc.b $F8, $D, 1, $4A, $B0
-		dc.b $F8, 1, 1,	$62, $D0
+		dc.b $F8, $D, $41, $4A, $B0
+		dc.b $F8, 1, $41, $62, $D0
 		dc.b $F8, 9, 1,	$64, $18
 		dc.b $F8, $D, 1, $6A, $30
 		dc.b $F7, 4, 0,	$6E, $CD
 		dc.b $FF, 4, $18, $6E, $CD
-byte_CD0D:	dc.b 7
-		dc.b $F8, $D, 1, $52, $B0
-		dc.b $F8, $D, 0, $66, $D9
-		dc.b $F8, 1, 1,	$4A, $F9
+M_SSR_RBonus:	dc.b 7
+		dc.b $F8, $D, $41, $52, $B0
+		dc.b $F8, $D, $40, $66, $D9
+		dc.b $F8, 1, $41, $4A, $F9
 		dc.b $F7, 4, 0,	$6E, $F6
 		dc.b $FF, 4, $18, $6E, $F6
 		dc.b $F8, $D, $FF, $F8,	$28
 		dc.b $F8, 1, 1,	$70, $48
-byte_CD31:	dc.b 4
+M_SSR_ContIcon1:	dc.b 4
 		dc.b $F8, $D, $FF, $D1,	$B0
 		dc.b $F8, $D, $FF, $D9,	$D0
 		dc.b $F8, 1, $FF, $E1, $F0
 		dc.b $F8, 6, $1F, $E3, $40
-byte_CD46:	dc.b 4
+M_SSR_ContIcon2:	dc.b 4
 		dc.b $F8, $D, $FF, $D1,	$B0
 		dc.b $F8, $D, $FF, $D9,	$D0
 		dc.b $F8, 1, $FF, $E1, $F0
 		dc.b $F8, 6, $1F, $E9, $40
-byte_CD5B:	dc.b 3
+M_SSR_Continue:	dc.b 3
 		dc.b $F8, $D, $FF, $D1,	$B0
 		dc.b $F8, $D, $FF, $D9,	$D0
 		dc.b $F8, 1, $FF, $E1, $F0
-byte_CD6B:	dc.b $C			; "SPECIAL STAGE"
+M_SSR_SStage:	dc.b $C			; "SPECIAL STAGE"
 		dc.b $F8, 5, 0,	$3E, $9C
 		dc.b $F8, 5, 0,	$36, $AC
 		dc.b $F8, 5, 0,	$10, $BC
@@ -120,7 +120,7 @@ byte_CD6B:	dc.b $C			; "SPECIAL STAGE"
 		dc.b $F8, 5, 0,	0, $34
 		dc.b $F8, 5, 0,	$18, $44
 		dc.b $F8, 5, 0,	$10, $54
-byte_CDA8:	dc.b $F			; "SONIC GOT THEM ALL"
+M_SSR_SonicGTA:	dc.b $F			; "SONIC GOT THEM ALL"
 		dc.b $F8, 5, 0,	$3E, $88
 		dc.b $F8, 5, 0,	$32, $98
 		dc.b $F8, 5, 0,	$2E, $A8
