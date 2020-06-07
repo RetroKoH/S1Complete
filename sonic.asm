@@ -333,7 +333,7 @@ GameInit:
 		move.b	#id_Sega,(v_gamemode).w ; set Game Mode to Sega Screen
 
 InitSRAM:
-		move.b  #1,($A130F1).l	; Enable SRAM writing
+		move.b  #1,(SRAM_access_flag).l	; Enable SRAM writing
 		lea 	($200001).l,a0	; Load SRAM memory into a0 (Change the last digit to 0 if you're using even SRAM)
 		movep.l 0(a0),d0		; Get the existing string at the start of SRAM
 		move.l  #"SRAM",d1		; Write the string "SRAM" to d1
@@ -344,7 +344,7 @@ InitSRAM:
 		; Example - 8(a0) => $A(a0)
  
 	@Continue:
-        clr.b    ($A130F1).l	; Disable SRAM writing
+        clr.b    (SRAM_access_flag).l	; Disable SRAM writing
 
 MainGameLoop:
 		move.b	(v_gamemode).w,d0		; load Game Mode
@@ -2165,15 +2165,15 @@ Option_PlaySnd:
 ; ===========================================================================
 
 PlayLevel_Load:
-		move.b	#1,($A130F1).l			; enable SRAM (required)
+		move.b	#1,(SRAM_access_flag).l			; enable SRAM (required)
 		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
 		move.b	0(a1),d0	
-		clr.b	($A130F1).l				; disable SRAM (required)
+		clr.b	(SRAM_access_flag).l				; disable SRAM (required)
 
 		cmpi.b	#$FF,d0
 		beq.s	PlayLevel_New			; if no save game exists, make a new one
 
-		move.b	#1,($A130F1).l			; enable SRAM (required)
+		move.b	#1,(SRAM_access_flag).l			; enable SRAM (required)
 		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
 		movep.l	2(a1),d0				; load to d0 (cannot do directly)
 		move.l	d0,(v_optgamemode).w	; load correct game mode
@@ -2194,7 +2194,7 @@ PlayLevel_Load:
 		move.w	d0,(v_emeralds).w
 		movep.w	$26(a1),d0
 		move.w	d0,(v_redrings).w
-		clr.b	($A130F1).l		; disable SRAM (required)
+		clr.b	(SRAM_access_flag).l		; disable SRAM (required)
 
 		move.b	#id_Level,(v_gamemode).w ; set screen mode to $0C (level)
 		clr.w	(v_rings).w	; clear rings
@@ -2215,7 +2215,7 @@ PlayLevel_New:
 		move.b	#5,(v_lives).w	; set lives to 5
 
 	@notEasy:
-		move.b	#1,($A130F1).l			; enable SRAM (required)
+		move.b	#1,(SRAM_access_flag).l			; enable SRAM (required)
 		lea		($200009).l,a1			; base of SRAM + 9 (01-07 for init SRAM)
 		moveq	#0,d0
 		move.b	d0,0(a1) 				; init new game
@@ -2224,7 +2224,7 @@ PlayLevel_New:
 										; load correct difficulty
 										; load correct monitor setting
 		movep.l	d0,2(a1)				; load to d0 (cannot do directly)
-		clr.b	($A130F1).l				; disable SRAM (required)
+		clr.b	(SRAM_access_flag).l				; disable SRAM (required)
 
 		clr.w	(v_rings).w	; clear rings
 		clr.l	(v_time).w	; clear time
@@ -3225,7 +3225,7 @@ GM_Level:
 		bne.s	@NoSRAM				; if yes, branch
 		tst.b	(f_timeattack).w
 		bne.s	@NoSRAM
-		move.b	#1,($A130F1).l	; enable SRAM (required)
+		move.b	#1,(SRAM_access_flag).l	; enable SRAM (required)
 		lea		($200009).l,a1	; base of usable SRAM + 1
 		move.w	(v_zone).w,d0	; move zone and act number to d0 (we can't do it directly)
 		movep.w	d0,$A(a1)		; save zone and act to SRAM
@@ -3244,7 +3244,7 @@ GM_Level:
 		movep.w	d0,$22(a1)
 		move.w	(v_redrings).w,d0
 		movep.w	d0,$26(a1)
-		clr.b	($A130F1).l		; disable SRAM (required)
+		clr.b	(SRAM_access_flag).l		; disable SRAM (required)
 
 	@NoSRAM:
 		bsr.w	ClearPLC

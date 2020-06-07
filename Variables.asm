@@ -20,10 +20,16 @@ v_ringsroutine:				equ $FFFFB688 ; 1 byte
 v_ringstart_addr:			equ $FFFFB68A ; 2 bytes
 v_ringend_addr:				equ $FFFFB68C ; 2 bytes
 
+
+v_savegamedata:				equ $FFFFC500	; $94 bytes (New slot every 22 bytes)
+v_savegamepointer:			equ $FFFFC59F	; pointer to active save slot in Main Game
+v_timeattackdata:			equ $FFFFC5A0	; $21C bytes (Each entry takes up 6 bytes)
+;C7C0 - C7FF UNUSED
+
 VDP_Command_Buffer:			equ $FFFFC800	; Buffer for DMA Queue replacing the old art buffer.
 VDP_Command_Buffer_Slot:	equ $FFFFC8FC	; Stores the address of the next open slot for a queued VDP command
 
-; $FFFFC900-CAFF - UNUSED
+; $FFFFC900-C9FF - UNUSED
 v_boss_start_x:			equ $FFFFCA00
 v_boss_start_y:			equ $FFFFCA04
 f_boss_active:			equ $FFFFCA08

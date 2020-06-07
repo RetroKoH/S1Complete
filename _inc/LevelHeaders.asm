@@ -26,7 +26,7 @@ SBZ3_Art:		equ $A
 	lhead	plcid_SYZ,	LvlArt_SYZ,	plcid_SYZ2,	Blk16_SYZ,	Blk128_SYZ,	palid_SYZ	; Spring Yard
 	lhead	plcid_SBZ,	LvlArt_SBZ,	plcid_SBZ2,	Blk16_SBZ,	Blk128_SBZ,	palid_SBZ1	; Scrap Brain
 	lhead	0,			LvlArt_GHZ,			0,	Blk16_GHZ,	Blk128_GHZ,	palid_Ending	; Ending
-	lhead	plcid_GHZ,	LvlArt_GHZ,	plcid_GHZ2,	Blk16_GHZ,	Blk128_GHZ,	palid_BZ	; Bridge
+	lhead	plcid_GHZ,	LvlArt_BZ,	plcid_GHZ2,	Blk16_BZ,	Blk128_BZ,	palid_BZ	; Bridge
 	lhead	plcid_MZ,	LvlArt_MZ,	plcid_MZ2,	Blk16_MZ,	Blk128_MZ,	palid_MZ	; Jungle
 	lhead	plcid_SLZ,	LvlArt_SLZ,	plcid_SLZ2,	Blk16_SLZ,	Blk128_SLZ,	palid_SLZ	; Sky Base
 	lhead	plcid_LZ,	LvlArt_SBZ3,plcid_LZ2,	Blk16_SBZ3,	Blk128_SBZ3,palid_SBZ3	; Scrap Brain 3 (#$A)

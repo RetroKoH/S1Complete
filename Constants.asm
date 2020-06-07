@@ -29,6 +29,8 @@ ym2612_d0:				equ $A04001
 ym2612_a1:				equ $A04002
 ym2612_d1:				equ $A04003
 
+SRAM_access_flag: 		equ $A130F1
+
 security_addr:			equ $A14000
 
 ; Sound driver constants
